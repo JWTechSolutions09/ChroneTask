@@ -1,0 +1,21 @@
+# general
+.DS_Store
+Thumbs.db
+
+# env files
+.env
+.env.*
+
+# logs
+*.log
+
+# Node
+node_modules/
+dist/
+
+# .NET
+**/bin/
+**/obj/
+*.user
+*.suo
+.vs/
