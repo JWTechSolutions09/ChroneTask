@@ -1,0 +1,68 @@
+version: '3.8'
+
+services:
+  # Base de datos PostgreSQL
+  postgres:
+    image: postgres:16-alpine
+    container_name: chronetask-db
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-chronetask}
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-changeme}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - chronetask-network
+
+  # Backend API
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: chronetask-api
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ASPNETCORE_URLS=http://+:80
+      - ConnectionStrings__DefaultConnection=Host=postgres;Port=5432;Database=${POSTGRES_DB:-chronetask};Username=${POSTGRES_USER:-postgres};Password=${POSTGRES_PASSWORD:-changeme}
+      - JWT__SecretKey=${JWT_SECRET_KEY:-your-super-secret-key-change-in-production-min-32-chars}
+      - JWT__Issuer=${JWT_ISSUER:-ChroneTask}
+      - JWT__Audience=${JWT_AUDIENCE:-ChroneTask}
+      - JWT__ExpirationMinutes=${JWT_EXPIRATION_MINUTES:-1440}
+    ports:
+      - "5279:80"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - chronetask-network
+    restart: unless-stopped
+
+  # Frontend
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        - VITE_API_URL=${VITE_API_URL:-http://localhost:5279}
+    container_name: chronetask-frontend
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    networks:
+      - chronetask-network
+    restart: unless-stopped
+
+networks:
+  chronetask-network:
+    driver: bridge
+
+volumes:
+  postgres_data:

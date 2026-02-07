@@ -12,8 +12,11 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("Frontend", policy =>
     {
+        var allowedOrigins = builder.Configuration.GetSection("CORS:AllowedOrigins").Get<string[]>() 
+            ?? new[] { "http://localhost:5173", "http://localhost:5174" };
+        
         policy
-            .WithOrigins("http://localhost:5173", "http://localhost:5174")
+            .WithOrigins(allowedOrigins)
             .AllowAnyHeader()
             .AllowAnyMethod()
             .AllowCredentials();
@@ -61,8 +64,9 @@ builder.Services.AddDbContext<ChroneTaskDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 // ✅ JWT
-var jwt = builder.Configuration.GetSection("Jwt");
-var key = Encoding.UTF8.GetBytes(jwt["Key"]!);
+var jwt = builder.Configuration.GetSection("JWT");
+var secretKey = jwt["SecretKey"] ?? throw new InvalidOperationException("JWT SecretKey no configurado");
+var key = Encoding.UTF8.GetBytes(secretKey);
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 .AddJwtBearer(options =>

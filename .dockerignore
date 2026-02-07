@@ -13,27 +13,13 @@ frontend/dist/
 frontend/.vite/
 frontend/.env.local
 frontend/.env.development
-frontend/.env.production
 
-# Docker
-.env
-.env.local
-
-# IDE
+# General
+.git/
+.gitignore
+README.md
+*.md
 .vscode/
 .idea/
-*.swp
-*.swo
-*~
-
-# OS
-.DS_Store
-Thumbs.db
-
-# Logs
 *.log
-logs/
-
-# Database
-*.db
-*.sqlite
+.DS_Store
