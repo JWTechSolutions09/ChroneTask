@@ -79,6 +79,67 @@ docker run -d -p 80:80 chronetask-frontend
 
 ## ☁️ Deployment en Plataformas Cloud
 
+### Render.com
+
+#### Configuración del Backend:
+
+1. **Crear nuevo Web Service:**
+   - Conecta tu repositorio de GitHub
+   - **Root Directory**: `backend/ChroneTask.Api`
+   - **Environment**: `Docker`
+   - **Dockerfile Path**: `Dockerfile` (o deja en blanco para auto-detect)
+
+2. **Variables de Entorno:**
+   ```
+   ASPNETCORE_ENVIRONMENT=Production
+   ASPNETCORE_URLS=http://+:10000
+   ConnectionStrings__DefaultConnection=${{postgres.DATABASE_URL}}
+   JWT__SecretKey=tu-clave-secreta-minimo-32-caracteres
+   JWT__Issuer=ChroneTask
+   JWT__Audience=ChroneTask
+   JWT__ExpirationMinutes=1440
+   ```
+
+3. **PostgreSQL:**
+   - Crea un servicio PostgreSQL
+   - Conecta con el backend usando la variable `${{postgres.DATABASE_URL}}`
+   - Render automáticamente inyecta esta variable
+
+4. **Build Command (si no usas Docker):**
+   ```
+   dotnet restore && dotnet publish -c Release -o ./publish
+   ```
+
+5. **Start Command (si no usas Docker):**
+   ```
+   cd publish && dotnet ChroneTask.Api.dll
+   ```
+
+#### Configuración del Frontend:
+
+1. **Crear Static Site:**
+   - **Root Directory**: `frontend`
+   - **Build Command**: `npm install && npm run build`
+   - **Publish Directory**: `dist`
+
+2. **Variables de Entorno:**
+   ```
+   VITE_API_URL=https://tu-backend.onrender.com
+   ```
+
+3. **Nota importante:** El build del frontend debe ejecutarse con la variable `VITE_API_URL` configurada, ya que Vite la inyecta en tiempo de build.
+
+#### Ejecutar Migraciones en Render:
+
+```bash
+# Opción 1: Desde el shell de Render
+cd backend/ChroneTask.Api
+dotnet ef database update
+
+# Opción 2: Como parte del build (agregar al Build Command)
+dotnet restore && dotnet ef database update && dotnet publish -c Release -o ./publish
+```
+
 ### Railway
 
 1. **Conectar repositorio:**
@@ -87,7 +148,7 @@ docker run -d -p 80:80 chronetask-frontend
 
 2. **Configurar servicios:**
    - **PostgreSQL**: Agrega un servicio PostgreSQL
-   - **Backend**: Agrega servicio desde `backend/`
+   - **Backend**: Agrega servicio desde `backend/ChroneTask.Api`
    - **Frontend**: Agrega servicio desde `frontend/`
 
 3. **Variables de entorno (Backend):**
@@ -109,23 +170,6 @@ docker run -d -p 80:80 chronetask-frontend
    railway run --service backend dotnet ef database update
    ```
 
-### Render
-
-1. **Backend:**
-   - Tipo: Web Service
-   - Build Command: `cd backend && dotnet restore && dotnet publish -c Release -o ./publish`
-   - Start Command: `cd backend/publish && dotnet ChroneTask.Api.dll`
-   - Variables de entorno: (igual que Railway)
-
-2. **Frontend:**
-   - Tipo: Static Site
-   - Build Command: `cd frontend && npm install && npm run build`
-   - Publish Directory: `frontend/dist`
-
-3. **PostgreSQL:**
-   - Agrega servicio PostgreSQL
-   - Conecta con el backend usando la variable de entorno
-
 ### Azure
 
 1. **Crear recursos:**
@@ -137,7 +181,7 @@ docker run -d -p 80:80 chronetask-frontend
 
 2. **Deploy Backend:**
    ```bash
-   cd backend
+   cd backend/ChroneTask.Api
    dotnet publish -c Release
    az webapp deploy --resource-group chronetask-rg --name chronetask-api --src-path ./publish
    ```
@@ -197,7 +241,7 @@ openssl rand -base64 32
 
 ### Opción 1: Durante el deployment
 ```bash
-docker-compose exec backend dotnet ef database update
+docker-compose exec backend dotnet ef database update --project ChroneTask.Api
 ```
 
 ### Opción 2: Manualmente
@@ -213,14 +257,20 @@ dotnet ef migrations script -o migrations.sql
 # Luego ejecutar en tu base de datos
 ```
 
+### Opción 4: En Render (automático)
+Agrega al Build Command:
+```bash
+dotnet restore && dotnet ef database update && dotnet publish -c Release -o ./publish
+```
+
 ---
 
 ## ✅ Verificación Post-Deployment
 
 ### 1. Verificar Backend
 ```bash
-curl https://tu-api.com/api/auth/health
-# O visita: https://tu-api.com/swagger
+curl https://tu-api.com/
+# O visita: https://tu-api.com/swagger (si está habilitado)
 ```
 
 ### 2. Verificar Frontend
@@ -267,7 +317,7 @@ docker-compose logs -f frontend
 echo "Building ChroneTask..."
 docker-compose build
 docker-compose up -d
-docker-compose exec backend dotnet ef database update
+docker-compose exec backend dotnet ef database update --project ChroneTask.Api
 echo "Deployment complete!"
 ```
 
@@ -276,7 +326,7 @@ echo "Deployment complete!"
 Write-Host "Building ChroneTask..."
 docker-compose build
 docker-compose up -d
-docker-compose exec backend dotnet ef database update
+docker-compose exec backend dotnet ef database update --project ChroneTask.Api
 Write-Host "Deployment complete!"
 ```
 
@@ -301,6 +351,12 @@ Write-Host "Deployment complete!"
 - Verifica `VITE_API_URL` en el build
 - Revisa la consola del navegador
 - Verifica que el backend esté accesible
+
+### Error en Render: "/ChroneTask.Api/ChroneTask.Api.csproj": not found
+- **Solución**: Asegúrate de que:
+  - **Root Directory** en Render esté configurado como `backend/ChroneTask.Api`
+  - El **Dockerfile** esté en `backend/ChroneTask.Api/Dockerfile`
+  - El Dockerfile use rutas relativas al contexto (sin `ChroneTask.Api/` en las rutas)
 
 ---
 

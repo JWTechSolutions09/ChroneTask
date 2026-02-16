@@ -1,6 +1,7 @@
 # Dockerfile para Backend (ASP.NET Core)
-# Optimizado para Render.com con Root Directory: backend/ChroneTask.Api
-# El contexto de build es directamente ChroneTask.Api/, no backend/
+# Para uso con docker-compose (context: ./backend)
+# Si usas Render con Root Directory: backend/ChroneTask.Api
+# usa el Dockerfile en backend/ChroneTask.Api/Dockerfile
 
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
 WORKDIR /app
@@ -10,14 +11,15 @@ EXPOSE 443
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
 
-# Copiar el archivo .csproj (está en la raíz del contexto)
-COPY ["ChroneTask.Api.csproj", "./"]
-RUN dotnet restore "ChroneTask.Api.csproj"
+# Copiar el archivo .csproj desde la subcarpeta
+COPY ["ChroneTask.Api/ChroneTask.Api.csproj", "ChroneTask.Api/"]
+RUN dotnet restore "ChroneTask.Api/ChroneTask.Api.csproj"
 
 # Copiar el resto del código
 COPY . .
 
 # Build y publish
+WORKDIR "/src/ChroneTask.Api"
 RUN dotnet build "ChroneTask.Api.csproj" -c Release -o /app/build
 
 FROM build AS publish
