@@ -12,9 +12,9 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("Frontend", policy =>
     {
-        var allowedOrigins = builder.Configuration.GetSection("CORS:AllowedOrigins").Get<string[]>() 
+        var allowedOrigins = builder.Configuration.GetSection("CORS:AllowedOrigins").Get<string[]>()
             ?? new[] { "http://localhost:5173", "http://localhost:5174" };
-        
+
         policy
             .WithOrigins(allowedOrigins)
             .AllowAnyHeader()
@@ -60,8 +60,24 @@ builder.Services.AddSwaggerGen(c =>
 
 
 // ✅ DbContext (PostgreSQL)
+// Soporta tanto connection string tradicional como DATABASE_URL de Render
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+if (string.IsNullOrEmpty(connectionString))
+{
+    // Intentar usar DATABASE_URL de Render
+    var databaseUrl = Environment.GetEnvironmentVariable("DATABASE_URL");
+    if (!string.IsNullOrEmpty(databaseUrl))
+    {
+        // Render proporciona DATABASE_URL en formato: postgresql://user:pass@host:port/dbname
+        // Convertir a formato Npgsql: Host=host;Port=port;Database=dbname;Username=user;Password=pass
+        var uri = new Uri(databaseUrl);
+        var userInfo = uri.UserInfo.Split(':');
+        connectionString = $"Host={uri.Host};Port={uri.Port};Database={uri.LocalPath.TrimStart('/')};Username={userInfo[0]};Password={userInfo[1]};SSL Mode=Require;Trust Server Certificate=true";
+    }
+}
+
 builder.Services.AddDbContext<ChroneTaskDbContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+    options.UseNpgsql(connectionString ?? throw new InvalidOperationException("Connection string no configurado")));
 
 // ✅ JWT
 var jwt = builder.Configuration.GetSection("JWT");
