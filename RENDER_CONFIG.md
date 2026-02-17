@@ -57,14 +57,11 @@ Ve a tu servicio de backend en Render y configura estas variables de entorno:
    ```
    (24 horas)
 
-8. **CORS__AllowedOrigins** (URL de tu frontend)
+8. **CORS__AllowedOrigins** (URLs permitidas, separadas por comas)
    ```
-   https://tu-frontend.onrender.com
+   http://localhost:5173,http://localhost:5174,https://tu-frontend.onrender.com
    ```
-   O si aún no tienes frontend:
-   ```
-   http://localhost:5173,https://chronetask-1.onrender.com
-   ```
+   **⚠️ IMPORTANTE:** Incluye `http://localhost:5173` si vas a probar desde tu máquina local.
 
 ## 🔧 Configuración Paso a Paso
 

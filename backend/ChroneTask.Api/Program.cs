@@ -12,8 +12,29 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("Frontend", policy =>
     {
-        var allowedOrigins = builder.Configuration.GetSection("CORS:AllowedOrigins").Get<string[]>()
-            ?? new[] { "http://localhost:5173", "http://localhost:5174" };
+        // Intentar obtener orígenes desde configuración
+        var allowedOrigins = builder.Configuration.GetSection("CORS:AllowedOrigins").Get<string[]>();
+
+        // Si no hay configuración, intentar desde variable de entorno (separada por comas)
+        if (allowedOrigins == null || allowedOrigins.Length == 0)
+        {
+            var corsEnv = Environment.GetEnvironmentVariable("CORS__AllowedOrigins");
+            if (!string.IsNullOrEmpty(corsEnv))
+            {
+                allowedOrigins = corsEnv.Split(',', StringSplitOptions.RemoveEmptyEntries)
+                    .Select(o => o.Trim())
+                    .Where(o => !string.IsNullOrEmpty(o))
+                    .ToArray();
+            }
+        }
+
+        // Fallback a valores por defecto para desarrollo local
+        if (allowedOrigins == null || allowedOrigins.Length == 0)
+        {
+            allowedOrigins = new[] { "http://localhost:5173", "http://localhost:5174" };
+        }
+
+        Console.WriteLine($"🌐 CORS configurado con orígenes: {string.Join(", ", allowedOrigins)}");
 
         policy
             .WithOrigins(allowedOrigins)
