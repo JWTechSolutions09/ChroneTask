@@ -16,6 +16,10 @@ builder.Services.AddCors(options =>
         // Para producción, puedes restringir esto más tarde
         var allowAllOrigins = Environment.GetEnvironmentVariable("CORS__AllowAll") == "true";
 
+        // Debug: Ver qué valor tiene la variable
+        var corsAllowAllValue = Environment.GetEnvironmentVariable("CORS__AllowAll");
+        Console.WriteLine($"🔍 CORS__AllowAll value: '{corsAllowAllValue}' (allowAllOrigins: {allowAllOrigins})");
+
         if (allowAllOrigins)
         {
             Console.WriteLine("🌐 CORS configurado: Permitir TODOS los orígenes");
