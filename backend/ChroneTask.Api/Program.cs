@@ -12,61 +12,17 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("Frontend", policy =>
     {
-        // SOLUCIÓN SIMPLE: Permitir todos los orígenes (menos seguro pero funciona)
-        // Para producción, puedes restringir esto más tarde
-        var allowAllOrigins = Environment.GetEnvironmentVariable("CORS__AllowAll") == "true";
+        // SOLUCIÓN DIRECTA: Permitir TODOS los orígenes por defecto
+        // Esto elimina completamente los problemas de CORS
+        Console.WriteLine("🌐 CORS configurado: Permitir TODOS los orígenes (AllowAnyOrigin)");
 
-        // Debug: Ver qué valor tiene la variable
-        var corsAllowAllValue = Environment.GetEnvironmentVariable("CORS__AllowAll");
-        Console.WriteLine($"🔍 CORS__AllowAll value: '{corsAllowAllValue}' (allowAllOrigins: {allowAllOrigins})");
+        policy
+            .AllowAnyOrigin()  // Permite cualquier origen - sin restricciones
+            .AllowAnyHeader()   // Permite cualquier header
+            .AllowAnyMethod();  // Permite cualquier método (GET, POST, PUT, DELETE, etc.)
 
-        if (allowAllOrigins)
-        {
-            Console.WriteLine("🌐 CORS configurado: Permitir TODOS los orígenes");
-            policy
-                .AllowAnyOrigin()  // Permite cualquier origen
-                .AllowAnyHeader()
-                .AllowAnyMethod();
-            // NOTA: AllowAnyOrigin() NO es compatible con AllowCredentials()
-        }
-        else
-        {
-            // Configuración específica de orígenes (más segura)
-            var allowedOrigins = (string[]?)null;
-            var corsEnv = Environment.GetEnvironmentVariable("CORS__AllowedOrigins");
-            if (!string.IsNullOrEmpty(corsEnv))
-            {
-                allowedOrigins = corsEnv.Split(',', StringSplitOptions.RemoveEmptyEntries)
-                    .Select(o => o.Trim())
-                    .Where(o => !string.IsNullOrEmpty(o) && !o.Contains("${"))
-                    .ToArray();
-            }
-
-            if (allowedOrigins == null || allowedOrigins.Length == 0)
-            {
-                var configOrigins = builder.Configuration.GetSection("CORS:AllowedOrigins").Get<string[]>();
-                if (configOrigins != null && configOrigins.Length > 0)
-                {
-                    allowedOrigins = configOrigins
-                        .Where(o => !string.IsNullOrEmpty(o) && !o.Contains("${"))
-                        .ToArray();
-                }
-            }
-
-            if (allowedOrigins == null || allowedOrigins.Length == 0)
-            {
-                allowedOrigins = new[] { "http://localhost:5173", "http://localhost:5174" };
-            }
-
-            Console.WriteLine($"🌐 CORS configurado con orígenes: {string.Join(", ", allowedOrigins)}");
-
-            policy
-                .WithOrigins(allowedOrigins)
-                .AllowAnyHeader()
-                .AllowAnyMethod()
-                .AllowCredentials()
-                .SetPreflightMaxAge(TimeSpan.FromSeconds(3600));
-        }
+        // NOTA: AllowAnyOrigin() NO es compatible con AllowCredentials()
+        // Si necesitas AllowCredentials() más tarde, tendrás que usar WithOrigins() específicos
     });
 });
 
