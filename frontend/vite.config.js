@@ -10,4 +10,14 @@ export default defineConfig({
       },
     }),
   ],
+  server: {
+    proxy: {
+      // Proxy para desarrollo local - evita problemas de CORS
+      '/api': {
+        target: 'https://chronetask-1.onrender.com',
+        changeOrigin: true,
+        secure: true,
+      },
+    },
+  },
 })

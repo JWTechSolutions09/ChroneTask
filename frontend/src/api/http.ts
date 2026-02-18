@@ -10,7 +10,16 @@ export const setNavigateFunction = (navigate: (path: string) => void) => {
 
 // Obtener la URL de la API desde variables de entorno
 const getApiUrl = () => {
-  // En Vite, las variables de entorno deben empezar con VITE_
+  // En desarrollo local, usar el proxy de Vite (sin CORS)
+  const isDevelopment = window.location.hostname === 'localhost' || 
+                        window.location.hostname === '127.0.0.1';
+  
+  if (isDevelopment) {
+    // En desarrollo, usar el proxy de Vite (relativo, sin CORS)
+    return ''; // URL relativa usa el proxy de Vite
+  }
+  
+  // En producción, usar la URL completa
   const apiUrl = import.meta.env.VITE_API_URL;
   
   if (apiUrl) {
@@ -18,21 +27,10 @@ const getApiUrl = () => {
     return apiUrl;
   }
   
-  // Detectar si estamos en producción (hostname no es localhost)
-  const isProduction = window.location.hostname !== 'localhost' && 
-                       window.location.hostname !== '127.0.0.1';
-  
-  if (isProduction) {
-    // URL por defecto para producción (Render)
-    const prodUrl = 'https://chronetask-1.onrender.com';
-    console.log('🌐 API URL (producción detectada):', prodUrl);
-    return prodUrl;
-  }
-  
-  // URL por defecto para desarrollo local
-  const devUrl = 'http://localhost:5279';
-  console.log('🌐 API URL (desarrollo local):', devUrl);
-  return devUrl;
+  // URL por defecto para producción (Render)
+  const prodUrl = 'https://chronetask-1.onrender.com';
+  console.log('🌐 API URL (producción):', prodUrl);
+  return prodUrl;
 };
 
 const apiBaseURL = getApiUrl();

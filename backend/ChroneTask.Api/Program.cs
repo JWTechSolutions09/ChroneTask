@@ -12,35 +12,57 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("Frontend", policy =>
     {
-        // Intentar obtener orígenes desde configuración
-        var allowedOrigins = builder.Configuration.GetSection("CORS:AllowedOrigins").Get<string[]>();
+        // SOLUCIÓN SIMPLE: Permitir todos los orígenes (menos seguro pero funciona)
+        // Para producción, puedes restringir esto más tarde
+        var allowAllOrigins = Environment.GetEnvironmentVariable("CORS__AllowAll") == "true";
 
-        // Si no hay configuración, intentar desde variable de entorno (separada por comas)
-        if (allowedOrigins == null || allowedOrigins.Length == 0)
+        if (allowAllOrigins)
         {
+            Console.WriteLine("🌐 CORS configurado: Permitir TODOS los orígenes");
+            policy
+                .AllowAnyOrigin()  // Permite cualquier origen
+                .AllowAnyHeader()
+                .AllowAnyMethod();
+            // NOTA: AllowAnyOrigin() NO es compatible con AllowCredentials()
+        }
+        else
+        {
+            // Configuración específica de orígenes (más segura)
+            var allowedOrigins = (string[]?)null;
             var corsEnv = Environment.GetEnvironmentVariable("CORS__AllowedOrigins");
             if (!string.IsNullOrEmpty(corsEnv))
             {
                 allowedOrigins = corsEnv.Split(',', StringSplitOptions.RemoveEmptyEntries)
                     .Select(o => o.Trim())
-                    .Where(o => !string.IsNullOrEmpty(o))
+                    .Where(o => !string.IsNullOrEmpty(o) && !o.Contains("${"))
                     .ToArray();
             }
+
+            if (allowedOrigins == null || allowedOrigins.Length == 0)
+            {
+                var configOrigins = builder.Configuration.GetSection("CORS:AllowedOrigins").Get<string[]>();
+                if (configOrigins != null && configOrigins.Length > 0)
+                {
+                    allowedOrigins = configOrigins
+                        .Where(o => !string.IsNullOrEmpty(o) && !o.Contains("${"))
+                        .ToArray();
+                }
+            }
+
+            if (allowedOrigins == null || allowedOrigins.Length == 0)
+            {
+                allowedOrigins = new[] { "http://localhost:5173", "http://localhost:5174" };
+            }
+
+            Console.WriteLine($"🌐 CORS configurado con orígenes: {string.Join(", ", allowedOrigins)}");
+
+            policy
+                .WithOrigins(allowedOrigins)
+                .AllowAnyHeader()
+                .AllowAnyMethod()
+                .AllowCredentials()
+                .SetPreflightMaxAge(TimeSpan.FromSeconds(3600));
         }
-
-        // Fallback a valores por defecto para desarrollo local
-        if (allowedOrigins == null || allowedOrigins.Length == 0)
-        {
-            allowedOrigins = new[] { "http://localhost:5173", "http://localhost:5174" };
-        }
-
-        Console.WriteLine($"🌐 CORS configurado con orígenes: {string.Join(", ", allowedOrigins)}");
-
-        policy
-            .WithOrigins(allowedOrigins)
-            .AllowAnyHeader()
-            .AllowAnyMethod()
-            .AllowCredentials();
     });
 });
 
@@ -124,7 +146,8 @@ builder.Services.AddAuthorization();
 
 var app = builder.Build();
 
-// ✅ CORS debe estar antes de otros middlewares
+// ✅ CORS debe estar ANTES de cualquier otro middleware
+// IMPORTANTE: UseCors debe estar antes de UseRouting y otros middlewares
 app.UseCors("Frontend");
 
 // ✅ Swagger solo en Development

@@ -17,7 +17,7 @@ JWT__SecretKey=Chrone_Task_Secret_090304_Render
 JWT__Issuer=ChroneTask
 JWT__Audience=ChroneTaskUsers
 JWT__ExpirationMinutes=1440
-CORS__AllowedOrigins=http://localhost:5173,http://localhost:5174
+CORS__AllowedOrigins=.
 ```
 
 ## 🔧 Cambios Necesarios
