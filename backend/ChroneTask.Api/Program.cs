@@ -65,22 +65,42 @@ builder.Services.AddSwaggerGen(c =>
 // ✅ DbContext (PostgreSQL)
 // Soporta tanto connection string tradicional como DATABASE_URL de Render
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-if (string.IsNullOrEmpty(connectionString))
+
+// Si la connection string está vacía o contiene variables no expandidas, intentar DATABASE_URL
+if (string.IsNullOrEmpty(connectionString) || connectionString.Contains("${"))
 {
     // Intentar usar DATABASE_URL de Render
     var databaseUrl = Environment.GetEnvironmentVariable("DATABASE_URL");
     if (!string.IsNullOrEmpty(databaseUrl))
     {
-        // Render proporciona DATABASE_URL en formato: postgresql://user:pass@host:port/dbname
-        // Convertir a formato Npgsql: Host=host;Port=port;Database=dbname;Username=user;Password=pass
-        var uri = new Uri(databaseUrl);
-        var userInfo = uri.UserInfo.Split(':');
-        connectionString = $"Host={uri.Host};Port={uri.Port};Database={uri.LocalPath.TrimStart('/')};Username={userInfo[0]};Password={userInfo[1]};SSL Mode=Require;Trust Server Certificate=true";
+        try
+        {
+            // Render proporciona DATABASE_URL en formato: postgresql://user:pass@host:port/dbname
+            // Convertir a formato Npgsql: Host=host;Port=port;Database=dbname;Username=user;Password=pass
+            var uri = new Uri(databaseUrl);
+            var userInfo = uri.UserInfo.Split(':');
+            if (userInfo.Length >= 2)
+            {
+                connectionString = $"Host={uri.Host};Port={uri.Port};Database={uri.LocalPath.TrimStart('/')};Username={userInfo[0]};Password={Uri.UnescapeDataString(userInfo[1])};SSL Mode=Require;Trust Server Certificate=true";
+                Console.WriteLine($"✅ Connection string construida desde DATABASE_URL");
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"❌ Error procesando DATABASE_URL: {ex.Message}");
+        }
     }
 }
 
+if (string.IsNullOrEmpty(connectionString))
+{
+    throw new InvalidOperationException("Connection string no configurado. Verifica ConnectionStrings__DefaultConnection o DATABASE_URL");
+}
+
+Console.WriteLine($"🔗 Usando base de datos: {connectionString.Split(';').FirstOrDefault(s => s.StartsWith("Database="))?.Replace("Database=", "") ?? "N/A"}");
+
 builder.Services.AddDbContext<ChroneTaskDbContext>(options =>
-    options.UseNpgsql(connectionString ?? throw new InvalidOperationException("Connection string no configurado")));
+    options.UseNpgsql(connectionString));
 
 // ✅ JWT
 var jwt = builder.Configuration.GetSection("JWT");
