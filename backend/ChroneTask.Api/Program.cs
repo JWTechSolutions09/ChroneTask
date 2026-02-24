@@ -158,6 +158,29 @@ builder.Services.AddAuthorization();
 
 var app = builder.Build();
 
+// ✅ Ejecutar migraciones automáticamente al iniciar
+try
+{
+    using (var scope = app.Services.CreateScope())
+    {
+        var dbContext = scope.ServiceProvider.GetRequiredService<ChroneTaskDbContext>();
+        Console.WriteLine("🔄 Aplicando migraciones de base de datos...");
+        dbContext.Database.Migrate();
+        Console.WriteLine("✅ Migraciones aplicadas correctamente");
+    }
+}
+catch (Exception ex)
+{
+    Console.WriteLine($"❌ Error aplicando migraciones: {ex.Message}");
+    Console.WriteLine($"Stack trace: {ex.StackTrace}");
+    if (ex.InnerException != null)
+    {
+        Console.WriteLine($"Inner exception: {ex.InnerException.Message}");
+    }
+    // No lanzar excepción aquí para permitir que la aplicación inicie
+    // Las migraciones se pueden ejecutar manualmente si es necesario
+}
+
 // ✅ CORS debe estar ANTES de cualquier otro middleware
 // IMPORTANTE: UseCors debe estar antes de UseRouting y otros middlewares
 app.UseCors("Frontend");
