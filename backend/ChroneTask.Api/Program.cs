@@ -66,6 +66,34 @@ builder.Services.AddSwaggerGen(c =>
 // Soporta tanto connection string tradicional como DATABASE_URL de Render
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 
+// Función helper para convertir URL de PostgreSQL a connection string de Npgsql
+string? ConvertPostgresUrlToConnectionString(string postgresUrl)
+{
+    try
+    {
+        // Render proporciona DATABASE_URL en formato: postgresql://user:pass@host:port/dbname
+        // También puede venir con dominio completo: postgresql://user:pass@host.oregon-postgres.render.com:port/dbname
+        // Convertir a formato Npgsql: Host=host;Port=port;Database=dbname;Username=user;Password=pass
+        var uri = new Uri(postgresUrl);
+        var userInfo = uri.UserInfo.Split(':');
+        if (userInfo.Length >= 2)
+        {
+            var host = uri.Host;
+            var port = uri.Port > 0 ? uri.Port : 5432; // Puerto por defecto de PostgreSQL
+            var database = uri.LocalPath.TrimStart('/');
+            var username = userInfo[0];
+            var password = Uri.UnescapeDataString(userInfo[1]);
+            
+            return $"Host={host};Port={port};Database={database};Username={username};Password={password};SSL Mode=Require;Trust Server Certificate=true";
+        }
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"❌ Error procesando URL de PostgreSQL: {ex.Message}");
+    }
+    return null;
+}
+
 // Si la connection string está vacía o contiene variables no expandidas, intentar DATABASE_URL
 if (string.IsNullOrEmpty(connectionString) || connectionString.Contains("${"))
 {
@@ -73,22 +101,23 @@ if (string.IsNullOrEmpty(connectionString) || connectionString.Contains("${"))
     var databaseUrl = Environment.GetEnvironmentVariable("DATABASE_URL");
     if (!string.IsNullOrEmpty(databaseUrl))
     {
-        try
+        var converted = ConvertPostgresUrlToConnectionString(databaseUrl);
+        if (!string.IsNullOrEmpty(converted))
         {
-            // Render proporciona DATABASE_URL en formato: postgresql://user:pass@host:port/dbname
-            // Convertir a formato Npgsql: Host=host;Port=port;Database=dbname;Username=user;Password=pass
-            var uri = new Uri(databaseUrl);
-            var userInfo = uri.UserInfo.Split(':');
-            if (userInfo.Length >= 2)
-            {
-                connectionString = $"Host={uri.Host};Port={uri.Port};Database={uri.LocalPath.TrimStart('/')};Username={userInfo[0]};Password={Uri.UnescapeDataString(userInfo[1])};SSL Mode=Require;Trust Server Certificate=true";
-                Console.WriteLine($"✅ Connection string construida desde DATABASE_URL");
-            }
+            connectionString = converted;
+            Console.WriteLine($"✅ Connection string construida desde DATABASE_URL");
         }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"❌ Error procesando DATABASE_URL: {ex.Message}");
-        }
+    }
+}
+// Si la connection string viene en formato URI de PostgreSQL, convertirla automáticamente
+else if (connectionString.StartsWith("postgresql://", StringComparison.OrdinalIgnoreCase) || 
+         connectionString.StartsWith("postgres://", StringComparison.OrdinalIgnoreCase))
+{
+    var converted = ConvertPostgresUrlToConnectionString(connectionString);
+    if (!string.IsNullOrEmpty(converted))
+    {
+        connectionString = converted;
+        Console.WriteLine($"✅ Connection string convertida desde formato URI de PostgreSQL");
     }
 }
 
