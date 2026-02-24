@@ -11,6 +11,11 @@ import { setNavigateFunction } from "./api/http";
 import type { ReactElement } from "react";
 
 function PrivateRoute({ children }: { children: ReactElement }) {
+    // TEMPORALMENTE DESHABILITADO: Permitir acceso sin autenticación
+    // TODO: Restaurar la validación cuando se reactive la autenticación
+    return children;
+    
+    /* CÓDIGO ORIGINAL COMENTADO
     const [isChecking, setIsChecking] = React.useState(true);
     const [isAuthenticated, setIsAuthenticated] = React.useState(false);
 
@@ -39,9 +44,15 @@ function PrivateRoute({ children }: { children: ReactElement }) {
     }
 
     return isAuthenticated ? children : <Navigate to="/login" replace />;
+    */
 }
 
 function PublicRoute({ children }: { children: ReactElement }) {
+    // TEMPORALMENTE DESHABILITADO: Permitir acceso sin verificar autenticación
+    // TODO: Restaurar la validación cuando se reactive la autenticación
+    return children;
+    
+    /* CÓDIGO ORIGINAL COMENTADO
     const [isChecking, setIsChecking] = React.useState(true);
     const [isAuthenticated, setIsAuthenticated] = React.useState(false);
 
@@ -70,6 +81,7 @@ function PublicRoute({ children }: { children: ReactElement }) {
     }
 
     return !isAuthenticated ? children : <Navigate to="/org-select" replace />;
+    */
 }
 
 function AppContent() {
@@ -141,7 +153,9 @@ function AppContent() {
             <Route
                 path="*"
                 element={
-                    <Navigate to={isAuthed() ? "/org-select" : "/login"} replace />
+                    // TEMPORALMENTE DESHABILITADO: Redirigir directamente sin verificar autenticación
+                    <Navigate to="/org-select" replace />
+                    // <Navigate to={isAuthed() ? "/org-select" : "/login"} replace />
                 }
             />
         </Routes>

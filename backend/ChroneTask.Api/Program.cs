@@ -142,8 +142,9 @@ if (app.Environment.IsDevelopment())
 
 
 
-app.UseAuthentication();
-app.UseAuthorization();
+// TEMPORALMENTE DESHABILITADO PARA VALIDACIÓN
+// app.UseAuthentication();
+// app.UseAuthorization();
 
 app.MapControllers();
 

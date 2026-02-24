@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ChroneTask.Api.Controllers;
 
-[Authorize]
+// [Authorize] // TEMPORALMENTE DESHABILITADO PARA VALIDACIÓN
 [ApiController]
 [Route("api/orgs/{organizationId:guid}/projects")]
 public class ProjectsController : ControllerBase

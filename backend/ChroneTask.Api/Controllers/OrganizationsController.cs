@@ -8,7 +8,7 @@ using ChroneTask.Api.Helpers;
 
 namespace ChroneTask.Api.Controllers;
 
-[Authorize]
+// [Authorize] // TEMPORALMENTE DESHABILITADO PARA VALIDACIÓN
 [ApiController]
 [Route("api/orgs")]
 public class OrganizationsController : ControllerBase
