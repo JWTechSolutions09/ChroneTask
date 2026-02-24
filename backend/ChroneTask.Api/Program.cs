@@ -142,9 +142,6 @@ if (app.Environment.IsDevelopment())
 
 //app.UseHttpsRedirection();
 
-
-
-
 // TEMPORALMENTE DESHABILITADO PARA VALIDACIÓN
 // app.UseAuthentication();
 // app.UseAuthorization();
