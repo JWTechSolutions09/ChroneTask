@@ -111,40 +111,63 @@ public class OrganizationsController : ControllerBase
     [HttpPost]
     public async Task<ActionResult<OrganizationResponse>> Create([FromBody] OrganizationCreateRequest request)
     {
-        var userId = UserContext.GetUserId(User);
-
-        if (!string.IsNullOrWhiteSpace(request.Slug))
+        try
         {
-            var existsSlug = await _db.Organizations.AnyAsync(x => x.Slug == request.Slug);
-            if (existsSlug)
-                return Conflict(new { message = "Slug already exists." });
+            var userId = UserContext.GetUserId(User);
+
+            if (!string.IsNullOrWhiteSpace(request.Slug))
+            {
+                var existsSlug = await _db.Organizations.AnyAsync(x => x.Slug == request.Slug);
+                if (existsSlug)
+                    return Conflict(new { message = "Slug already exists." });
+            }
+
+            var org = new Organization
+            {
+                Name = request.Name.Trim(),
+                Slug = string.IsNullOrWhiteSpace(request.Slug) ? null : request.Slug.Trim()
+            };
+
+            _db.Organizations.Add(org);
+
+            // TEMPORALMENTE: Solo crear OrganizationMember si hay un userId válido (no Guid.Empty)
+            if (userId != Guid.Empty)
+            {
+                _db.OrganizationMembers.Add(new OrganizationMember
+                {
+                    Organization = org,
+                    UserId = userId,
+                    Role = "org_admin"
+                });
+            }
+
+                await _db.SaveChangesAsync();
+
+            return CreatedAtAction(nameof(GetById), new { id = org.Id }, new OrganizationResponse
+            {
+                Id = org.Id,
+                Name = org.Name,
+                Slug = org.Slug,
+                IsActive = org.IsActive,
+                CreatedAt = org.CreatedAt
+            });
         }
-
-        var org = new Organization
+        catch (Exception ex)
         {
-            Name = request.Name.Trim(),
-            Slug = string.IsNullOrWhiteSpace(request.Slug) ? null : request.Slug.Trim()
-        };
-
-        _db.Organizations.Add(org);
-
-        _db.OrganizationMembers.Add(new OrganizationMember
-        {
-            Organization = org,
-            UserId = userId,
-            Role = "org_admin"
-        });
-
-        await _db.SaveChangesAsync();
-
-        return CreatedAtAction(nameof(GetById), new { id = org.Id }, new OrganizationResponse
-        {
-            Id = org.Id,
-            Name = org.Name,
-            Slug = org.Slug,
-            IsActive = org.IsActive,
-            CreatedAt = org.CreatedAt
-        });
+            // Log del error para debugging
+            Console.WriteLine($"❌ Error en Create: {ex.Message}");
+            Console.WriteLine($"Stack trace: {ex.StackTrace}");
+            if (ex.InnerException != null)
+            {
+                Console.WriteLine($"Inner exception: {ex.InnerException.Message}");
+            }
+            
+            return StatusCode(500, new { 
+                error = "Internal Server Error", 
+                message = ex.Message,
+                details = ex.InnerException?.Message 
+            });
+        }
     }
 
 
