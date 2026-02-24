@@ -162,6 +162,34 @@ var app = builder.Build();
 // IMPORTANTE: UseCors debe estar antes de UseRouting y otros middlewares
 app.UseCors("Frontend");
 
+// ✅ Middleware de manejo de excepciones para asegurar que CORS se envíe incluso en errores
+app.Use(async (context, next) =>
+{
+    try
+    {
+        await next();
+    }
+    catch (Exception ex)
+    {
+        // Asegurar que los headers de CORS se envíen incluso en errores
+        context.Response.Headers.Add("Access-Control-Allow-Origin", "*");
+        context.Response.Headers.Add("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, PATCH, OPTIONS");
+        context.Response.Headers.Add("Access-Control-Allow-Headers", "*");
+        
+        context.Response.StatusCode = 500;
+        context.Response.ContentType = "application/json";
+        
+        var errorResponse = new
+        {
+            error = "Internal Server Error",
+            message = app.Environment.IsDevelopment() ? ex.Message : "An error occurred while processing your request",
+            stackTrace = app.Environment.IsDevelopment() ? ex.StackTrace : null
+        };
+        
+        await context.Response.WriteAsJsonAsync(errorResponse);
+    }
+});
+
 // ✅ Swagger solo en Development
 if (app.Environment.IsDevelopment())
 {
