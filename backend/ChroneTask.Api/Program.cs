@@ -132,8 +132,6 @@ builder.Services.AddDbContext<ChroneTaskDbContext>(options =>
     options.UseNpgsql(connectionString));
 
 // ✅ JWT
-// TEMPORALMENTE DESHABILITADO PARA VALIDACIÓN
-/*
 var jwt = builder.Configuration.GetSection("JWT");
 var secretKey = jwt["SecretKey"] ?? throw new InvalidOperationException("JWT SecretKey no configurado");
 var key = Encoding.UTF8.GetBytes(secretKey);
@@ -154,7 +152,6 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 });
 
 builder.Services.AddAuthorization();
-*/
 
 var app = builder.Build();
 
@@ -240,9 +237,8 @@ if (app.Environment.IsDevelopment())
 
 //app.UseHttpsRedirection();
 
-// TEMPORALMENTE DESHABILITADO PARA VALIDACIÓN
-// app.UseAuthentication();
-// app.UseAuthorization();
+app.UseAuthentication();
+app.UseAuthorization();
 
 app.MapControllers();
 

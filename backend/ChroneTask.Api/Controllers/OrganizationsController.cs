@@ -8,7 +8,7 @@ using ChroneTask.Api.Helpers;
 
 namespace ChroneTask.Api.Controllers;
 
-// [Authorize] // TEMPORALMENTE DESHABILITADO PARA VALIDACIÓN
+[Authorize]
 [ApiController]
 [Route("api/orgs")]
 public class OrganizationsController : ControllerBase
@@ -26,34 +26,21 @@ public class OrganizationsController : ControllerBase
     {
         try
         {
-            var userId = UserContext.GetUserId(User);
+        var userId = UserContext.GetUserId(User);
 
-            // TEMPORALMENTE: Si no hay autenticación (userId == Guid.Empty), retornar todas las organizaciones
-            var items = userId == Guid.Empty
-                ? await _db.Organizations
-                    .OrderByDescending(o => o.CreatedAt)
-                    .Select(o => new OrganizationResponse
-                    {
-                        Id = o.Id,
-                        Name = o.Name,
-                        Slug = o.Slug,
-                        IsActive = o.IsActive,
-                        CreatedAt = o.CreatedAt
-                    })
-                    .ToListAsync()
-                : await _db.OrganizationMembers
-                    .Where(m => m.UserId == userId)
-                    .Select(m => m.Organization)
-                    .OrderByDescending(o => o.CreatedAt)
-                    .Select(o => new OrganizationResponse
-                    {
-                        Id = o.Id,
-                        Name = o.Name,
-                        Slug = o.Slug,
-                        IsActive = o.IsActive,
-                        CreatedAt = o.CreatedAt
-                    })
-                    .ToListAsync();
+        var items = await _db.OrganizationMembers
+            .Where(m => m.UserId == userId)
+            .Select(m => m.Organization)
+            .OrderByDescending(o => o.CreatedAt)
+            .Select(o => new OrganizationResponse
+            {
+                Id = o.Id,
+                Name = o.Name,
+                Slug = o.Slug,
+                IsActive = o.IsActive,
+                CreatedAt = o.CreatedAt
+            })
+            .ToListAsync();
 
             return Ok(items);
         }
@@ -88,14 +75,10 @@ public class OrganizationsController : ControllerBase
 
         if (org is null) return NotFound();
 
-        // TEMPORALMENTE: Si no hay autenticación, permitir acceso
-        if (userId != Guid.Empty)
-        {
-            // Verificar que el usuario es miembro de la organización
-            var isMember = org.OrganizationMembers.Any(m => m.UserId == userId);
-            if (!isMember)
-                return StatusCode(403, new { message = "You are not a member of this organization" });
-        }
+        // Verificar que el usuario es miembro de la organización
+        var isMember = org.OrganizationMembers.Any(m => m.UserId == userId);
+        if (!isMember)
+            return StatusCode(403, new { message = "You are not a member of this organization" });
 
         return Ok(new OrganizationResponse
         {
@@ -130,16 +113,12 @@ public class OrganizationsController : ControllerBase
 
             _db.Organizations.Add(org);
 
-            // TEMPORALMENTE: Solo crear OrganizationMember si hay un userId válido (no Guid.Empty)
-            if (userId != Guid.Empty)
+            _db.OrganizationMembers.Add(new OrganizationMember
             {
-                _db.OrganizationMembers.Add(new OrganizationMember
-                {
-                    Organization = org,
-                    UserId = userId,
-                    Role = "org_admin"
-                });
-            }
+                Organization = org,
+                UserId = userId,
+                Role = "org_admin"
+            });
 
                 await _db.SaveChangesAsync();
 
@@ -183,14 +162,10 @@ public class OrganizationsController : ControllerBase
 
         if (org is null) return NotFound();
 
-        // TEMPORALMENTE: Si no hay autenticación, permitir acceso
-        if (userId != Guid.Empty)
-        {
-            // Verificar que el usuario es miembro de la organización
-            var isMember = org.OrganizationMembers.Any(m => m.UserId == userId);
-            if (!isMember)
-                return StatusCode(403, new { message = "You are not a member of this organization" });
-        }
+        // Verificar que el usuario es miembro de la organización
+        var isMember = org.OrganizationMembers.Any(m => m.UserId == userId);
+        if (!isMember)
+            return StatusCode(403, new { message = "You are not a member of this organization" });
 
         if (!string.IsNullOrWhiteSpace(request.Slug) && request.Slug != org.Slug)
         {
@@ -226,17 +201,13 @@ public class OrganizationsController : ControllerBase
 
         if (org is null) return NotFound();
 
-        // TEMPORALMENTE: Si no hay autenticación, permitir acceso
-        if (userId != Guid.Empty)
-        {
-            // Verificar que el usuario es admin de la organización
-            var member = org.OrganizationMembers.FirstOrDefault(m => m.UserId == userId);
-            if (member is null)
-                return StatusCode(403, new { message = "You are not a member of this organization" });
+        // Verificar que el usuario es admin de la organización
+        var member = org.OrganizationMembers.FirstOrDefault(m => m.UserId == userId);
+        if (member is null)
+            return StatusCode(403, new { message = "You are not a member of this organization" });
 
-            if (member.Role != "org_admin")
-                return StatusCode(403, new { message = "Only organization admins can delete organizations" });
-        }
+        if (member.Role != "org_admin")
+            return StatusCode(403, new { message = "Only organization admins can delete organizations" });
 
         _db.Organizations.Remove(org);
         await _db.SaveChangesAsync();

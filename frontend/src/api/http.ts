@@ -46,12 +46,8 @@ export const http = axios.create({
 console.log('✅ Axios configurado con baseURL:', apiBaseURL);
 
 // Interceptor de request: agrega el token a todas las peticiones y valida expiración
-// TEMPORALMENTE DESHABILITADO: No enviar token ni validar autenticación
 http.interceptors.request.use(
   (config) => {
-    // TEMPORALMENTE DESHABILITADO: No enviar token
-    // TODO: Restaurar cuando se reactive la autenticación
-    /*
     const token = getToken();
     if (token) {
       // Verificar si el token está expirado antes de enviar la petición
@@ -70,7 +66,6 @@ http.interceptors.request.use(
       }
       config.headers.Authorization = `Bearer ${token}`;
     }
-    */
     return config;
   },
   (error) => {
@@ -79,13 +74,9 @@ http.interceptors.request.use(
 );
 
 // Interceptor de response: maneja errores 401 (no autorizado)
-// TEMPORALMENTE DESHABILITADO: No redirigir en caso de 401
 http.interceptors.response.use(
   (response) => response,
   (error: AxiosError) => {
-    // TEMPORALMENTE DESHABILITADO: No manejar errores 401
-    // TODO: Restaurar cuando se reactive la autenticación
-    /*
     if (error.response?.status === 401) {
       // Token expirado o inválido
       clearToken();
@@ -103,7 +94,6 @@ http.interceptors.response.use(
         }
       }
     }
-    */
     return Promise.reject(error);
   }
 );
