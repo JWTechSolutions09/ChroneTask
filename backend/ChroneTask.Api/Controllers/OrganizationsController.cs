@@ -24,36 +24,55 @@ public class OrganizationsController : ControllerBase
     [HttpGet]
     public async Task<ActionResult<List<OrganizationResponse>>> GetAll()
     {
-        var userId = UserContext.GetUserId(User);
+        try
+        {
+            var userId = UserContext.GetUserId(User);
 
-        // TEMPORALMENTE: Si no hay autenticación (userId == Guid.Empty), retornar todas las organizaciones
-        var items = userId == Guid.Empty
-            ? await _db.Organizations
-                .OrderByDescending(o => o.CreatedAt)
-                .Select(o => new OrganizationResponse
-                {
-                    Id = o.Id,
-                    Name = o.Name,
-                    Slug = o.Slug,
-                    IsActive = o.IsActive,
-                    CreatedAt = o.CreatedAt
-                })
-                .ToListAsync()
-            : await _db.OrganizationMembers
-                .Where(m => m.UserId == userId)
-                .Select(m => m.Organization)
-                .OrderByDescending(o => o.CreatedAt)
-                .Select(o => new OrganizationResponse
-                {
-                    Id = o.Id,
-                    Name = o.Name,
-                    Slug = o.Slug,
-                    IsActive = o.IsActive,
-                    CreatedAt = o.CreatedAt
-                })
-                .ToListAsync();
+            // TEMPORALMENTE: Si no hay autenticación (userId == Guid.Empty), retornar todas las organizaciones
+            var items = userId == Guid.Empty
+                ? await _db.Organizations
+                    .OrderByDescending(o => o.CreatedAt)
+                    .Select(o => new OrganizationResponse
+                    {
+                        Id = o.Id,
+                        Name = o.Name,
+                        Slug = o.Slug,
+                        IsActive = o.IsActive,
+                        CreatedAt = o.CreatedAt
+                    })
+                    .ToListAsync()
+                : await _db.OrganizationMembers
+                    .Where(m => m.UserId == userId)
+                    .Select(m => m.Organization)
+                    .OrderByDescending(o => o.CreatedAt)
+                    .Select(o => new OrganizationResponse
+                    {
+                        Id = o.Id,
+                        Name = o.Name,
+                        Slug = o.Slug,
+                        IsActive = o.IsActive,
+                        CreatedAt = o.CreatedAt
+                    })
+                    .ToListAsync();
 
-        return Ok(items);
+            return Ok(items);
+        }
+        catch (Exception ex)
+        {
+            // Log del error para debugging
+            Console.WriteLine($"❌ Error en GetAll: {ex.Message}");
+            Console.WriteLine($"Stack trace: {ex.StackTrace}");
+            if (ex.InnerException != null)
+            {
+                Console.WriteLine($"Inner exception: {ex.InnerException.Message}");
+            }
+            
+            return StatusCode(500, new { 
+                error = "Internal Server Error", 
+                message = ex.Message,
+                details = ex.InnerException?.Message 
+            });
+        }
     }
 
 

@@ -171,22 +171,40 @@ app.Use(async (context, next) =>
     }
     catch (Exception ex)
     {
-        // Asegurar que los headers de CORS se envíen incluso en errores
-        context.Response.Headers.Add("Access-Control-Allow-Origin", "*");
-        context.Response.Headers.Add("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, PATCH, OPTIONS");
-        context.Response.Headers.Add("Access-Control-Allow-Headers", "*");
-        
-        context.Response.StatusCode = 500;
-        context.Response.ContentType = "application/json";
-        
-        var errorResponse = new
+        // Log del error
+        Console.WriteLine($"❌ Error no manejado: {ex.Message}");
+        Console.WriteLine($"Stack trace: {ex.StackTrace}");
+        if (ex.InnerException != null)
         {
-            error = "Internal Server Error",
-            message = app.Environment.IsDevelopment() ? ex.Message : "An error occurred while processing your request",
-            stackTrace = app.Environment.IsDevelopment() ? ex.StackTrace : null
-        };
+            Console.WriteLine($"Inner exception: {ex.InnerException.Message}");
+        }
         
-        await context.Response.WriteAsJsonAsync(errorResponse);
+        // Solo modificar la respuesta si no ha comenzado
+        if (!context.Response.HasStarted)
+        {
+            // Asegurar que los headers de CORS se envíen incluso en errores
+            context.Response.Headers.Add("Access-Control-Allow-Origin", "*");
+            context.Response.Headers.Add("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, PATCH, OPTIONS");
+            context.Response.Headers.Add("Access-Control-Allow-Headers", "*");
+            
+            context.Response.StatusCode = 500;
+            context.Response.ContentType = "application/json";
+            
+            var errorResponse = new
+            {
+                error = "Internal Server Error",
+                message = app.Environment.IsDevelopment() ? ex.Message : "An error occurred while processing your request",
+                stackTrace = app.Environment.IsDevelopment() ? ex.StackTrace : null,
+                innerException = app.Environment.IsDevelopment() && ex.InnerException != null ? ex.InnerException.Message : null
+            };
+            
+            await context.Response.WriteAsJsonAsync(errorResponse);
+        }
+        else
+        {
+            // Si la respuesta ya comenzó, re-lanzar la excepción
+            throw;
+        }
     }
 });
 
