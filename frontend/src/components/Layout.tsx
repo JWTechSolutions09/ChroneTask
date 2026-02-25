@@ -149,47 +149,35 @@ export default function Layout({ children, organizationId }: LayoutProps) {
         >
           {!sidebarCollapsed && (
             <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-              <div
+              <img 
+                src="/logo.png" 
+                alt="ChroneTask Logo" 
                 style={{
                   width: "36px",
                   height: "36px",
                   borderRadius: "8px",
-                  background: "linear-gradient(135deg, #007bff 0%, #0056b3 100%)",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  color: "white",
-                  fontWeight: 700,
-                  fontSize: "20px",
-                  boxShadow: "0 2px 4px rgba(0, 123, 255, 0.3)",
+                  objectFit: "cover",
+                  boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
                 }}
-              >
-                ⏱️
-              </div>
+              />
               <span style={{ fontWeight: 700, fontSize: "18px", color: "var(--text-primary)", letterSpacing: "-0.5px" }}>
                 ChroneTask
               </span>
             </div>
           )}
           {sidebarCollapsed && (
-            <div
+            <img 
+              src="/logo.png" 
+              alt="ChroneTask Logo" 
               style={{
                 width: "36px",
                 height: "36px",
                 borderRadius: "8px",
-                background: "linear-gradient(135deg, #007bff 0%, #0056b3 100%)",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                color: "white",
-                fontWeight: 700,
-                fontSize: "20px",
-                boxShadow: "0 2px 4px rgba(0, 123, 255, 0.3)",
+                objectFit: "cover",
+                boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
                 margin: "0 auto",
               }}
-            >
-              ⏱️
-            </div>
+            />
           )}
           <button
             onClick={() => setSidebarCollapsed(!sidebarCollapsed)}

@@ -353,6 +353,18 @@ export default function Auth() {
         <div className="slide-panel-wrapper">
           <div className="slide-panel">
             <div className="panel-content panel-content-left">
+              <img 
+                src="/logo.png" 
+                alt="ChroneTask Logo" 
+                className="auth-logo"
+                style={{
+                  width: "80px",
+                  height: "80px",
+                  marginBottom: "20px",
+                  borderRadius: "12px",
+                  boxShadow: "0 4px 12px rgba(0, 0, 0, 0.2)",
+                }}
+              />
               <h1>Welcome Back!</h1>
               <p>
                 Stay connected by logging in with your credentials and continue your experience
@@ -362,6 +374,18 @@ export default function Auth() {
               </button>
             </div>
             <div className="panel-content panel-content-right">
+              <img 
+                src="/logo.png" 
+                alt="ChroneTask Logo" 
+                className="auth-logo"
+                style={{
+                  width: "80px",
+                  height: "80px",
+                  marginBottom: "20px",
+                  borderRadius: "12px",
+                  boxShadow: "0 4px 12px rgba(0, 0, 0, 0.2)",
+                }}
+              />
               <h1>Hey There!</h1>
               <p>Begin your amazing journey by creating an account with us today</p>
               <button type="button" className="transparent-btn" onClick={toggleMode}>
