@@ -47,7 +47,8 @@ public class ProjectsController : ControllerBase
                 CreatedAt = p.CreatedAt,
                 UpdatedAt = p.UpdatedAt,
                 TaskCount = p.Tasks.Count,
-                ActiveTaskCount = p.Tasks.Count(t => t.Status != "Done")
+                ActiveTaskCount = p.Tasks.Count(t => t.Status != "Done"),
+                ImageUrl = p.ImageUrl
             })
             .ToListAsync();
 
@@ -85,7 +86,8 @@ public class ProjectsController : ControllerBase
             CreatedAt = project.CreatedAt,
             UpdatedAt = project.UpdatedAt,
             TaskCount = project.Tasks.Count,
-            ActiveTaskCount = project.Tasks.Count(t => t.Status != "Done")
+            ActiveTaskCount = project.Tasks.Count(t => t.Status != "Done"),
+            ImageUrl = project.ImageUrl
         });
     }
 
@@ -111,7 +113,8 @@ public class ProjectsController : ControllerBase
             Name = request.Name.Trim(),
             Description = string.IsNullOrWhiteSpace(request.Description) ? null : request.Description.Trim(),
             OrganizationId = organizationId,
-            Template = string.IsNullOrWhiteSpace(request.Template) ? null : request.Template.Trim()
+            Template = string.IsNullOrWhiteSpace(request.Template) ? null : request.Template.Trim(),
+            ImageUrl = string.IsNullOrWhiteSpace(request.ImageUrl) ? null : request.ImageUrl.Trim()
         };
 
         _db.Projects.Add(project);
@@ -137,7 +140,8 @@ public class ProjectsController : ControllerBase
             CreatedAt = project.CreatedAt,
             UpdatedAt = project.UpdatedAt,
             TaskCount = 0,
-            ActiveTaskCount = 0
+            ActiveTaskCount = 0,
+            ImageUrl = project.ImageUrl
         });
     }
 
@@ -169,6 +173,7 @@ public class ProjectsController : ControllerBase
         project.Name = request.Name.Trim();
         project.Description = string.IsNullOrWhiteSpace(request.Description) ? null : request.Description.Trim();
         project.Template = string.IsNullOrWhiteSpace(request.Template) ? null : request.Template.Trim();
+        project.ImageUrl = string.IsNullOrWhiteSpace(request.ImageUrl) ? null : request.ImageUrl.Trim();
         project.UpdatedAt = DateTime.UtcNow;
 
         await _db.SaveChangesAsync();
@@ -187,7 +192,8 @@ public class ProjectsController : ControllerBase
             CreatedAt = project.CreatedAt,
             UpdatedAt = project.UpdatedAt,
             TaskCount = taskCount,
-            ActiveTaskCount = activeTaskCount
+            ActiveTaskCount = activeTaskCount,
+            ImageUrl = project.ImageUrl
         });
     }
 

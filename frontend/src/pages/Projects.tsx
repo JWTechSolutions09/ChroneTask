@@ -7,6 +7,7 @@ import Card from "../components/Card";
 import Button from "../components/Button";
 import SearchBar from "../components/SearchBar";
 import AddProjectMemberModal from "../components/AddProjectMemberModal";
+import ImageUpload from "../components/ImageUpload";
 import { useToast } from "../contexts/ToastContext";
 
 type Project = {
@@ -14,6 +15,7 @@ type Project = {
   name: string;
   description?: string;
   template?: string;
+  imageUrl?: string;
   taskCount: number;
   activeTaskCount: number;
   createdAt: string;
@@ -26,6 +28,7 @@ export default function Projects() {
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [template, setTemplate] = useState("");
+  const [imageUrl, setImageUrl] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
   const [filterTemplate, setFilterTemplate] = useState("");
   const [err, setErr] = useState<string | null>(null);
@@ -97,10 +100,12 @@ export default function Projects() {
         name: name.trim(),
         description: description.trim() || null,
         template: template.trim() || null,
+        imageUrl: imageUrl.trim() || null,
       });
       setName("");
       setDescription("");
       setTemplate("");
+      setImageUrl("");
       await loadProjects();
       showToast("Proyecto creado exitosamente", "success");
       
@@ -151,7 +156,7 @@ export default function Projects() {
         <div style={{ padding: "24px" }}>
           {/* Create Project Form */}
           <Card style={{ marginBottom: "24px" }}>
-            <h2 style={{ fontSize: "18px", fontWeight: 600, marginBottom: "16px", color: "#212529" }}>
+            <h2 style={{ fontSize: "18px", fontWeight: 600, marginBottom: "16px", color: "var(--text-primary)" }}>
               Crear Nuevo Proyecto
             </h2>
             <form onSubmit={createProject} style={{ display: "grid", gap: "12px" }}>
@@ -162,7 +167,7 @@ export default function Projects() {
                     marginBottom: "6px",
                     fontSize: "14px",
                     fontWeight: 500,
-                    color: "#495057",
+                    color: "var(--text-primary)",
                   }}
                 >
                   Nombre del proyecto *
@@ -183,7 +188,7 @@ export default function Projects() {
                     marginBottom: "6px",
                     fontSize: "14px",
                     fontWeight: 500,
-                    color: "#495057",
+                    color: "var(--text-primary)",
                   }}
                 >
                   Descripción
@@ -204,7 +209,7 @@ export default function Projects() {
                     marginBottom: "6px",
                     fontSize: "14px",
                     fontWeight: 500,
-                    color: "#495057",
+                    color: "var(--text-primary)",
                   }}
                 >
                   Plantilla
@@ -220,6 +225,33 @@ export default function Projects() {
                   <option value="Operaciones">Operaciones</option>
                   <option value="Soporte">Soporte</option>
                 </select>
+              </div>
+              <ImageUpload
+                currentImageUrl={imageUrl || undefined}
+                onImageChange={(url) => setImageUrl(url)}
+                label="Imagen del Proyecto"
+                maxSizeMB={5}
+              />
+              <div>
+                <label
+                  style={{
+                    display: "block",
+                    marginBottom: "6px",
+                    fontSize: "14px",
+                    fontWeight: 500,
+                    color: "var(--text-primary)",
+                  }}
+                >
+                  O pega una URL de imagen
+                </label>
+                <input
+                  type="url"
+                  placeholder="https://ejemplo.com/imagen.jpg"
+                  value={imageUrl}
+                  onChange={(e) => setImageUrl(e.target.value)}
+                  disabled={creating}
+                  className="input"
+                />
               </div>
               <Button
                 type="submit"
@@ -299,7 +331,31 @@ export default function Projects() {
                     ? Math.round((project.activeTaskCount / project.taskCount) * 100)
                     : 0;
                 return (
-                    <Card key={project.id} hover className="hover-lift" style={{ position: "relative" }}>
+                    <Card key={project.id} hover className="hover-lift" style={{ position: "relative", overflow: "hidden" }}>
+                      {project.imageUrl && (
+                        <div
+                          style={{
+                            width: "100%",
+                            height: "120px",
+                            margin: "-20px -20px 16px -20px",
+                            backgroundImage: `url(${project.imageUrl})`,
+                            backgroundSize: "cover",
+                            backgroundPosition: "center",
+                            position: "relative",
+                          }}
+                        >
+                          <div
+                            style={{
+                              position: "absolute",
+                              top: 0,
+                              left: 0,
+                              right: 0,
+                              bottom: 0,
+                              background: "linear-gradient(to bottom, rgba(0,0,0,0.1), rgba(0,0,0,0.3))",
+                            }}
+                          />
+                        </div>
+                      )}
                       <Link
                         to={`/org/${organizationId}/project/${project.id}/board`}
                         style={{ textDecoration: "none", color: "inherit" }}
@@ -319,7 +375,7 @@ export default function Projects() {
                               fontSize: "18px",
                               fontWeight: 600,
                               margin: 0,
-                              color: "#212529",
+                              color: "var(--text-primary)",
                               flex: 1,
                             }}
                           >
@@ -344,7 +400,7 @@ export default function Projects() {
                           <p
                             style={{
                               fontSize: "13px",
-                              color: "#6c757d",
+                              color: "var(--text-secondary)",
                               margin: 0,
                               overflow: "hidden",
                               textOverflow: "ellipsis",
@@ -364,7 +420,7 @@ export default function Projects() {
                             alignItems: "center",
                             marginBottom: "4px",
                             fontSize: "12px",
-                            color: "#6c757d",
+                            color: "var(--text-secondary)",
                           }}
                         >
                           <span>Progreso</span>
@@ -373,7 +429,7 @@ export default function Projects() {
                         <div
                           style={{
                             height: "6px",
-                            backgroundColor: "#e9ecef",
+                            backgroundColor: "var(--bg-tertiary)",
                             borderRadius: "3px",
                             overflow: "hidden",
                           }}
@@ -382,7 +438,7 @@ export default function Projects() {
                             style={{
                               height: "100%",
                               width: `${progress}%`,
-                              backgroundColor: "#007bff",
+                              backgroundColor: "var(--primary)",
                               transition: "width 0.3s",
                             }}
                           />
@@ -394,16 +450,16 @@ export default function Projects() {
                           display: "flex",
                           justifyContent: "space-between",
                           fontSize: "13px",
-                          color: "#6c757d",
+                          color: "var(--text-secondary)",
                           paddingTop: "12px",
-                          borderTop: "1px solid #e9ecef",
+                          borderTop: "1px solid var(--border-color)",
                         }}
                       >
                         <span>
-                          <strong style={{ color: "#212529" }}>{project.activeTaskCount}</strong> activas
+                          <strong style={{ color: "var(--text-primary)" }}>{project.activeTaskCount}</strong> activas
                         </span>
                         <span>
-                          <strong style={{ color: "#212529" }}>{project.taskCount}</strong> total
+                          <strong style={{ color: "var(--text-primary)" }}>{project.taskCount}</strong> total
                         </span>
                       </div>
                       </Link>

@@ -13,4 +13,7 @@ public class ProjectCreateRequest
 
     [MaxLength(50)]
     public string? Template { get; set; } // "Software", "Operaciones", "Soporte"
+
+    [MaxLength(500)]
+    public string? ImageUrl { get; set; } // URL de imagen del proyecto
 }

@@ -11,6 +11,7 @@ type StatsCardProps = {
     isPositive: boolean;
   };
   color?: string;
+  children?: React.ReactNode;
 };
 
 export default function StatsCard({
@@ -19,7 +20,7 @@ export default function StatsCard({
   subtitle,
   icon,
   trend,
-  color = "#007bff",
+  color = "var(--primary)",
   children,
 }: StatsCardProps) {
   return (
@@ -34,9 +35,9 @@ export default function StatsCard({
           <div
             style={{
               fontSize: "12px",
-              color: "#6c757d",
+              color: "var(--text-secondary)",
               marginBottom: "8px",
-              fontWeight: 500,
+              fontWeight: 600,
               textTransform: "uppercase",
               letterSpacing: "0.5px",
             }}
@@ -45,17 +46,17 @@ export default function StatsCard({
           </div>
           <div
             style={{
-              fontSize: "32px",
+              fontSize: "36px",
               fontWeight: 700,
               color: color,
-              marginBottom: subtitle ? "4px" : 0,
+              marginBottom: subtitle ? "6px" : 0,
               lineHeight: 1.2,
             }}
           >
             {value}
           </div>
           {subtitle && (
-            <div style={{ fontSize: "13px", color: "#6c757d", marginTop: "4px" }}>{subtitle}</div>
+            <div style={{ fontSize: "14px", color: "var(--text-secondary)", marginTop: "4px", fontWeight: 500 }}>{subtitle}</div>
           )}
           {trend && (
             <div

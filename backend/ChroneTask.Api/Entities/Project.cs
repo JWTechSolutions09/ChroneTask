@@ -19,6 +19,9 @@ public class Project
     [MaxLength(50)]
     public string? Template { get; set; } // "Software", "Operaciones", "Soporte"
 
+    [MaxLength(500)]
+    public string? ImageUrl { get; set; } // URL de imagen del proyecto
+
     public bool IsActive { get; set; } = true;
 
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;

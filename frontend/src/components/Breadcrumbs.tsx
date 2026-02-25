@@ -17,32 +17,36 @@ export default function Breadcrumbs({ items }: BreadcrumbsProps) {
         display: "flex",
         alignItems: "center",
         gap: "8px",
-        fontSize: "14px",
-        color: "#6c757d",
-        marginBottom: "16px",
+        fontSize: "13px",
+        color: "var(--text-secondary)",
+        marginBottom: "12px",
       }}
     >
       {items.map((item, index) => (
         <React.Fragment key={index}>
-          {index > 0 && <span style={{ color: "#adb5bd" }}>/</span>}
+          {index > 0 && <span style={{ color: "var(--text-tertiary)", margin: "0 4px" }}>›</span>}
           {item.to && index < items.length - 1 ? (
             <Link
               to={item.to}
               style={{
-                color: "#007bff",
+                color: "var(--primary)",
                 textDecoration: "none",
+                fontWeight: 500,
+                transition: "all 0.2s",
               }}
               onMouseEnter={(e) => {
                 e.currentTarget.style.textDecoration = "underline";
+                e.currentTarget.style.color = "var(--primary-dark)";
               }}
               onMouseLeave={(e) => {
                 e.currentTarget.style.textDecoration = "none";
+                e.currentTarget.style.color = "var(--primary)";
               }}
             >
               {item.label}
             </Link>
           ) : (
-            <span style={{ color: index === items.length - 1 ? "#212529" : "#6c757d" }}>
+            <span style={{ color: index === items.length - 1 ? "var(--text-primary)" : "var(--text-secondary)", fontWeight: index === items.length - 1 ? 600 : 400 }}>
               {item.label}
             </span>
           )}

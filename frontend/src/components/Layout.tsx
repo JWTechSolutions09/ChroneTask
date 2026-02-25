@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { useNavigate, useLocation, Link, useParams } from "react-router-dom";
 import { clearToken, isAuthed } from "../auth/token";
 import { http } from "../api/http";
+import { useTheme } from "../contexts/ThemeContext";
 
 type LayoutProps = {
   children: React.ReactNode;
@@ -23,6 +24,7 @@ export default function Layout({ children, organizationId }: LayoutProps) {
   const navigate = useNavigate();
   const location = useLocation();
   const params = useParams();
+  const { theme, toggleTheme } = useTheme();
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [orgs, setOrgs] = useState<Org[]>([]);
   const [currentOrg, setCurrentOrg] = useState<Org | null>(null);
@@ -116,31 +118,33 @@ export default function Layout({ children, organizationId }: LayoutProps) {
   }
 
   return (
-    <div style={{ display: "flex", minHeight: "100vh", backgroundColor: "#f8f9fa" }}>
+    <div style={{ display: "flex", minHeight: "100vh", backgroundColor: "var(--bg-secondary)" }}>
       {/* Sidebar */}
       <aside
         style={{
-          width: sidebarCollapsed ? "60px" : "260px",
-          backgroundColor: "#ffffff",
-          borderRight: "1px solid #e9ecef",
+          width: sidebarCollapsed ? "70px" : "280px",
+          backgroundColor: "var(--bg-primary)",
+          borderRight: "1px solid var(--border-color)",
           display: "flex",
           flexDirection: "column",
-          transition: "width 0.2s ease",
+          transition: "width 0.3s ease",
           position: "sticky",
           top: 0,
           height: "100vh",
           overflowY: "auto",
+          boxShadow: theme === "dark" ? "2px 0 8px rgba(0, 0, 0, 0.3)" : "2px 0 8px rgba(0, 0, 0, 0.05)",
         }}
       >
         {/* Logo/Header */}
         <div
           style={{
-            padding: "16px",
-            borderBottom: "1px solid #e9ecef",
+            padding: "20px 16px",
+            borderBottom: "1px solid var(--border-color)",
             display: "flex",
             alignItems: "center",
             justifyContent: "space-between",
-            minHeight: "64px",
+            minHeight: "72px",
+            backgroundColor: "var(--bg-primary)",
           }}
         >
           {!sidebarCollapsed && (
@@ -162,7 +166,7 @@ export default function Layout({ children, organizationId }: LayoutProps) {
               >
                 ⏱️
               </div>
-              <span style={{ fontWeight: 700, fontSize: "18px", color: "#212529", letterSpacing: "-0.5px" }}>
+              <span style={{ fontWeight: 700, fontSize: "18px", color: "var(--text-primary)", letterSpacing: "-0.5px" }}>
                 ChroneTask
               </span>
             </div>
@@ -190,15 +194,26 @@ export default function Layout({ children, organizationId }: LayoutProps) {
           <button
             onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
             style={{
-              background: "none",
-              border: "none",
+              background: "var(--hover-bg)",
+              border: "1px solid var(--border-color)",
               cursor: "pointer",
-              padding: "4px",
-              borderRadius: "4px",
-              color: "#6c757d",
+              padding: "8px",
+              borderRadius: "8px",
+              color: "var(--text-secondary)",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
+              transition: "all 0.2s",
+              width: "36px",
+              height: "36px",
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = "var(--bg-tertiary)";
+              e.currentTarget.style.color = "var(--text-primary)";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = "var(--hover-bg)";
+              e.currentTarget.style.color = "var(--text-secondary)";
             }}
             title={sidebarCollapsed ? "Expandir" : "Colapsar"}
           >
@@ -207,31 +222,86 @@ export default function Layout({ children, organizationId }: LayoutProps) {
         </div>
 
         {/* Navigation */}
-        <nav style={{ flex: 1, padding: "8px", overflowY: "auto" }}>
+        <nav style={{ flex: 1, padding: "12px", overflowY: "auto", display: "flex", flexDirection: "column" }}>
           {organizationId ? (
             <>
               {/* Organization Info */}
               {currentOrg && !sidebarCollapsed && (
                 <div
                   style={{
-                    padding: "12px",
-                    marginBottom: "8px",
-                    backgroundColor: "#f8f9fa",
-                    borderRadius: "6px",
-                    border: "1px solid #e9ecef",
+                    padding: "14px",
+                    marginBottom: "12px",
+                    backgroundColor: "var(--bg-secondary)",
+                    borderRadius: "10px",
+                    border: "1px solid var(--border-color)",
+                    boxShadow: "0 2px 4px rgba(0, 0, 0, 0.05)",
                   }}
                 >
-                  <div style={{ fontSize: "12px", color: "#6c757d", marginBottom: "4px" }}>
+                  <div style={{ fontSize: "11px", color: "var(--text-secondary)", marginBottom: "6px", textTransform: "uppercase", letterSpacing: "0.5px", fontWeight: 600 }}>
                     Organización
                   </div>
-                  <div style={{ fontWeight: 600, color: "#212529", fontSize: "14px" }}>
+                  <div style={{ fontWeight: 700, color: "var(--text-primary)", fontSize: "15px" }}>
                     {currentOrg.name}
                   </div>
                 </div>
               )}
 
+              {/* Quick Actions */}
+              {!sidebarCollapsed && (
+                <div style={{ marginBottom: "16px" }}>
+                  <div style={{ fontSize: "11px", fontWeight: 600, color: "var(--text-secondary)", textTransform: "uppercase", letterSpacing: "0.5px", padding: "8px 12px", marginBottom: "4px" }}>
+                    Accesos Rápidos
+                  </div>
+                  <NavItem
+                    icon="➕"
+                    label="Nuevo Proyecto"
+                    to={`/org/${organizationId}/projects`}
+                    active={isActive(`/org/${organizationId}/projects`) && location.search.includes("new")}
+                    collapsed={false}
+                    onClick={() => {
+                      // Scroll to create form
+                      setTimeout(() => {
+                        const form = document.querySelector('form');
+                        if (form) form.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                      }, 100);
+                    }}
+                  />
+                  <NavItem
+                    icon="✉️"
+                    label="Invitar Miembros"
+                    to={`/org/${organizationId}/dashboard`}
+                    active={false}
+                    collapsed={false}
+                    onClick={() => {
+                      navigate(`/org/${organizationId}/dashboard`);
+                      setTimeout(() => {
+                        const inviteBtn = document.querySelector('[title="Invitar miembros a la organización"]');
+                        if (inviteBtn) (inviteBtn as HTMLElement).click();
+                      }, 300);
+                    }}
+                  />
+                  <NavItem
+                    icon="👥"
+                    label="Ver Miembros"
+                    to={`/org/${organizationId}/dashboard`}
+                    active={false}
+                    collapsed={false}
+                    onClick={() => {
+                      navigate(`/org/${organizationId}/dashboard`);
+                      setTimeout(() => {
+                        const membersBtn = document.querySelector('[title="Ver miembros de la organización"]');
+                        if (membersBtn) (membersBtn as HTMLElement).click();
+                      }, 300);
+                    }}
+                  />
+                </div>
+              )}
+
               {/* Main Navigation */}
               <div style={{ marginBottom: "16px" }}>
+                <div style={{ fontSize: "11px", fontWeight: 600, color: "var(--text-secondary)", textTransform: "uppercase", letterSpacing: "0.5px", padding: "8px 12px", marginBottom: "4px" }}>
+                  {sidebarCollapsed ? "" : "Navegación"}
+                </div>
                 <NavItem
                   icon="📊"
                   label="Dashboard"
@@ -250,19 +320,19 @@ export default function Layout({ children, organizationId }: LayoutProps) {
 
               {/* Projects List */}
               {!sidebarCollapsed && projects.length > 0 && (
-                <div style={{ marginTop: "16px", paddingTop: "16px", borderTop: "1px solid #e9ecef" }}>
+                <div style={{ marginTop: "16px", paddingTop: "16px", borderTop: "1px solid var(--border-color)" }}>
                   <div
                     style={{
                       fontSize: "11px",
                       fontWeight: 600,
-                      color: "#6c757d",
+                      color: "var(--text-secondary)",
                       textTransform: "uppercase",
                       letterSpacing: "0.5px",
                       padding: "8px 12px",
                       marginBottom: "4px",
                     }}
                   >
-                    Proyectos
+                    Mis Proyectos
                   </div>
                   {projects.map((project) => (
                     <NavItem
@@ -298,68 +368,142 @@ export default function Layout({ children, organizationId }: LayoutProps) {
           )}
 
           {/* Bottom Actions */}
-          <div style={{ marginTop: "auto", paddingTop: "16px", borderTop: "1px solid #e9ecef" }}>
+          <div style={{ marginTop: "auto", paddingTop: "16px", borderTop: "1px solid var(--border-color)" }}>
             {!sidebarCollapsed && (
+              <div style={{ fontSize: "11px", fontWeight: 600, color: "var(--text-secondary)", textTransform: "uppercase", letterSpacing: "0.5px", padding: "8px 12px", marginBottom: "8px" }}>
+                Configuración
+              </div>
+            )}
+            
+            {/* Theme Toggle */}
+            <button
+              onClick={toggleTheme}
+              style={{
+                width: "100%",
+                padding: "10px 12px",
+                marginBottom: "8px",
+                background: "var(--hover-bg)",
+                border: "1px solid var(--border-color)",
+                borderRadius: "8px",
+                cursor: "pointer",
+                fontSize: "14px",
+                color: "var(--text-primary)",
+                display: "flex",
+                alignItems: "center",
+                gap: "10px",
+                justifyContent: sidebarCollapsed ? "center" : "flex-start",
+                transition: "all 0.2s",
+                fontWeight: 500,
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = "var(--bg-tertiary)";
+                e.currentTarget.style.transform = "translateX(2px)";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = "var(--hover-bg)";
+                e.currentTarget.style.transform = "translateX(0)";
+              }}
+              title={sidebarCollapsed ? (theme === "dark" ? "Modo Claro" : "Modo Oscuro") : undefined}
+            >
+              <span style={{ fontSize: "18px" }}>{theme === "dark" ? "☀️" : "🌙"}</span>
+              {!sidebarCollapsed && <span>{theme === "dark" ? "Modo Claro" : "Modo Oscuro"}</span>}
+            </button>
+
+            {!sidebarCollapsed && organizationId && (
               <button
                 onClick={() => navigate("/org-select")}
                 style={{
                   width: "100%",
-                  padding: "8px 12px",
+                  padding: "10px 12px",
                   marginBottom: "8px",
-                  background: "none",
-                  border: "1px solid #e9ecef",
-                  borderRadius: "6px",
+                  background: "var(--hover-bg)",
+                  border: "1px solid var(--border-color)",
+                  borderRadius: "8px",
                   cursor: "pointer",
                   fontSize: "14px",
-                  color: "#495057",
+                  color: "var(--text-primary)",
                   display: "flex",
                   alignItems: "center",
-                  gap: "8px",
+                  gap: "10px",
+                  transition: "all 0.2s",
+                  fontWeight: 500,
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = "var(--bg-tertiary)";
+                  e.currentTarget.style.transform = "translateX(2px)";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = "var(--hover-bg)";
+                  e.currentTarget.style.transform = "translateX(0)";
                 }}
               >
-                <span>🔄</span>
+                <span style={{ fontSize: "18px" }}>🔄</span>
                 <span>Cambiar Org</span>
               </button>
             )}
+            
             <button
               onClick={() => navigate("/settings")}
               style={{
                 width: "100%",
-                padding: "8px 12px",
-                background: "none",
-                border: "1px solid #e9ecef",
-                borderRadius: "6px",
+                padding: "10px 12px",
+                marginBottom: "8px",
+                background: "var(--hover-bg)",
+                border: "1px solid var(--border-color)",
+                borderRadius: "8px",
                 cursor: "pointer",
                 fontSize: "14px",
-                color: "#495057",
+                color: "var(--text-primary)",
                 display: "flex",
                 alignItems: "center",
-                gap: "8px",
+                gap: "10px",
                 justifyContent: sidebarCollapsed ? "center" : "flex-start",
-                marginBottom: "8px",
+                transition: "all 0.2s",
+                fontWeight: 500,
               }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = "var(--bg-tertiary)";
+                e.currentTarget.style.transform = "translateX(2px)";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = "var(--hover-bg)";
+                e.currentTarget.style.transform = "translateX(0)";
+              }}
+              title={sidebarCollapsed ? "Configuración" : undefined}
             >
-              <span>⚙️</span>
+              <span style={{ fontSize: "18px" }}>⚙️</span>
               {!sidebarCollapsed && <span>Configuración</span>}
             </button>
+            
             <button
               onClick={handleLogout}
               style={{
                 width: "100%",
-                padding: "8px 12px",
-                background: "none",
-                border: "1px solid #e9ecef",
-                borderRadius: "6px",
+                padding: "10px 12px",
+                background: theme === "dark" ? "rgba(220, 53, 69, 0.2)" : "rgba(220, 53, 69, 0.1)",
+                border: "1px solid var(--danger)",
+                borderRadius: "8px",
                 cursor: "pointer",
                 fontSize: "14px",
-                color: "#dc3545",
+                color: "var(--danger)",
                 display: "flex",
                 alignItems: "center",
-                gap: "8px",
+                gap: "10px",
                 justifyContent: sidebarCollapsed ? "center" : "flex-start",
+                transition: "all 0.2s",
+                fontWeight: 500,
               }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = theme === "dark" ? "rgba(220, 53, 69, 0.3)" : "rgba(220, 53, 69, 0.15)";
+                e.currentTarget.style.transform = "translateX(2px)";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = theme === "dark" ? "rgba(220, 53, 69, 0.2)" : "rgba(220, 53, 69, 0.1)";
+                e.currentTarget.style.transform = "translateX(0)";
+              }}
+              title={sidebarCollapsed ? "Salir" : undefined}
             >
-              <span>🚪</span>
+              <span style={{ fontSize: "18px" }}>🚪</span>
               {!sidebarCollapsed && <span>Salir</span>}
             </button>
           </div>
@@ -388,41 +532,53 @@ type NavItemProps = {
   active: boolean;
   collapsed: boolean;
   indent?: boolean;
+  onClick?: () => void;
 };
 
-function NavItem({ icon, label, to, active, collapsed, indent }: NavItemProps) {
+function NavItem({ icon, label, to, active, collapsed, indent, onClick }: NavItemProps) {
+  const handleClick = (e: React.MouseEvent) => {
+    if (onClick) {
+      e.preventDefault();
+      onClick();
+    }
+  };
+
   return (
     <Link
       to={to}
+      onClick={handleClick}
       style={{
         display: "flex",
         alignItems: "center",
         gap: "12px",
-        padding: "8px 12px",
-        marginBottom: "4px",
-        borderRadius: "6px",
+        padding: "10px 12px",
+        marginBottom: "6px",
+        borderRadius: "8px",
         textDecoration: "none",
-        color: active ? "#007bff" : "#495057",
-        backgroundColor: active ? "#e7f3ff" : "transparent",
-        fontWeight: active ? 600 : 400,
+        color: active ? "var(--primary)" : "var(--text-primary)",
+        backgroundColor: active ? "rgba(0, 123, 255, 0.1)" : "transparent",
+        fontWeight: active ? 600 : 500,
         fontSize: "14px",
         transition: "all 0.2s",
-        paddingLeft: indent ? "32px" : "12px",
+        paddingLeft: indent ? "36px" : "12px",
         justifyContent: collapsed ? "center" : "flex-start",
+        border: active ? "1px solid rgba(0, 123, 255, 0.2)" : "1px solid transparent",
       }}
       onMouseEnter={(e) => {
         if (!active) {
-          e.currentTarget.style.backgroundColor = "#f8f9fa";
+          e.currentTarget.style.backgroundColor = "var(--hover-bg)";
+          e.currentTarget.style.transform = "translateX(4px)";
         }
       }}
       onMouseLeave={(e) => {
         if (!active) {
           e.currentTarget.style.backgroundColor = "transparent";
+          e.currentTarget.style.transform = "translateX(0)";
         }
       }}
       title={collapsed ? label : undefined}
     >
-      <span style={{ fontSize: "18px", minWidth: "20px", textAlign: "center" }}>{icon}</span>
+      <span style={{ fontSize: "20px", minWidth: "24px", textAlign: "center", display: "flex", alignItems: "center", justifyContent: "center" }}>{icon}</span>
       {!collapsed && <span>{label}</span>}
     </Link>
   );

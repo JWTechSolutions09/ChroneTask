@@ -17,6 +17,7 @@ type Project = {
   name: string;
   description?: string;
   template?: string;
+  imageUrl?: string;
   taskCount: number;
   activeTaskCount: number;
   createdAt: string;
@@ -125,7 +126,7 @@ export default function Dashboard() {
 
   return (
     <Layout organizationId={organizationId}>
-      <div style={{ flex: 1, overflowY: "auto", backgroundColor: "#f8f9fa" }}>
+      <div style={{ flex: 1, overflowY: "auto", backgroundColor: "var(--bg-secondary)" }}>
         <PageHeader
           title="Dashboard"
           subtitle={
@@ -442,7 +443,7 @@ export default function Dashboard() {
                               to={`/org/${organizationId}/project/${project.id}/board`}
                               style={{
                                 textDecoration: "none",
-                                color: "#212529",
+                                color: "var(--text-primary)",
                                 fontWeight: 600,
                               }}
                             >
@@ -452,7 +453,7 @@ export default function Dashboard() {
                               <div
                                 style={{
                                   fontSize: "12px",
-                                  color: "#6c757d",
+                                  color: "var(--text-secondary)",
                                   marginTop: "4px",
                                 }}
                               >
@@ -484,7 +485,7 @@ export default function Dashboard() {
                                 style={{
                                   width: "100px",
                                   height: "8px",
-                                  backgroundColor: "#e9ecef",
+                                  backgroundColor: "var(--bg-tertiary)",
                                   borderRadius: "4px",
                                   overflow: "hidden",
                                 }}
@@ -557,7 +558,31 @@ export default function Dashboard() {
                         color: "inherit",
                       }}
                     >
-                      <Card hover>
+                      <Card hover style={{ overflow: "hidden" }}>
+                        {project.imageUrl && (
+                          <div
+                            style={{
+                              width: "100%",
+                              height: "100px",
+                              margin: "-20px -20px 16px -20px",
+                              backgroundImage: `url(${project.imageUrl})`,
+                              backgroundSize: "cover",
+                              backgroundPosition: "center",
+                              position: "relative",
+                            }}
+                          >
+                            <div
+                              style={{
+                                position: "absolute",
+                                top: 0,
+                                left: 0,
+                                right: 0,
+                                bottom: 0,
+                                background: "linear-gradient(to bottom, rgba(0,0,0,0.1), rgba(0,0,0,0.3))",
+                              }}
+                            />
+                          </div>
+                        )}
                         <div style={{ marginBottom: "12px" }}>
                           <div
                             style={{
@@ -572,7 +597,7 @@ export default function Dashboard() {
                                 fontSize: "16px",
                                 fontWeight: 600,
                                 margin: 0,
-                                color: "#212529",
+                                color: "var(--text-primary)",
                                 flex: 1,
                               }}
                             >
@@ -597,7 +622,7 @@ export default function Dashboard() {
                             <p
                               style={{
                                 fontSize: "13px",
-                                color: "#6c757d",
+                                color: "var(--text-secondary)",
                                 margin: 0,
                                 overflow: "hidden",
                                 textOverflow: "ellipsis",

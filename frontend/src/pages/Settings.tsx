@@ -4,6 +4,7 @@ import Layout from "../components/Layout";
 import PageHeader from "../components/PageHeader";
 import Card from "../components/Card";
 import Button from "../components/Button";
+import ImageUpload from "../components/ImageUpload";
 import { useToast } from "../contexts/ToastContext";
 
 type UserProfile = {
@@ -138,15 +139,15 @@ export default function Settings() {
 
         <div style={{ padding: "24px" }}>
           {/* Tabs */}
-          <div style={{ display: "flex", gap: "8px", marginBottom: "24px", borderBottom: "2px solid #dee2e6" }}>
+          <div style={{ display: "flex", gap: "8px", marginBottom: "24px", borderBottom: "2px solid var(--border-color)" }}>
             <button
               onClick={() => setActiveTab("profile")}
               style={{
                 padding: "12px 20px",
                 border: "none",
-                borderBottom: activeTab === "profile" ? "3px solid #007bff" : "3px solid transparent",
+                borderBottom: activeTab === "profile" ? "3px solid var(--primary)" : "3px solid transparent",
                 backgroundColor: "transparent",
-                color: activeTab === "profile" ? "#007bff" : "#6c757d",
+                color: activeTab === "profile" ? "var(--primary)" : "var(--text-secondary)",
                 cursor: "pointer",
                 fontWeight: activeTab === "profile" ? 600 : 400,
                 fontSize: "14px",
@@ -160,9 +161,9 @@ export default function Settings() {
               style={{
                 padding: "12px 20px",
                 border: "none",
-                borderBottom: activeTab === "password" ? "3px solid #007bff" : "3px solid transparent",
+                borderBottom: activeTab === "password" ? "3px solid var(--primary)" : "3px solid transparent",
                 backgroundColor: "transparent",
-                color: activeTab === "password" ? "#007bff" : "#6c757d",
+                color: activeTab === "password" ? "var(--primary)" : "var(--text-secondary)",
                 cursor: "pointer",
                 fontWeight: activeTab === "password" ? 600 : 400,
                 fontSize: "14px",
@@ -176,9 +177,9 @@ export default function Settings() {
               style={{
                 padding: "12px 20px",
                 border: "none",
-                borderBottom: activeTab === "organizations" ? "3px solid #007bff" : "3px solid transparent",
+                borderBottom: activeTab === "organizations" ? "3px solid var(--primary)" : "3px solid transparent",
                 backgroundColor: "transparent",
-                color: activeTab === "organizations" ? "#007bff" : "#6c757d",
+                color: activeTab === "organizations" ? "var(--primary)" : "var(--text-secondary)",
                 cursor: "pointer",
                 fontWeight: activeTab === "organizations" ? 600 : 400,
                 fontSize: "14px",
@@ -192,13 +193,19 @@ export default function Settings() {
           {/* Profile Tab */}
           {activeTab === "profile" && (
             <Card>
-              <h2 style={{ fontSize: "20px", fontWeight: 600, marginBottom: "24px", color: "#212529" }}>
+              <h2 style={{ fontSize: "20px", fontWeight: 600, marginBottom: "24px", color: "var(--text-primary)" }}>
                 Información del Perfil
               </h2>
               <form onSubmit={handleSaveProfile} style={{ display: "grid", gap: "16px" }}>
+                <ImageUpload
+                  currentImageUrl={profilePictureUrl || undefined}
+                  onImageChange={(url) => setProfilePictureUrl(url)}
+                  label="Foto de Perfil"
+                  maxSizeMB={5}
+                />
                 <div>
-                  <label style={{ display: "block", marginBottom: "6px", fontSize: "14px", fontWeight: 500, color: "#495057" }}>
-                    Foto de Perfil (URL)
+                  <label style={{ display: "block", marginBottom: "6px", fontSize: "14px", fontWeight: 500, color: "var(--text-primary)" }}>
+                    O pega una URL de imagen
                   </label>
                   <input
                     type="url"
@@ -208,27 +215,9 @@ export default function Settings() {
                     disabled={saving}
                     className="input"
                   />
-                  {profilePictureUrl && (
-                    <div style={{ marginTop: "12px" }}>
-                      <img
-                        src={profilePictureUrl}
-                        alt="Preview"
-                        style={{
-                          width: "100px",
-                          height: "100px",
-                          borderRadius: "50%",
-                          objectFit: "cover",
-                          border: "2px solid #dee2e6",
-                        }}
-                        onError={(e) => {
-                          (e.target as HTMLImageElement).style.display = "none";
-                        }}
-                      />
-                    </div>
-                  )}
                 </div>
                 <div>
-                  <label style={{ display: "block", marginBottom: "6px", fontSize: "14px", fontWeight: 500, color: "#495057" }}>
+                  <label style={{ display: "block", marginBottom: "6px", fontSize: "14px", fontWeight: 500, color: "var(--text-primary)" }}>
                     Nombre Completo
                   </label>
                   <input
@@ -242,7 +231,7 @@ export default function Settings() {
                   />
                 </div>
                 <div>
-                  <label style={{ display: "block", marginBottom: "6px", fontSize: "14px", fontWeight: 500, color: "#495057" }}>
+                  <label style={{ display: "block", marginBottom: "6px", fontSize: "14px", fontWeight: 500, color: "var(--text-primary)" }}>
                     Email
                   </label>
                   <input
@@ -250,14 +239,14 @@ export default function Settings() {
                     value={profile?.email || ""}
                     disabled
                     className="input"
-                    style={{ backgroundColor: "#f8f9fa", color: "#6c757d" }}
+                    style={{ backgroundColor: "var(--bg-secondary)", color: "var(--text-secondary)" }}
                   />
-                  <p style={{ fontSize: "12px", color: "#6c757d", marginTop: "4px" }}>
+                  <p style={{ fontSize: "12px", color: "var(--text-secondary)", marginTop: "4px" }}>
                     El email no se puede cambiar
                   </p>
                 </div>
                 <div>
-                  <label style={{ display: "block", marginBottom: "6px", fontSize: "14px", fontWeight: 500, color: "#495057" }}>
+                  <label style={{ display: "block", marginBottom: "6px", fontSize: "14px", fontWeight: 500, color: "var(--text-primary)" }}>
                     Miembro desde
                   </label>
                   <input
@@ -269,7 +258,7 @@ export default function Settings() {
                     }) : ""}
                     disabled
                     className="input"
-                    style={{ backgroundColor: "#f8f9fa", color: "#6c757d" }}
+                    style={{ backgroundColor: "var(--bg-secondary)", color: "var(--text-secondary)" }}
                   />
                 </div>
                 <Button type="submit" variant="primary" disabled={saving} loading={saving}>
@@ -282,12 +271,12 @@ export default function Settings() {
           {/* Password Tab */}
           {activeTab === "password" && (
             <Card>
-              <h2 style={{ fontSize: "20px", fontWeight: 600, marginBottom: "24px", color: "#212529" }}>
+              <h2 style={{ fontSize: "20px", fontWeight: 600, marginBottom: "24px", color: "var(--text-primary)" }}>
                 Cambiar Contraseña
               </h2>
               <form onSubmit={handleChangePassword} style={{ display: "grid", gap: "16px" }}>
                 <div>
-                  <label style={{ display: "block", marginBottom: "6px", fontSize: "14px", fontWeight: 500, color: "#495057" }}>
+                  <label style={{ display: "block", marginBottom: "6px", fontSize: "14px", fontWeight: 500, color: "var(--text-primary)" }}>
                     Contraseña Actual
                   </label>
                   <input
@@ -301,7 +290,7 @@ export default function Settings() {
                   />
                 </div>
                 <div>
-                  <label style={{ display: "block", marginBottom: "6px", fontSize: "14px", fontWeight: 500, color: "#495057" }}>
+                  <label style={{ display: "block", marginBottom: "6px", fontSize: "14px", fontWeight: 500, color: "var(--text-primary)" }}>
                     Nueva Contraseña
                   </label>
                   <input
@@ -316,7 +305,7 @@ export default function Settings() {
                   />
                 </div>
                 <div>
-                  <label style={{ display: "block", marginBottom: "6px", fontSize: "14px", fontWeight: 500, color: "#495057" }}>
+                  <label style={{ display: "block", marginBottom: "6px", fontSize: "14px", fontWeight: 500, color: "var(--text-primary)" }}>
                     Confirmar Nueva Contraseña
                   </label>
                   <input
@@ -345,7 +334,7 @@ export default function Settings() {
           {/* Organizations Tab */}
           {activeTab === "organizations" && (
             <Card>
-              <h2 style={{ fontSize: "20px", fontWeight: 600, marginBottom: "24px", color: "#212529" }}>
+              <h2 style={{ fontSize: "20px", fontWeight: 600, marginBottom: "24px", color: "var(--text-primary)" }}>
                 Mis Organizaciones
               </h2>
               {profile?.organizations && profile.organizations.length > 0 ? (
@@ -355,18 +344,30 @@ export default function Settings() {
                       key={org.organizationId}
                       style={{
                         padding: "16px",
-                        border: "1px solid #dee2e6",
-                        borderRadius: "8px",
+                        border: "1px solid var(--border-color)",
+                        borderRadius: "12px",
                         display: "flex",
                         justifyContent: "space-between",
                         alignItems: "center",
+                        backgroundColor: "var(--bg-secondary)",
+                        transition: "all 0.2s",
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.backgroundColor = "var(--hover-bg)";
+                        e.currentTarget.style.transform = "translateY(-2px)";
+                        e.currentTarget.style.boxShadow = "var(--shadow-md)";
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.backgroundColor = "var(--bg-secondary)";
+                        e.currentTarget.style.transform = "translateY(0)";
+                        e.currentTarget.style.boxShadow = "none";
                       }}
                     >
                       <div>
-                        <h3 style={{ fontSize: "16px", fontWeight: 600, margin: 0, color: "#212529" }}>
+                        <h3 style={{ fontSize: "16px", fontWeight: 600, margin: 0, color: "var(--text-primary)" }}>
                           {org.organizationName}
                         </h3>
-                        <div style={{ display: "flex", gap: "12px", marginTop: "8px", fontSize: "12px", color: "#6c757d" }}>
+                        <div style={{ display: "flex", gap: "12px", marginTop: "8px", fontSize: "12px", color: "var(--text-secondary)" }}>
                           <span>Rol: <strong>{getRoleLabel(org.role)}</strong></span>
                           <span>•</span>
                           <span>Unido: {new Date(org.joinedAt).toLocaleDateString("es-ES")}</span>
@@ -375,13 +376,22 @@ export default function Settings() {
                       <a
                         href={`/org/${org.organizationId}/dashboard`}
                         style={{
-                          padding: "8px 16px",
-                          backgroundColor: "#007bff",
+                          padding: "10px 20px",
+                          backgroundColor: "var(--primary)",
                           color: "white",
                           textDecoration: "none",
-                          borderRadius: "6px",
+                          borderRadius: "8px",
                           fontSize: "14px",
                           fontWeight: 500,
+                          transition: "all 0.2s",
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.backgroundColor = "var(--primary-dark)";
+                          e.currentTarget.style.transform = "translateY(-1px)";
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.backgroundColor = "var(--primary)";
+                          e.currentTarget.style.transform = "translateY(0)";
                         }}
                       >
                         Ir a Dashboard

@@ -132,7 +132,7 @@ export default function Orgs() {
 
   return (
     <Layout>
-      <div style={{ flex: 1, overflowY: "auto", backgroundColor: "#f8f9fa" }}>
+      <div style={{ flex: 1, overflowY: "auto", backgroundColor: "var(--bg-secondary)" }}>
         <PageHeader
           title="Organizaciones"
           subtitle="Gestiona tus organizaciones"
@@ -142,7 +142,7 @@ export default function Orgs() {
         <div style={{ padding: "24px" }}>
           {/* Create Org Form */}
           <Card style={{ marginBottom: "24px" }}>
-            <h2 style={{ fontSize: "18px", fontWeight: 600, marginBottom: "16px", color: "#212529" }}>
+            <h2 style={{ fontSize: "18px", fontWeight: 600, marginBottom: "16px", color: "var(--text-primary)" }}>
               Crear Nueva Organización
             </h2>
             <form onSubmit={createOrg} style={{ display: "grid", gap: "12px" }}>

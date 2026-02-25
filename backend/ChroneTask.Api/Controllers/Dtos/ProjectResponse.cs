@@ -12,4 +12,5 @@ public class ProjectResponse
     public DateTime? UpdatedAt { get; set; }
     public int TaskCount { get; set; }
     public int ActiveTaskCount { get; set; }
+    public string? ImageUrl { get; set; }
 }
