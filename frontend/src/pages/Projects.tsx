@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { useParams, Link } from "react-router-dom";
 import { http } from "../api/http";
 import Layout from "../components/Layout";
@@ -39,7 +39,7 @@ export default function Projects() {
 
   const loadProjects = useCallback(async () => {
     if (!organizationId) return;
-    
+
     setLoading(true);
     setErr(null);
     try {
@@ -87,7 +87,7 @@ export default function Projects() {
 
   const createProject = useCallback(async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
-    
+
     if (!organizationId || !name.trim()) {
       setErr("El nombre es requerido");
       return;
@@ -108,7 +108,7 @@ export default function Projects() {
       setImageUrl("");
       await loadProjects();
       showToast("Proyecto creado exitosamente", "success");
-      
+
       // Scroll suave hacia arriba para mostrar el nuevo proyecto
       setTimeout(() => {
         window.scrollTo({ top: 0, behavior: "smooth" });
@@ -331,36 +331,36 @@ export default function Projects() {
                     ? Math.round((project.activeTaskCount / project.taskCount) * 100)
                     : 0;
                 return (
-                    <Card key={project.id} hover className="hover-lift" style={{ position: "relative", overflow: "hidden" }}>
-                      {project.imageUrl && (
+                  <Card key={project.id} hover className="hover-lift" style={{ position: "relative", overflow: "hidden" }}>
+                    {project.imageUrl && (
+                      <div
+                        style={{
+                          width: "100%",
+                          height: "120px",
+                          margin: "-20px -20px 16px -20px",
+                          backgroundImage: `url(${project.imageUrl})`,
+                          backgroundSize: "cover",
+                          backgroundPosition: "center",
+                          position: "relative",
+                        }}
+                      >
                         <div
                           style={{
-                            width: "100%",
-                            height: "120px",
-                            margin: "-20px -20px 16px -20px",
-                            backgroundImage: `url(${project.imageUrl})`,
-                            backgroundSize: "cover",
-                            backgroundPosition: "center",
-                            position: "relative",
+                            position: "absolute",
+                            top: 0,
+                            left: 0,
+                            right: 0,
+                            bottom: 0,
+                            background: "linear-gradient(to bottom, rgba(0,0,0,0.1), rgba(0,0,0,0.3))",
                           }}
-                        >
-                          <div
-                            style={{
-                              position: "absolute",
-                              top: 0,
-                              left: 0,
-                              right: 0,
-                              bottom: 0,
-                              background: "linear-gradient(to bottom, rgba(0,0,0,0.1), rgba(0,0,0,0.3))",
-                            }}
-                          />
-                        </div>
-                      )}
-                      <Link
-                        to={`/org/${organizationId}/project/${project.id}/board`}
-                        style={{ textDecoration: "none", color: "inherit" }}
-                        className="fade-in"
-                      >
+                        />
+                      </div>
+                    )}
+                    <Link
+                      to={`/org/${organizationId}/project/${project.id}/board`}
+                      style={{ textDecoration: "none", color: "inherit" }}
+                      className="fade-in"
+                    >
                       <div style={{ marginBottom: "12px" }}>
                         <div
                           style={{
@@ -462,42 +462,42 @@ export default function Projects() {
                           <strong style={{ color: "var(--text-primary)" }}>{project.taskCount}</strong> total
                         </span>
                       </div>
-                      </Link>
-                      <button
-                        onClick={(e) => {
-                          e.preventDefault();
-                          e.stopPropagation();
-                          setShowMemberModal({ projectId: project.id, projectName: project.name });
-                        }}
-                        style={{
-                          position: "absolute",
-                          top: "12px",
-                          right: "12px",
-                          padding: "6px 10px",
-                          borderRadius: "6px",
-                          border: "1px solid #007bff",
-                          backgroundColor: "white",
-                          color: "#007bff",
-                          cursor: "pointer",
-                          fontSize: "12px",
-                          display: "flex",
-                          alignItems: "center",
-                          gap: "4px",
-                          fontWeight: 500,
-                          transition: "all 0.2s",
-                          zIndex: 10,
-                        }}
-                        onMouseEnter={(e) => {
-                          e.currentTarget.style.backgroundColor = "#e7f3ff";
-                        }}
-                        onMouseLeave={(e) => {
-                          e.currentTarget.style.backgroundColor = "white";
-                        }}
-                        title="Gestionar miembros del proyecto"
-                      >
-                        👥 Miembros
-                      </button>
-                    </Card>
+                    </Link>
+                    <button
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        setShowMemberModal({ projectId: project.id, projectName: project.name });
+                      }}
+                      style={{
+                        position: "absolute",
+                        top: "12px",
+                        right: "12px",
+                        padding: "6px 10px",
+                        borderRadius: "6px",
+                        border: "1px solid #007bff",
+                        backgroundColor: "white",
+                        color: "#007bff",
+                        cursor: "pointer",
+                        fontSize: "12px",
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "4px",
+                        fontWeight: 500,
+                        transition: "all 0.2s",
+                        zIndex: 10,
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.backgroundColor = "#e7f3ff";
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.backgroundColor = "white";
+                      }}
+                      title="Gestionar miembros del proyecto"
+                    >
+                      👥 Miembros
+                    </button>
+                  </Card>
                 );
               })}
             </div>
