@@ -45,6 +45,39 @@ public class AuthController : ControllerBase
             _db.Users.Add(user);
             await _db.SaveChangesAsync();
 
+            // Si hay un token de invitación, procesarlo
+            if (!string.IsNullOrWhiteSpace(request.InvitationToken))
+            {
+                var invitation = await _db.OrganizationInvitations
+                    .Include(i => i.Organization)
+                    .FirstOrDefaultAsync(i => i.Token == request.InvitationToken.Trim());
+
+                if (invitation != null && !invitation.IsUsed && invitation.ExpiresAt > DateTime.UtcNow)
+                {
+                    // Verificar que el usuario no sea ya miembro de la organización
+                    var isAlreadyMember = await _db.OrganizationMembers
+                        .AnyAsync(m => m.OrganizationId == invitation.OrganizationId && m.UserId == user.Id);
+
+                    if (!isAlreadyMember)
+                    {
+                        // Agregar usuario a la organización
+                        _db.OrganizationMembers.Add(new OrganizationMember
+                        {
+                            OrganizationId = invitation.OrganizationId,
+                            UserId = user.Id,
+                            Role = invitation.Role
+                        });
+
+                        // Marcar invitación como usada
+                        invitation.IsUsed = true;
+                        invitation.UsedAt = DateTime.UtcNow;
+                        invitation.UsedByUserId = user.Id;
+
+                        await _db.SaveChangesAsync();
+                    }
+                }
+            }
+
             return Ok(new { message = "User registered successfully" });
         }
         catch (Exception ex)

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate, useLocation, useSearchParams } from "react-router-dom";
 import { http } from "../api/http";
 import { setToken, isAuthed } from "../auth/token";
 import { useToast } from "../contexts/ToastContext";
@@ -8,6 +8,7 @@ import "../styles/auth.css";
 export default function Auth() {
   const navigate = useNavigate();
   const location = useLocation();
+  const [searchParams] = useSearchParams();
   const { showToast } = useToast();
   const [isRegisterMode, setIsRegisterMode] = useState(location.pathname === "/register");
   
@@ -18,6 +19,7 @@ export default function Auth() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [err, setErr] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [invitationToken, setInvitationToken] = useState<string | null>(null);
 
   // Si ya está autenticado, redirigir
   useEffect(() => {
@@ -25,6 +27,14 @@ export default function Auth() {
       navigate("/org-select", { replace: true });
     }
   }, [navigate]);
+
+  // Obtener token de invitación de la URL
+  useEffect(() => {
+    const invite = searchParams.get("invite");
+    if (invite) {
+      setInvitationToken(invite);
+    }
+  }, [searchParams]);
 
   // Actualizar modo cuando cambie la ruta
   useEffect(() => {
@@ -116,6 +126,7 @@ export default function Auth() {
         fullName: fullName.trim(),
         email: email.trim().toLowerCase(),
         password: password,
+        invitationToken: invitationToken || null,
       });
 
       // Después de registrarse, hacer login automático

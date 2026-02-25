@@ -11,6 +11,7 @@ public class ChroneTaskDbContext : DbContext
     public DbSet<Organization> Organizations => Set<Organization>();
     public DbSet<User> Users => Set<User>();
     public DbSet<OrganizationMember> OrganizationMembers => Set<OrganizationMember>();
+    public DbSet<OrganizationInvitation> OrganizationInvitations => Set<OrganizationInvitation>();
     public DbSet<Project> Projects => Set<Project>();
     public DbSet<ProjectMember> ProjectMembers => Set<ProjectMember>();
     public DbSet<TaskEntity> Tasks => Set<TaskEntity>();
@@ -114,6 +115,26 @@ public class ChroneTaskDbContext : DbContext
             entity.HasOne(te => te.User)
                 .WithMany()
                 .HasForeignKey(te => te.UserId)
+                .OnDelete(DeleteBehavior.Restrict);
+        });
+
+        // OrganizationInvitation configuration
+        modelBuilder.Entity<OrganizationInvitation>(entity =>
+        {
+            entity.HasKey(x => x.Id);
+            entity.HasIndex(x => x.Token).IsUnique();
+            entity.Property(x => x.Token).IsRequired().HasMaxLength(100);
+            entity.Property(x => x.Email).HasMaxLength(150);
+            entity.Property(x => x.Role).IsRequired().HasMaxLength(20);
+
+            entity.HasOne(i => i.Organization)
+                .WithMany()
+                .HasForeignKey(i => i.OrganizationId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasOne(i => i.CreatedByUser)
+                .WithMany()
+                .HasForeignKey(i => i.CreatedByUserId)
                 .OnDelete(DeleteBehavior.Restrict);
         });
     }

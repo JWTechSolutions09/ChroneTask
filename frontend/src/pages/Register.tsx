@@ -1,18 +1,28 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate, Link, useSearchParams } from "react-router-dom";
 import { http } from "../api/http";
 import { setToken, isAuthed } from "../auth/token";
 import { useToast } from "../contexts/ToastContext";
 
 export default function Register() {
   const nav = useNavigate();
+  const [searchParams] = useSearchParams();
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [err, setErr] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [invitationToken, setInvitationToken] = useState<string | null>(null);
   const { showToast } = useToast();
+
+  // Obtener token de invitación de la URL
+  useEffect(() => {
+    const invite = searchParams.get("invite");
+    if (invite) {
+      setInvitationToken(invite);
+    }
+  }, [searchParams]);
 
   // Si ya está autenticado, redirigir a /orgs
   useEffect(() => {
@@ -64,6 +74,7 @@ export default function Register() {
         fullName: fullName.trim(),
         email: email.trim(),
         password,
+        invitationToken: invitationToken || null,
       });
 
       // Después de registrarse, hacer login automático
@@ -117,7 +128,14 @@ export default function Register() {
           <h1 style={{ fontSize: "32px", marginBottom: "8px", color: "#212529", fontWeight: 700 }}>
             ChroneTask
           </h1>
-          <p style={{ color: "#6c757d", fontSize: "16px" }}>Crea una cuenta para comenzar</p>
+          <p style={{ color: "#6c757d", fontSize: "16px" }}>
+            {invitationToken ? "Únete a la organización" : "Crea una cuenta para comenzar"}
+          </p>
+          {invitationToken && (
+            <div className="alert alert-info" style={{ marginTop: "12px", fontSize: "14px" }}>
+              Has sido invitado a unirte a una organización. Al registrarte, serás agregado automáticamente.
+            </div>
+          )}
         </div>
 
         <form onSubmit={onRegister} style={{ display: "grid", gap: "16px" }}>

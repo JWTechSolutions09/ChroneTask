@@ -5,6 +5,7 @@ import Layout from "../components/Layout";
 import PageHeader from "../components/PageHeader";
 import Card from "../components/Card";
 import Button from "../components/Button";
+import InvitationsModal from "../components/InvitationsModal";
 import { useToast } from "../contexts/ToastContext";
 
 type Org = {
@@ -24,6 +25,7 @@ export default function Orgs() {
   const [creating, setCreating] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [confirmDelete, setConfirmDelete] = useState<string | null>(null);
+  const [invitationsModalOrg, setInvitationsModalOrg] = useState<{ id: string; name: string } | null>(null);
   const { showToast } = useToast();
 
   const load = useCallback(async () => {
@@ -388,6 +390,16 @@ export default function Orgs() {
           )}
         </div>
       </div>
+
+      {/* Modal de Invitaciones */}
+      {invitationsModalOrg && (
+        <InvitationsModal
+          organizationId={invitationsModalOrg.id}
+          organizationName={invitationsModalOrg.name}
+          isOpen={true}
+          onClose={() => setInvitationsModalOrg(null)}
+        />
+      )}
     </Layout>
   );
 }
