@@ -155,20 +155,24 @@ export default function Layout({ children, organizationId }: LayoutProps) {
                   height: "48px",
                   borderRadius: "10px",
                   backgroundColor: theme === "dark" ? "transparent" : "#000000",
+                  border: theme === "dark" ? "none" : "2px solid #000000",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
-                  padding: theme === "dark" ? "0" : "4px",
-                  boxShadow: theme === "dark" ? "0 3px 8px rgba(0, 0, 0, 0.15)" : "0 3px 8px rgba(0, 0, 0, 0.3)",
+                  padding: theme === "dark" ? "0" : "6px",
+                  boxShadow: theme === "dark" ? "0 3px 8px rgba(0, 0, 0, 0.15)" : "0 3px 12px rgba(0, 0, 0, 0.4)",
+                  minHeight: "48px",
+                  minWidth: "48px",
                 }}
               >
                 <img 
                   src="/logosidebar.png" 
                   alt="ChroneTask Logo" 
                   style={{
-                    width: "100%",
-                    height: "100%",
+                    width: theme === "dark" ? "100%" : "calc(100% - 12px)",
+                    height: theme === "dark" ? "100%" : "calc(100% - 12px)",
                     objectFit: "contain",
+                    display: "block",
                   }}
                 />
               </div>
@@ -184,21 +188,25 @@ export default function Layout({ children, organizationId }: LayoutProps) {
                 height: "48px",
                 borderRadius: "10px",
                 backgroundColor: theme === "dark" ? "transparent" : "#000000",
+                border: theme === "dark" ? "none" : "2px solid #000000",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
-                padding: theme === "dark" ? "0" : "4px",
-                boxShadow: theme === "dark" ? "0 3px 8px rgba(0, 0, 0, 0.15)" : "0 3px 8px rgba(0, 0, 0, 0.3)",
+                padding: theme === "dark" ? "0" : "6px",
+                boxShadow: theme === "dark" ? "0 3px 8px rgba(0, 0, 0, 0.15)" : "0 3px 12px rgba(0, 0, 0, 0.4)",
                 margin: "0 auto",
+                minHeight: "48px",
+                minWidth: "48px",
               }}
             >
               <img 
                 src="/logosidebar.png" 
                 alt="ChroneTask Logo" 
                 style={{
-                  width: "100%",
-                  height: "100%",
+                  width: theme === "dark" ? "100%" : "calc(100% - 12px)",
+                  height: theme === "dark" ? "100%" : "calc(100% - 12px)",
                   objectFit: "contain",
+                  display: "block",
                 }}
               />
             </div>
