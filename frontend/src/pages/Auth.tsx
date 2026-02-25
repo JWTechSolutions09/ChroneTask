@@ -361,12 +361,13 @@ export default function Auth() {
                   height: "160px",
                   marginBottom: "24px",
                   borderRadius: "20px",
-                  backgroundColor: theme === "dark" ? "transparent" : "#000000",
+                  backgroundColor: theme === "dark" ? "transparent" : "#1a1a1a",
+                  border: theme === "dark" ? "none" : "2px solid #000000",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
-                  padding: theme === "dark" ? "0" : "20px",
-                  boxShadow: "0 8px 24px rgba(0, 0, 0, 0.4)",
+                  padding: theme === "dark" ? "0" : "16px",
+                  boxShadow: theme === "dark" ? "0 8px 24px rgba(0, 0, 0, 0.4)" : "0 8px 24px rgba(0, 0, 0, 0.5), inset 0 2px 4px rgba(255, 255, 255, 0.1)",
                 }}
               >
                 <img 
@@ -374,10 +375,11 @@ export default function Auth() {
                   alt="ChroneTask Logo" 
                   className="auth-logo"
                   style={{
-                    width: "180px",
-                    height: "180px",
+                    width: "200px",
+                    height: "200px",
                     objectFit: "contain",
-                    transform: "scale(1.2)",
+                    transform: "scale(1.3)",
+                    filter: theme === "dark" ? "none" : "brightness(1.1) contrast(1.1)",
                   }}
                 />
               </div>
@@ -396,12 +398,13 @@ export default function Auth() {
                   height: "160px",
                   marginBottom: "24px",
                   borderRadius: "20px",
-                  backgroundColor: theme === "dark" ? "transparent" : "#000000",
+                  backgroundColor: theme === "dark" ? "transparent" : "#1a1a1a",
+                  border: theme === "dark" ? "none" : "2px solid #000000",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
-                  padding: theme === "dark" ? "0" : "20px",
-                  boxShadow: "0 8px 24px rgba(0, 0, 0, 0.4)",
+                  padding: theme === "dark" ? "0" : "16px",
+                  boxShadow: theme === "dark" ? "0 8px 24px rgba(0, 0, 0, 0.4)" : "0 8px 24px rgba(0, 0, 0, 0.5), inset 0 2px 4px rgba(255, 255, 255, 0.1)",
                 }}
               >
                 <img 
@@ -409,10 +412,11 @@ export default function Auth() {
                   alt="ChroneTask Logo" 
                   className="auth-logo"
                   style={{
-                    width: "180px",
-                    height: "180px",
+                    width: "200px",
+                    height: "200px",
                     objectFit: "contain",
-                    transform: "scale(1.2)",
+                    transform: "scale(1.3)",
+                    filter: theme === "dark" ? "none" : "brightness(1.1) contrast(1.1)",
                   }}
                 />
               </div>
