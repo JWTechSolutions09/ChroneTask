@@ -8,6 +8,7 @@ import Button from "../components/Button";
 import StatsCard from "../components/StatsCard";
 import SearchBar from "../components/SearchBar";
 import MiniChart from "../components/MiniChart";
+import InvitationsModal from "../components/InvitationsModal";
 import { useToast } from "../contexts/ToastContext";
 
 type Project = {
@@ -28,7 +29,23 @@ export default function Dashboard() {
   const [err, setErr] = useState<string | null>(null);
   const [viewMode, setViewMode] = useState<"grid" | "table">("grid");
   const [searchQuery, setSearchQuery] = useState("");
+  const [organizationName, setOrganizationName] = useState<string>("");
+  const [showInvitationsModal, setShowInvitationsModal] = useState(false);
   const { showToast } = useToast();
+
+  const loadOrganizationInfo = useCallback(async () => {
+    if (!organizationId) return;
+    try {
+      const res = await http.get("/api/orgs");
+      const orgs = res.data || [];
+      const org = orgs.find((o: { id: string }) => o.id === organizationId);
+      if (org) {
+        setOrganizationName(org.name || "");
+      }
+    } catch (ex: any) {
+      console.error("Error cargando información de organización:", ex);
+    }
+  }, [organizationId]);
 
   const loadProjects = useCallback(async () => {
     if (!organizationId) return;
@@ -55,6 +72,7 @@ export default function Dashboard() {
 
   useEffect(() => {
     if (organizationId) {
+      loadOrganizationInfo();
       loadProjects();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -119,6 +137,32 @@ export default function Dashboard() {
           ]}
           actions={
             <div style={{ display: "flex", gap: "8px" }}>
+              <button
+                onClick={() => setShowInvitationsModal(true)}
+                style={{
+                  padding: "8px 12px",
+                  borderRadius: "6px",
+                  border: "1px solid #007bff",
+                  backgroundColor: "white",
+                  color: "#007bff",
+                  cursor: "pointer",
+                  fontSize: "14px",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "6px",
+                  fontWeight: 500,
+                  transition: "all 0.2s",
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = "#e7f3ff";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = "white";
+                }}
+                title="Invitar miembros a la organización"
+              >
+                ✉️ Invitar
+              </button>
               <button
                 onClick={() => setViewMode(viewMode === "grid" ? "table" : "grid")}
                 style={{
@@ -596,6 +640,16 @@ export default function Dashboard() {
           </Card>
         </div>
       </div>
+
+      {/* Modal de Invitaciones */}
+      {organizationId && showInvitationsModal && (
+        <InvitationsModal
+          organizationId={organizationId}
+          organizationName={organizationName}
+          isOpen={showInvitationsModal}
+          onClose={() => setShowInvitationsModal(false)}
+        />
+      )}
     </Layout>
   );
 }
