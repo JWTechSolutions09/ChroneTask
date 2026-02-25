@@ -1,7 +1,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap');
 
 .auth-page-wrapper {
-  background: linear-gradient(135deg, #ffffff 0%, #fff5f5 25%, #ffe5e5 50%, #ffcccc 75%, #ff9999 100%);
+  background: linear-gradient(135deg, #fff5f5 0%, #ffe5e5 20%, #ffcccc 40%, #ff9999 60%, #ff6666 80%, #ff4d4d 100%);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -21,9 +21,9 @@
   right: 0;
   bottom: 0;
   background: 
-    radial-gradient(circle at 20% 30%, rgba(220, 53, 69, 0.15) 0%, transparent 40%),
-    radial-gradient(circle at 80% 70%, rgba(220, 53, 69, 0.12) 0%, transparent 40%),
-    radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.3) 0%, transparent 60%);
+    radial-gradient(circle at 20% 30%, rgba(220, 53, 69, 0.25) 0%, transparent 40%),
+    radial-gradient(circle at 80% 70%, rgba(220, 53, 69, 0.2) 0%, transparent 40%),
+    radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.2) 0%, transparent 60%);
   pointer-events: none;
 }
 
@@ -35,7 +35,7 @@
   right: 0;
   bottom: 0;
   background: 
-    linear-gradient(135deg, rgba(255, 255, 255, 0.4) 0%, rgba(255, 255, 255, 0.1) 100%);
+    linear-gradient(135deg, rgba(255, 255, 255, 0.25) 0%, rgba(255, 255, 255, 0.05) 100%);
   pointer-events: none;
 }
 
@@ -209,7 +209,7 @@
 
 .auth-wrapper input {
   background-color: #ffffff;
-  border: 2px solid #ffe5e5;
+  border: 2px solid #ffcccc;
   border-radius: 12px;
   padding: 14px 18px;
   margin: 8px 0;
@@ -298,7 +298,7 @@
 }
 
 .slide-panel {
-  background: linear-gradient(135deg, #ffffff 0%, #fff5f5 20%, #ffe5e5 40%, #ffcccc 60%, #ff9999 80%, #ff6666 100%);
+  background: linear-gradient(135deg, #fff5f5 0%, #ffe5e5 15%, #ffcccc 30%, #ff9999 50%, #ff6666 70%, #ff4d4d 100%);
   background-size: cover;
   background-position: center;
   color: #dc3545;
@@ -308,8 +308,8 @@
   width: 200%;
   transform: translateX(0);
   transition: transform 0.6s ease-in-out;
-  border-left: 2px solid rgba(220, 53, 69, 0.1);
-  border-right: 2px solid rgba(220, 53, 69, 0.1);
+  border-left: 2px solid rgba(220, 53, 69, 0.15);
+  border-right: 2px solid rgba(220, 53, 69, 0.15);
 }
 
 .slide-panel::before {
@@ -320,8 +320,8 @@
   right: 0;
   bottom: 0;
   background: 
-    radial-gradient(circle at 30% 40%, rgba(255, 255, 255, 0.6) 0%, transparent 50%),
-    radial-gradient(circle at 70% 60%, rgba(255, 255, 255, 0.4) 0%, transparent 50%);
+    radial-gradient(circle at 30% 40%, rgba(255, 255, 255, 0.4) 0%, transparent 50%),
+    radial-gradient(circle at 70% 60%, rgba(255, 255, 255, 0.25) 0%, transparent 50%);
   pointer-events: none;
 }
 
@@ -366,7 +366,7 @@
 }
 
 .social-links a {
-  border: 2px solid #ffe5e5;
+  border: 2px solid #ffcccc;
   border-radius: 50%;
   display: inline-flex;
   justify-content: center;
@@ -377,7 +377,7 @@
   transition: all 0.3s ease;
   color: #dc3545;
   background-color: #ffffff;
-  box-shadow: 0 2px 8px rgba(220, 53, 69, 0.1);
+  box-shadow: 0 2px 8px rgba(220, 53, 69, 0.15);
 }
 
 .social-links a:hover {
