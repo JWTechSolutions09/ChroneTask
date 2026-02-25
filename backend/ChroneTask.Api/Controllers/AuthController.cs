@@ -137,12 +137,71 @@ public class AuthController : ControllerBase
             if (string.IsNullOrWhiteSpace(request.IdToken))
                 return BadRequest(new { message = "Google ID token is required" });
 
-            // TODO: Validar el token de Google usando Google's API
-            // Por ahora, creamos o encontramos el usuario basado en el email
-            if (string.IsNullOrWhiteSpace(request.Email))
-                return BadRequest(new { message = "Email is required for Google login" });
+            // Validar el token de Google
+            var googleClientId = _config["Google:ClientId"];
+            if (string.IsNullOrWhiteSpace(googleClientId))
+            {
+                // Si no hay ClientId configurado, usar validación básica (solo para desarrollo)
+                Console.WriteLine("⚠️ Google ClientId no configurado. Usando validación básica.");
+                if (string.IsNullOrWhiteSpace(request.Email))
+                    return BadRequest(new { message = "Email is required for Google login" });
+            }
+            else
+            {
+                // Validar token con Google API
+                using var httpClient = new HttpClient();
+                var validationUrl = $"https://oauth2.googleapis.com/tokeninfo?id_token={request.IdToken}";
+                
+                try
+                {
+                    var response = await httpClient.GetAsync(validationUrl);
+                    if (response.IsSuccessStatusCode)
+                    {
+                        var content = await response.Content.ReadAsStringAsync();
+                        var tokenInfo = System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, object>>(content);
+                        
+                        // Verificar que el token es para nuestro cliente
+                        if (tokenInfo != null && tokenInfo.ContainsKey("aud"))
+                        {
+                            var aud = tokenInfo["aud"].ToString();
+                            if (aud != googleClientId)
+                            {
+                                return Unauthorized(new { message = "Invalid Google token: Client ID mismatch" });
+                            }
+                            
+                            // Extraer email del token validado
+                            if (tokenInfo.ContainsKey("email"))
+                            {
+                                request.Email = tokenInfo["email"].ToString();
+                            }
+                            if (tokenInfo.ContainsKey("name") && string.IsNullOrWhiteSpace(request.FullName))
+                            {
+                                request.FullName = tokenInfo["name"].ToString();
+                            }
+                            if (tokenInfo.ContainsKey("picture") && string.IsNullOrWhiteSpace(request.ProfilePictureUrl))
+                            {
+                                request.ProfilePictureUrl = tokenInfo["picture"].ToString();
+                            }
+                        }
+                    }
+                    else
+                    {
+                        Console.WriteLine($"⚠️ Error validando token de Google: {response.StatusCode}");
+                        // Continuar con validación básica si falla la validación de Google
+                        if (string.IsNullOrWhiteSpace(request.Email))
+                            return BadRequest(new { message = "Email is required for Google login" });
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"⚠️ Error validando token de Google: {ex.Message}");
+                    // Continuar con validación básica si falla
+                    if (string.IsNullOrWhiteSpace(request.Email))
+                        return BadRequest(new { message = "Email is required for Google login" });
+                }
+            }
 
-            var normalizedEmail = request.Email.Trim().ToLowerInvariant();
+            var normalizedEmail = request.Email!.Trim().ToLowerInvariant();
             var user = await _db.Users.FirstOrDefaultAsync(x => x.Email == normalizedEmail);
 
             if (user == null)
