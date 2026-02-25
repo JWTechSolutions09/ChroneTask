@@ -358,11 +358,11 @@ export default function Auth() {
                 alt="ChroneTask Logo" 
                 className="auth-logo"
                 style={{
-                  width: "80px",
-                  height: "80px",
-                  marginBottom: "20px",
-                  borderRadius: "12px",
-                  boxShadow: "0 4px 12px rgba(0, 0, 0, 0.2)",
+                  width: "120px",
+                  height: "120px",
+                  marginBottom: "24px",
+                  borderRadius: "16px",
+                  boxShadow: "0 6px 20px rgba(0, 0, 0, 0.3)",
                 }}
               />
               <h1>Welcome Back!</h1>
@@ -379,11 +379,11 @@ export default function Auth() {
                 alt="ChroneTask Logo" 
                 className="auth-logo"
                 style={{
-                  width: "80px",
-                  height: "80px",
-                  marginBottom: "20px",
-                  borderRadius: "12px",
-                  boxShadow: "0 4px 12px rgba(0, 0, 0, 0.2)",
+                  width: "120px",
+                  height: "120px",
+                  marginBottom: "24px",
+                  borderRadius: "16px",
+                  boxShadow: "0 6px 20px rgba(0, 0, 0, 0.3)",
                 }}
               />
               <h1>Hey There!</h1>

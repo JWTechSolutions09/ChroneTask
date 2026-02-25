@@ -153,11 +153,11 @@ export default function Layout({ children, organizationId }: LayoutProps) {
                 src="/logo.png" 
                 alt="ChroneTask Logo" 
                 style={{
-                  width: "36px",
-                  height: "36px",
-                  borderRadius: "8px",
+                  width: "48px",
+                  height: "48px",
+                  borderRadius: "10px",
                   objectFit: "cover",
-                  boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
+                  boxShadow: "0 3px 8px rgba(0, 0, 0, 0.15)",
                 }}
               />
               <span style={{ fontWeight: 700, fontSize: "18px", color: "var(--text-primary)", letterSpacing: "-0.5px" }}>
@@ -170,11 +170,11 @@ export default function Layout({ children, organizationId }: LayoutProps) {
               src="/logo.png" 
               alt="ChroneTask Logo" 
               style={{
-                width: "36px",
-                height: "36px",
-                borderRadius: "8px",
+                width: "48px",
+                height: "48px",
+                borderRadius: "10px",
                 objectFit: "cover",
-                boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
+                boxShadow: "0 3px 8px rgba(0, 0, 0, 0.15)",
                 margin: "0 auto",
               }}
             />
