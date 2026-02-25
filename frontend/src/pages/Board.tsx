@@ -23,6 +23,13 @@ type Task = {
   tags?: string;
 };
 
+type ProjectMember = {
+  userId: string;
+  userName: string;
+  userEmail: string;
+  role: string;
+};
+
 const STATUSES = ["To Do", "In Progress", "Blocked", "Review", "Done"];
 const STATUS_COLORS: Record<string, string> = {
   "To Do": "#6c757d",
@@ -36,10 +43,12 @@ export default function Board() {
   const { organizationId, projectId } = useParams<{ organizationId: string; projectId: string }>();
   const [tasks, setTasks] = useState<Task[]>([]);
   const [projectName, setProjectName] = useState<string>("");
+  const [projectMembers, setProjectMembers] = useState<ProjectMember[]>([]);
   const [loading, setLoading] = useState(false);
   const [err, setErr] = useState<string | null>(null);
   const [draggedTask, setDraggedTask] = useState<Task | null>(null);
   const [showCreateModal, setShowCreateModal] = useState(false);
+  const [assigningTaskId, setAssigningTaskId] = useState<string | null>(null);
   const { showToast } = useToast();
 
   const loadProjectInfo = useCallback(async () => {
@@ -50,6 +59,17 @@ export default function Board() {
     } catch (err: any) {
       console.error("Error cargando información del proyecto:", err);
       setErr(err?.response?.data?.message ?? "Error cargando información del proyecto");
+    }
+  }, [projectId, organizationId]);
+
+  const loadProjectMembers = useCallback(async () => {
+    if (!projectId || !organizationId) return;
+    try {
+      const res = await http.get(`/api/orgs/${organizationId}/projects/${projectId}/members`);
+      setProjectMembers(res.data || []);
+    } catch (err: any) {
+      console.error("Error cargando miembros del proyecto:", err);
+      // No mostrar error si falla, simplemente no habrá miembros disponibles
     }
   }, [projectId, organizationId]);
 
@@ -71,6 +91,7 @@ export default function Board() {
   useEffect(() => {
     if (projectId && organizationId) {
       loadProjectInfo();
+      loadProjectMembers();
       loadTasks();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -130,6 +151,24 @@ export default function Board() {
     } catch (ex: any) {
       const errorMsg = ex?.response?.data?.message ?? ex.message ?? "Error actualizando estado";
       showToast(errorMsg, "error");
+    }
+  }, [projectId, loadTasks, showToast]);
+
+  const assignTask = useCallback(async (taskId: string, userId: string | null) => {
+    if (!projectId) return;
+
+    try {
+      await http.patch(
+        `/api/projects/${projectId}/tasks/${taskId}/assign`,
+        userId || null
+      );
+      await loadTasks();
+      setAssigningTaskId(null);
+      showToast(userId ? "Usuario asignado correctamente" : "Asignación removida", "success");
+    } catch (ex: any) {
+      const errorMsg = ex?.response?.data?.message ?? ex.message ?? "Error asignando tarea";
+      showToast(errorMsg, "error");
+      setAssigningTaskId(null);
     }
   }, [projectId, loadTasks, showToast]);
 
@@ -386,16 +425,71 @@ export default function Board() {
                               marginBottom: "10px",
                             }}
                           >
-                            <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-                              {task.assignedToName ? (
-                                <>
-                                  <span style={{ fontSize: "14px" }}>👤</span>
-                                  <span style={{ fontWeight: 600, color: "#495057" }}>
-                                    {task.assignedToName}
-                                  </span>
-                                </>
+                            <div style={{ display: "flex", alignItems: "center", gap: "6px", position: "relative" }}>
+                              {assigningTaskId === task.id ? (
+                                <select
+                                  value={task.assignedToId || ""}
+                                  onChange={(e) => {
+                                    const userId = e.target.value || null;
+                                    assignTask(task.id, userId);
+                                  }}
+                                  onBlur={() => setAssigningTaskId(null)}
+                                  autoFocus
+                                  style={{
+                                    padding: "4px 8px",
+                                    fontSize: "11px",
+                                    border: "1px solid #007bff",
+                                    borderRadius: "6px",
+                                    backgroundColor: "white",
+                                    cursor: "pointer",
+                                    minWidth: "120px",
+                                  }}
+                                  onClick={(e) => e.stopPropagation()}
+                                >
+                                  <option value="">Sin asignar</option>
+                                  {projectMembers.map((member) => (
+                                    <option key={member.userId} value={member.userId}>
+                                      {member.userName}
+                                    </option>
+                                  ))}
+                                </select>
                               ) : (
-                                <span style={{ opacity: 0.6, fontSize: "11px" }}>Sin asignar</span>
+                                <div
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    setAssigningTaskId(task.id);
+                                  }}
+                                  style={{
+                                    cursor: "pointer",
+                                    display: "flex",
+                                    alignItems: "center",
+                                    gap: "6px",
+                                    padding: "4px 8px",
+                                    borderRadius: "6px",
+                                    transition: "background-color 0.2s",
+                                  }}
+                                  onMouseEnter={(e) => {
+                                    e.currentTarget.style.backgroundColor = "#f0f0f0";
+                                  }}
+                                  onMouseLeave={(e) => {
+                                    e.currentTarget.style.backgroundColor = "transparent";
+                                  }}
+                                  title="Click para asignar usuario"
+                                >
+                                  {task.assignedToName ? (
+                                    <>
+                                      <span style={{ fontSize: "14px" }}>👤</span>
+                                      <span style={{ fontWeight: 600, color: "#495057" }}>
+                                        {task.assignedToName}
+                                      </span>
+                                    </>
+                                  ) : (
+                                    <>
+                                      <span style={{ fontSize: "12px" }}>➕</span>
+                                      <span style={{ opacity: 0.6, fontSize: "11px" }}>Asignar</span>
+                                    </>
+                                  )}
+                                </div>
                               )}
                             </div>
                             {task.estimatedMinutes && (

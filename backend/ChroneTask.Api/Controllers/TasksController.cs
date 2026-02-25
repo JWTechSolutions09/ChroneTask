@@ -221,6 +221,68 @@ public class TasksController : ControllerBase
         });
     }
 
+    // PATCH: api/projects/{projectId}/tasks/{id}/assign
+    [HttpPatch("{id:guid}/assign")]
+    public async Task<ActionResult<TaskResponse>> AssignTask(Guid projectId, Guid id, [FromBody] Guid? assignedToId)
+    {
+        var userId = UserContext.GetUserId(User);
+
+        var task = await _db.Tasks
+            .Include(t => t.AssignedTo)
+            .FirstOrDefaultAsync(t => t.Id == id && t.ProjectId == projectId);
+
+        if (task is null)
+            return NotFound();
+
+        // Verificar que el usuario es miembro del proyecto
+        var isMember = await _db.ProjectMembers
+            .AnyAsync(m => m.ProjectId == projectId && m.UserId == userId);
+
+        if (!isMember)
+            return StatusCode(403, new { message = "You are not a member of this project" });
+
+        // Si se asigna un usuario, verificar que es miembro del proyecto
+        if (assignedToId.HasValue)
+        {
+            var isAssignedUserMember = await _db.ProjectMembers
+                .AnyAsync(m => m.ProjectId == projectId && m.UserId == assignedToId.Value);
+
+            if (!isAssignedUserMember)
+                return BadRequest(new { message = "The assigned user must be a member of the project" });
+        }
+
+        task.AssignedToId = assignedToId;
+        task.UpdatedAt = DateTime.UtcNow;
+
+        await _db.SaveChangesAsync();
+
+        // Recargar el usuario asignado si existe
+        if (task.AssignedToId.HasValue)
+        {
+            await _db.Entry(task).Reference(t => t.AssignedTo).LoadAsync();
+        }
+
+        return Ok(new TaskResponse
+        {
+            Id = task.Id,
+            Title = task.Title,
+            Description = task.Description,
+            ProjectId = task.ProjectId,
+            Type = task.Type,
+            Status = task.Status,
+            Priority = task.Priority,
+            AssignedToId = task.AssignedToId,
+            AssignedToName = task.AssignedTo != null ? task.AssignedTo.FullName : null,
+            StartDate = task.StartDate,
+            DueDate = task.DueDate,
+            EstimatedMinutes = task.EstimatedMinutes,
+            TotalMinutes = task.TotalMinutes,
+            Tags = task.Tags,
+            CreatedAt = task.CreatedAt,
+            UpdatedAt = task.UpdatedAt
+        });
+    }
+
     // PATCH: api/projects/{projectId}/tasks/{id}/status
     [HttpPatch("{id:guid}/status")]
     public async Task<ActionResult<TaskResponse>> UpdateStatus(Guid projectId, Guid id, [FromBody] string status)

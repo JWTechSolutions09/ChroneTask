@@ -217,4 +217,32 @@ public class ProjectsController : ControllerBase
 
         return NoContent();
     }
+
+    // GET: api/orgs/{organizationId}/projects/{id}/members
+    [HttpGet("{id:guid}/members")]
+    public async Task<ActionResult<List<ProjectMemberResponse>>> GetMembers(Guid organizationId, Guid id)
+    {
+        var userId = UserContext.GetUserId(User);
+
+        // Verificar que el usuario es miembro de la organización
+        var isOrgMember = await _db.OrganizationMembers
+            .AnyAsync(m => m.OrganizationId == organizationId && m.UserId == userId);
+
+        if (!isOrgMember)
+            return StatusCode(403, new { message = "You are not a member of this organization" });
+
+        var members = await _db.ProjectMembers
+            .Where(m => m.ProjectId == id)
+            .Include(m => m.User)
+            .Select(m => new ProjectMemberResponse
+            {
+                UserId = m.UserId,
+                UserName = m.User.FullName,
+                UserEmail = m.User.Email,
+                Role = m.Role
+            })
+            .ToListAsync();
+
+        return Ok(members);
+    }
 }
