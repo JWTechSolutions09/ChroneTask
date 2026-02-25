@@ -6,6 +6,7 @@ import OrgSelect from "./pages/OrgSelect";
 import Dashboard from "./pages/Dashboard";
 import Projects from "./pages/Projects";
 import Board from "./pages/Board";
+import Settings from "./pages/Settings";
 import { isAuthed } from "./auth/token";
 import { setNavigateFunction } from "./api/http";
 import type { ReactElement } from "react";
@@ -135,6 +136,14 @@ function AppContent() {
                 element={
                     <PrivateRoute>
                         <Board />
+                    </PrivateRoute>
+                }
+            />
+            <Route
+                path="/settings"
+                element={
+                    <PrivateRoute>
+                        <Settings />
                     </PrivateRoute>
                 }
             />

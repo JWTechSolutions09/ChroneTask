@@ -376,4 +376,46 @@ public class OrganizationsController : ControllerBase
             });
         }
     }
+
+    // GET: api/orgs/{id}/members
+    [HttpGet("{id:guid}/members")]
+    public async Task<ActionResult<List<OrganizationMemberResponse>>> GetMembers(Guid id)
+    {
+        try
+        {
+            var userId = UserContext.GetUserId(User);
+
+            // Verificar que el usuario es miembro de la organización
+            var isOrgMember = await _db.OrganizationMembers
+                .AnyAsync(m => m.OrganizationId == id && m.UserId == userId);
+
+            if (!isOrgMember)
+                return StatusCode(403, new { message = "You are not a member of this organization" });
+
+            var members = await _db.OrganizationMembers
+                .Where(m => m.OrganizationId == id)
+                .Include(m => m.User)
+                .Select(m => new OrganizationMemberResponse
+                {
+                    UserId = m.UserId,
+                    UserName = m.User.FullName,
+                    UserEmail = m.User.Email,
+                    ProfilePictureUrl = m.User.ProfilePictureUrl,
+                    Role = m.Role,
+                    JoinedAt = m.JoinedAt
+                })
+                .OrderBy(m => m.UserName)
+                .ToListAsync();
+
+            return Ok(members);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"❌ Error en GetMembers: {ex.Message}");
+            return StatusCode(500, new { 
+                error = "Internal Server Error", 
+                message = ex.Message
+            });
+        }
+    }
 }

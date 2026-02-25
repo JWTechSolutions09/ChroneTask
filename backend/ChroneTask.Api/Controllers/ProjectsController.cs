@@ -245,4 +245,116 @@ public class ProjectsController : ControllerBase
 
         return Ok(members);
     }
+
+    // POST: api/orgs/{organizationId}/projects/{id}/members
+    [HttpPost("{id:guid}/members")]
+    public async Task<ActionResult<ProjectMemberResponse>> AddMember(Guid organizationId, Guid id, [FromBody] AddProjectMemberRequest request)
+    {
+        try
+        {
+            var userId = UserContext.GetUserId(User);
+
+            // Verificar que el proyecto existe y pertenece a la organización
+            var project = await _db.Projects
+                .FirstOrDefaultAsync(p => p.Id == id && p.OrganizationId == organizationId);
+
+            if (project is null)
+                return NotFound();
+
+            // Verificar que el usuario que hace la petición es miembro de la organización
+            var isOrgMember = await _db.OrganizationMembers
+                .AnyAsync(m => m.OrganizationId == organizationId && m.UserId == userId);
+
+            if (!isOrgMember)
+                return StatusCode(403, new { message = "You are not a member of this organization" });
+
+            // Verificar que el usuario a agregar es miembro de la organización
+            var isTargetUserOrgMember = await _db.OrganizationMembers
+                .AnyAsync(m => m.OrganizationId == organizationId && m.UserId == request.UserId);
+
+            if (!isTargetUserOrgMember)
+                return BadRequest(new { message = "The user must be a member of the organization first" });
+
+            // Verificar que el usuario no sea ya miembro del proyecto
+            var existingMember = await _db.ProjectMembers
+                .FirstOrDefaultAsync(m => m.ProjectId == id && m.UserId == request.UserId);
+
+            if (existingMember != null)
+                return Conflict(new { message = "User is already a member of this project" });
+
+            // Agregar miembro al proyecto
+            var projectMember = new ProjectMember
+            {
+                ProjectId = id,
+                UserId = request.UserId,
+                Role = request.Role ?? "member"
+            };
+
+            _db.ProjectMembers.Add(projectMember);
+            await _db.SaveChangesAsync();
+
+            // Cargar información del usuario
+            await _db.Entry(projectMember).Reference(m => m.User).LoadAsync();
+
+            return Ok(new ProjectMemberResponse
+            {
+                UserId = projectMember.UserId,
+                UserName = projectMember.User.FullName,
+                UserEmail = projectMember.User.Email,
+                Role = projectMember.Role
+            });
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"❌ Error en AddMember: {ex.Message}");
+            return StatusCode(500, new { 
+                error = "Internal Server Error", 
+                message = ex.Message
+            });
+        }
+    }
+
+    // DELETE: api/orgs/{organizationId}/projects/{id}/members/{userId}
+    [HttpDelete("{id:guid}/members/{memberUserId:guid}")]
+    public async Task<IActionResult> RemoveMember(Guid organizationId, Guid id, Guid memberUserId)
+    {
+        try
+        {
+            var userId = UserContext.GetUserId(User);
+
+            // Verificar que el proyecto existe y pertenece a la organización
+            var project = await _db.Projects
+                .FirstOrDefaultAsync(p => p.Id == id && p.OrganizationId == organizationId);
+
+            if (project is null)
+                return NotFound();
+
+            // Verificar que el usuario que hace la petición es miembro de la organización
+            var isOrgMember = await _db.OrganizationMembers
+                .AnyAsync(m => m.OrganizationId == organizationId && m.UserId == userId);
+
+            if (!isOrgMember)
+                return StatusCode(403, new { message = "You are not a member of this organization" });
+
+            // Buscar el miembro del proyecto
+            var projectMember = await _db.ProjectMembers
+                .FirstOrDefaultAsync(m => m.ProjectId == id && m.UserId == memberUserId);
+
+            if (projectMember is null)
+                return NotFound();
+
+            _db.ProjectMembers.Remove(projectMember);
+            await _db.SaveChangesAsync();
+
+            return NoContent();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"❌ Error en RemoveMember: {ex.Message}");
+            return StatusCode(500, new { 
+                error = "Internal Server Error", 
+                message = ex.Message
+            });
+        }
+    }
 }

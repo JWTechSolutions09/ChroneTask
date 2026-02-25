@@ -9,6 +9,7 @@ import StatsCard from "../components/StatsCard";
 import SearchBar from "../components/SearchBar";
 import MiniChart from "../components/MiniChart";
 import InvitationsModal from "../components/InvitationsModal";
+import OrganizationMembersModal from "../components/OrganizationMembersModal";
 import { useToast } from "../contexts/ToastContext";
 
 type Project = {
@@ -31,6 +32,7 @@ export default function Dashboard() {
   const [searchQuery, setSearchQuery] = useState("");
   const [organizationName, setOrganizationName] = useState<string>("");
   const [showInvitationsModal, setShowInvitationsModal] = useState(false);
+  const [showMembersModal, setShowMembersModal] = useState(false);
   const { showToast } = useToast();
 
   const loadOrganizationInfo = useCallback(async () => {
@@ -137,6 +139,32 @@ export default function Dashboard() {
           ]}
           actions={
             <div style={{ display: "flex", gap: "8px" }}>
+              <button
+                onClick={() => setShowMembersModal(true)}
+                style={{
+                  padding: "8px 12px",
+                  borderRadius: "6px",
+                  border: "1px solid #6c757d",
+                  backgroundColor: "white",
+                  color: "#6c757d",
+                  cursor: "pointer",
+                  fontSize: "14px",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "6px",
+                  fontWeight: 500,
+                  transition: "all 0.2s",
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = "#f8f9fa";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = "white";
+                }}
+                title="Ver miembros de la organización"
+              >
+                👥 Miembros
+              </button>
               <button
                 onClick={() => setShowInvitationsModal(true)}
                 style={{
@@ -648,6 +676,16 @@ export default function Dashboard() {
           organizationName={organizationName}
           isOpen={showInvitationsModal}
           onClose={() => setShowInvitationsModal(false)}
+        />
+      )}
+
+      {/* Modal de Miembros */}
+      {organizationId && showMembersModal && (
+        <OrganizationMembersModal
+          organizationId={organizationId}
+          organizationName={organizationName}
+          isOpen={showMembersModal}
+          onClose={() => setShowMembersModal(false)}
         />
       )}
     </Layout>

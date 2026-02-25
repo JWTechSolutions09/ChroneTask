@@ -6,6 +6,7 @@ import PageHeader from "../components/PageHeader";
 import Card from "../components/Card";
 import Button from "../components/Button";
 import SearchBar from "../components/SearchBar";
+import AddProjectMemberModal from "../components/AddProjectMemberModal";
 import { useToast } from "../contexts/ToastContext";
 
 type Project = {
@@ -30,6 +31,7 @@ export default function Projects() {
   const [err, setErr] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [creating, setCreating] = useState(false);
+  const [showMemberModal, setShowMemberModal] = useState<{ projectId: string; projectName: string } | null>(null);
   const { showToast } = useToast();
 
   const loadProjects = useCallback(async () => {
@@ -297,13 +299,12 @@ export default function Projects() {
                     ? Math.round((project.activeTaskCount / project.taskCount) * 100)
                     : 0;
                 return (
-                    <Link
-                      key={project.id}
-                      to={`/org/${organizationId}/project/${project.id}/board`}
-                      style={{ textDecoration: "none", color: "inherit" }}
-                      className="fade-in"
-                    >
-                      <Card hover className="hover-lift">
+                    <Card key={project.id} hover className="hover-lift" style={{ position: "relative" }}>
+                      <Link
+                        to={`/org/${organizationId}/project/${project.id}/board`}
+                        style={{ textDecoration: "none", color: "inherit" }}
+                        className="fade-in"
+                      >
                       <div style={{ marginBottom: "12px" }}>
                         <div
                           style={{
@@ -405,14 +406,62 @@ export default function Projects() {
                           <strong style={{ color: "#212529" }}>{project.taskCount}</strong> total
                         </span>
                       </div>
+                      </Link>
+                      <button
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          setShowMemberModal({ projectId: project.id, projectName: project.name });
+                        }}
+                        style={{
+                          position: "absolute",
+                          top: "12px",
+                          right: "12px",
+                          padding: "6px 10px",
+                          borderRadius: "6px",
+                          border: "1px solid #007bff",
+                          backgroundColor: "white",
+                          color: "#007bff",
+                          cursor: "pointer",
+                          fontSize: "12px",
+                          display: "flex",
+                          alignItems: "center",
+                          gap: "4px",
+                          fontWeight: 500,
+                          transition: "all 0.2s",
+                          zIndex: 10,
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.backgroundColor = "#e7f3ff";
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.backgroundColor = "white";
+                        }}
+                        title="Gestionar miembros del proyecto"
+                      >
+                        👥 Miembros
+                      </button>
                     </Card>
-                  </Link>
                 );
               })}
             </div>
           )}
         </div>
       </div>
+
+      {/* Modal de Miembros del Proyecto */}
+      {organizationId && showMemberModal && (
+        <AddProjectMemberModal
+          organizationId={organizationId}
+          projectId={showMemberModal.projectId}
+          projectName={showMemberModal.projectName}
+          isOpen={true}
+          onClose={() => setShowMemberModal(null)}
+          onMemberAdded={() => {
+            // Recargar proyectos si es necesario
+          }}
+        />
+      )}
     </Layout>
   );
 }

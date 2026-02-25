@@ -322,6 +322,27 @@ export default function Layout({ children, organizationId }: LayoutProps) {
               </button>
             )}
             <button
+              onClick={() => navigate("/settings")}
+              style={{
+                width: "100%",
+                padding: "8px 12px",
+                background: "none",
+                border: "1px solid #e9ecef",
+                borderRadius: "6px",
+                cursor: "pointer",
+                fontSize: "14px",
+                color: "#495057",
+                display: "flex",
+                alignItems: "center",
+                gap: "8px",
+                justifyContent: sidebarCollapsed ? "center" : "flex-start",
+                marginBottom: "8px",
+              }}
+            >
+              <span>⚙️</span>
+              {!sidebarCollapsed && <span>Configuración</span>}
+            </button>
+            <button
               onClick={handleLogout}
               style={{
                 width: "100%",

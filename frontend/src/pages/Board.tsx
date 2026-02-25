@@ -320,7 +320,10 @@ export default function Board() {
                       <div
                         key={task.id}
                         draggable
-                        onDragStart={(e) => handleDragStart(e, task)}
+                        onDragStart={(e) => {
+                          e.currentTarget.style.opacity = "0.5";
+                          handleDragStart(e, task);
+                        }}
                         className="hover-lift fade-in"
                         style={{
                           padding: "14px",
@@ -340,10 +343,6 @@ export default function Board() {
                         onMouseLeave={(e) => {
                           e.currentTarget.style.borderColor = "#e9ecef";
                           e.currentTarget.style.cursor = "grab";
-                        }}
-                        onDragStart={(e) => {
-                          e.currentTarget.style.opacity = "0.5";
-                          handleDragStart(e, task);
                         }}
                         onDragEnd={(e) => {
                           e.currentTarget.style.opacity = "1";
