@@ -3,6 +3,7 @@ import { useNavigate, useLocation, useSearchParams } from "react-router-dom";
 import { http } from "../api/http";
 import { setToken, isAuthed } from "../auth/token";
 import { useToast } from "../contexts/ToastContext";
+import { useTheme } from "../contexts/ThemeContext";
 import "../styles/auth.css";
 
 export default function Auth() {
@@ -20,6 +21,7 @@ export default function Auth() {
   const [err, setErr] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [invitationToken, setInvitationToken] = useState<string | null>(null);
+  const { theme } = useTheme();
 
   // Si ya está autenticado, redirigir
   useEffect(() => {
@@ -353,18 +355,32 @@ export default function Auth() {
         <div className="slide-panel-wrapper">
           <div className="slide-panel">
             <div className="panel-content panel-content-left">
-              <img 
-                src="/logo.png" 
-                alt="ChroneTask Logo" 
-                className="auth-logo"
+              <div
                 style={{
-                  width: "120px",
-                  height: "120px",
+                  width: "160px",
+                  height: "160px",
                   marginBottom: "24px",
-                  borderRadius: "16px",
-                  boxShadow: "0 6px 20px rgba(0, 0, 0, 0.3)",
+                  borderRadius: "20px",
+                  backgroundColor: theme === "dark" ? "transparent" : "#000000",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  padding: theme === "dark" ? "0" : "20px",
+                  boxShadow: "0 8px 24px rgba(0, 0, 0, 0.4)",
                 }}
-              />
+              >
+                <img 
+                  src="/logo.png" 
+                  alt="ChroneTask Logo" 
+                  className="auth-logo"
+                  style={{
+                    width: "180px",
+                    height: "180px",
+                    objectFit: "contain",
+                    transform: "scale(1.2)",
+                  }}
+                />
+              </div>
               <h1>Welcome Back!</h1>
               <p>
                 Stay connected by logging in with your credentials and continue your experience
@@ -374,18 +390,32 @@ export default function Auth() {
               </button>
             </div>
             <div className="panel-content panel-content-right">
-              <img 
-                src="/logo.png" 
-                alt="ChroneTask Logo" 
-                className="auth-logo"
+              <div
                 style={{
-                  width: "120px",
-                  height: "120px",
+                  width: "160px",
+                  height: "160px",
                   marginBottom: "24px",
-                  borderRadius: "16px",
-                  boxShadow: "0 6px 20px rgba(0, 0, 0, 0.3)",
+                  borderRadius: "20px",
+                  backgroundColor: theme === "dark" ? "transparent" : "#000000",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  padding: theme === "dark" ? "0" : "20px",
+                  boxShadow: "0 8px 24px rgba(0, 0, 0, 0.4)",
                 }}
-              />
+              >
+                <img 
+                  src="/logo.png" 
+                  alt="ChroneTask Logo" 
+                  className="auth-logo"
+                  style={{
+                    width: "180px",
+                    height: "180px",
+                    objectFit: "contain",
+                    transform: "scale(1.2)",
+                  }}
+                />
+              </div>
               <h1>Hey There!</h1>
               <p>Begin your amazing journey by creating an account with us today</p>
               <button type="button" className="transparent-btn" onClick={toggleMode}>

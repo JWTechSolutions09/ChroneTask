@@ -150,7 +150,7 @@ export default function Layout({ children, organizationId }: LayoutProps) {
           {!sidebarCollapsed && (
             <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
               <img 
-                src="/logo.png" 
+                src="/logosidebar.png" 
                 alt="ChroneTask Logo" 
                 style={{
                   width: "48px",
@@ -167,7 +167,7 @@ export default function Layout({ children, organizationId }: LayoutProps) {
           )}
           {sidebarCollapsed && (
             <img 
-              src="/logo.png" 
+              src="/logosidebar.png" 
               alt="ChroneTask Logo" 
               style={{
                 width: "48px",
