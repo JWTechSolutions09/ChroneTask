@@ -6,6 +6,7 @@ import PageHeader from "../components/PageHeader";
 import TimeTracker from "../components/TimeTracker";
 import CreateTaskModal from "../components/CreateTaskModal";
 import AddProjectMemberModal from "../components/AddProjectMemberModal";
+import KeyboardShortcuts from "../components/KeyboardShortcuts";
 import Button from "../components/Button";
 import { useToast } from "../contexts/ToastContext";
 
