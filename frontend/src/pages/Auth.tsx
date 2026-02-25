@@ -162,22 +162,102 @@ export default function Auth() {
     setConfirmPassword("");
   };
 
+  const handleGoogleLogin = async () => {
+    try {
+      setLoading(true);
+      setErr(null);
+      
+      // Verificar si Google está disponible
+      if (!window.google) {
+        showToast("Google Sign-In no está disponible. Por favor, usa email y contraseña.", "info");
+        setLoading(false);
+        return;
+      }
+
+      // Usar Google Identity Services
+      window.google.accounts.id.initialize({
+        client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID || "",
+        callback: async (response: any) => {
+          try {
+            // Decodificar el token JWT de Google
+            const payload = JSON.parse(atob(response.credential.split('.')[1]));
+            
+            // Enviar el token al backend
+            const res = await http.post("/api/auth/google", {
+              idToken: response.credential,
+              email: payload.email,
+              fullName: payload.name,
+              profilePictureUrl: payload.picture,
+            });
+
+            if (res.data?.token) {
+              setToken(res.data.token);
+              showToast("Inicio de sesión con Google exitoso", "success");
+              navigate("/org-select", { replace: true });
+            }
+          } catch (ex: any) {
+            const errorMsg = ex?.response?.data?.message ?? ex.message ?? "Error al iniciar sesión con Google";
+            setErr(errorMsg);
+            showToast(errorMsg, "error");
+          } finally {
+            setLoading(false);
+          }
+        },
+      });
+
+      window.google.accounts.id.prompt((notification: any) => {
+        if (notification.isNotDisplayed() || notification.isSkippedMoment()) {
+          // Si no se muestra el prompt, usar popup manual
+          window.google?.accounts.oauth2.initTokenClient({
+            client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID || "",
+            scope: "email profile",
+            callback: async (tokenResponse: any) => {
+              try {
+                const userInfo = await fetch(`https://www.googleapis.com/oauth2/v2/userinfo?access_token=${tokenResponse.access_token}`);
+                const userData = await userInfo.json();
+                
+                const res = await http.post("/api/auth/google", {
+                  idToken: tokenResponse.access_token,
+                  email: userData.email,
+                  fullName: userData.name,
+                  profilePictureUrl: userData.picture,
+                });
+
+                if (res.data?.token) {
+                  setToken(res.data.token);
+                  showToast("Inicio de sesión con Google exitoso", "success");
+                  navigate("/org-select", { replace: true });
+                }
+              } catch (ex: any) {
+                const errorMsg = ex?.response?.data?.message ?? ex.message ?? "Error al iniciar sesión con Google";
+                setErr(errorMsg);
+                showToast(errorMsg, "error");
+              } finally {
+                setLoading(false);
+              }
+            },
+          }).requestAccessToken();
+        }
+      });
+    } catch (error: any) {
+      showToast("Error al iniciar sesión con Google. Usa email y contraseña.", "error");
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="auth-page-wrapper">
+      <div className="jw-tech-signature">
+        <span>JW TECH SOLUTIONS</span>
+      </div>
       <div className={`auth-wrapper ${isRegisterMode ? "panel-active" : ""}`} id="authWrapper">
         {/* Register Form */}
         <div className="auth-form-box register-form-box">
           <form onSubmit={handleRegister}>
             <h1>Create Account</h1>
             <div className="social-links">
-              <a href="#" aria-label="Facebook" onClick={(e) => e.preventDefault()}>
-                <i className="fab fa-facebook-f"></i>
-              </a>
-              <a href="#" aria-label="Google" onClick={(e) => e.preventDefault()}>
+              <a href="#" aria-label="Google" onClick={(e) => { e.preventDefault(); handleGoogleLogin(); }} className="google-btn">
                 <i className="fab fa-google"></i>
-              </a>
-              <a href="#" aria-label="LinkedIn" onClick={(e) => e.preventDefault()}>
-                <i className="fab fa-linkedin-in"></i>
               </a>
             </div>
             <span>or use your email for registration</span>
@@ -232,14 +312,8 @@ export default function Auth() {
           <form onSubmit={handleLogin}>
             <h1>Sign In</h1>
             <div className="social-links">
-              <a href="#" aria-label="Facebook" onClick={(e) => e.preventDefault()}>
-                <i className="fab fa-facebook-f"></i>
-              </a>
-              <a href="#" aria-label="Google" onClick={(e) => e.preventDefault()}>
+              <a href="#" aria-label="Google" onClick={(e) => { e.preventDefault(); handleGoogleLogin(); }} className="google-btn">
                 <i className="fab fa-google"></i>
-              </a>
-              <a href="#" aria-label="LinkedIn" onClick={(e) => e.preventDefault()}>
-                <i className="fab fa-linkedin-in"></i>
               </a>
             </div>
             <span>or use your account</span>

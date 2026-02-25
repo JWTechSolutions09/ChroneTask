@@ -129,6 +129,59 @@ public class AuthController : ControllerBase
         }
     }
 
+    [HttpPost("google")]
+    public async Task<IActionResult> GoogleLogin([FromBody] GoogleLoginRequest request)
+    {
+        try
+        {
+            if (string.IsNullOrWhiteSpace(request.IdToken))
+                return BadRequest(new { message = "Google ID token is required" });
+
+            // TODO: Validar el token de Google usando Google's API
+            // Por ahora, creamos o encontramos el usuario basado en el email
+            if (string.IsNullOrWhiteSpace(request.Email))
+                return BadRequest(new { message = "Email is required for Google login" });
+
+            var normalizedEmail = request.Email.Trim().ToLowerInvariant();
+            var user = await _db.Users.FirstOrDefaultAsync(x => x.Email == normalizedEmail);
+
+            if (user == null)
+            {
+                // Crear nuevo usuario desde Google
+                user = new User
+                {
+                    FullName = request.FullName?.Trim() ?? "Usuario Google",
+                    Email = normalizedEmail,
+                    PasswordHash = BCrypt.Net.BCrypt.HashPassword(Guid.NewGuid().ToString()), // Password aleatorio
+                    ProfilePictureUrl = request.ProfilePictureUrl
+                };
+
+                _db.Users.Add(user);
+                await _db.SaveChangesAsync();
+            }
+            else
+            {
+                // Actualizar foto de perfil si viene de Google
+                if (!string.IsNullOrWhiteSpace(request.ProfilePictureUrl))
+                {
+                    user.ProfilePictureUrl = request.ProfilePictureUrl;
+                    await _db.SaveChangesAsync();
+                }
+            }
+
+            var token = GenerateToken(user);
+            return Ok(new { token });
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"❌ Error en GoogleLogin: {ex.Message}");
+            return StatusCode(500, new { 
+                error = "Internal Server Error", 
+                message = ex.Message
+            });
+        }
+    }
+
     private string GenerateToken(User user)
     {
         var jwt = _config.GetSection("JWT");

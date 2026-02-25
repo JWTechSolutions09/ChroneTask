@@ -5,6 +5,7 @@ import Layout from "../components/Layout";
 import PageHeader from "../components/PageHeader";
 import TimeTracker from "../components/TimeTracker";
 import CreateTaskModal from "../components/CreateTaskModal";
+import AddProjectMemberModal from "../components/AddProjectMemberModal";
 import Button from "../components/Button";
 import { useToast } from "../contexts/ToastContext";
 
@@ -48,6 +49,7 @@ export default function Board() {
   const [err, setErr] = useState<string | null>(null);
   const [draggedTask, setDraggedTask] = useState<Task | null>(null);
   const [showCreateModal, setShowCreateModal] = useState(false);
+  const [showMemberModal, setShowMemberModal] = useState(false);
   const [assigningTaskId, setAssigningTaskId] = useState<string | null>(null);
   const { showToast } = useToast();
 
@@ -209,6 +211,12 @@ export default function Board() {
 
   return (
     <Layout organizationId={organizationId}>
+      <KeyboardShortcuts
+        onNewTask={() => setShowCreateModal(true)}
+        onSearch={() => {
+          // TODO: Implementar búsqueda rápida
+        }}
+      />
       <div style={{ flex: 1, overflowY: "auto", backgroundColor: "var(--bg-secondary)" }}>
         <PageHeader
           title={projectName || "Board Kanban"}
@@ -220,9 +228,14 @@ export default function Board() {
             { label: projectName || "Board" },
           ]}
           actions={
-            <Button variant="primary" onClick={() => setShowCreateModal(true)}>
-              + Nueva Tarea
-            </Button>
+            <div style={{ display: "flex", gap: "10px" }}>
+              <Button variant="secondary" onClick={() => setShowMemberModal(true)}>
+                👥 Miembros
+              </Button>
+              <Button variant="primary" onClick={() => setShowCreateModal(true)}>
+                + Nueva Tarea
+              </Button>
+            </div>
           }
         />
 
@@ -534,7 +547,7 @@ export default function Board() {
                                     border: "none",
                                     borderRadius: "6px",
                                     backgroundColor: "var(--bg-tertiary)",
-                                        color: "var(--text-primary)",
+                                    color: "var(--text-primary)",
                                     cursor: "pointer",
                                     transition: "all 0.2s",
                                     display: "flex",
@@ -668,6 +681,20 @@ export default function Board() {
               projectId={projectId}
               onClose={() => setShowCreateModal(false)}
               onSuccess={loadTasks}
+            />
+          )}
+
+          {showMemberModal && organizationId && projectId && (
+            <AddProjectMemberModal
+              organizationId={organizationId}
+              projectId={projectId}
+              projectName={projectName || "Proyecto"}
+              isOpen={showMemberModal}
+              onClose={() => setShowMemberModal(false)}
+              onMemberAdded={() => {
+                loadProjectMembers();
+                showToast("Miembro agregado exitosamente", "success");
+              }}
             />
           )}
         </div>
