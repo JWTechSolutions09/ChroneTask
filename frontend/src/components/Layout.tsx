@@ -149,35 +149,59 @@ export default function Layout({ children, organizationId }: LayoutProps) {
         >
           {!sidebarCollapsed && (
             <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-              <img 
-                src="/logosidebar.png" 
-                alt="ChroneTask Logo" 
+              <div
                 style={{
                   width: "48px",
                   height: "48px",
                   borderRadius: "10px",
-                  objectFit: "cover",
-                  boxShadow: "0 3px 8px rgba(0, 0, 0, 0.15)",
+                  backgroundColor: theme === "dark" ? "transparent" : "#000000",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  padding: theme === "dark" ? "0" : "4px",
+                  boxShadow: theme === "dark" ? "0 3px 8px rgba(0, 0, 0, 0.15)" : "0 3px 8px rgba(0, 0, 0, 0.3)",
                 }}
-              />
+              >
+                <img 
+                  src="/logosidebar.png" 
+                  alt="ChroneTask Logo" 
+                  style={{
+                    width: "100%",
+                    height: "100%",
+                    objectFit: "contain",
+                  }}
+                />
+              </div>
               <span style={{ fontWeight: 700, fontSize: "18px", color: "var(--text-primary)", letterSpacing: "-0.5px" }}>
                 ChroneTask
               </span>
             </div>
           )}
           {sidebarCollapsed && (
-            <img 
-              src="/logosidebar.png" 
-              alt="ChroneTask Logo" 
+            <div
               style={{
                 width: "48px",
                 height: "48px",
                 borderRadius: "10px",
-                objectFit: "cover",
-                boxShadow: "0 3px 8px rgba(0, 0, 0, 0.15)",
+                backgroundColor: theme === "dark" ? "transparent" : "#000000",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                padding: theme === "dark" ? "0" : "4px",
+                boxShadow: theme === "dark" ? "0 3px 8px rgba(0, 0, 0, 0.15)" : "0 3px 8px rgba(0, 0, 0, 0.3)",
                 margin: "0 auto",
               }}
-            />
+            >
+              <img 
+                src="/logosidebar.png" 
+                alt="ChroneTask Logo" 
+                style={{
+                  width: "100%",
+                  height: "100%",
+                  objectFit: "contain",
+                }}
+              />
+            </div>
           )}
           <button
             onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
