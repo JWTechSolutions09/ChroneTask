@@ -3,6 +3,7 @@ import { useParams, Link } from "react-router-dom";
 import { http } from "../api/http";
 import Layout from "../components/Layout";
 import PageHeader from "../components/PageHeader";
+import Card from "../components/Card";
 import TimeTracker from "../components/TimeTracker";
 import CreateTaskModal from "../components/CreateTaskModal";
 import AddProjectMemberModal from "../components/AddProjectMemberModal";
@@ -242,6 +243,51 @@ export default function Board() {
 
         <div style={{ padding: "24px" }}>
           {err && <div className="alert alert-error">{err}</div>}
+
+          {/* Quick Stats */}
+          {!loading && tasks.length > 0 && (
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))",
+                gap: "16px",
+                marginBottom: "24px",
+              }}
+            >
+              <Card style={{ textAlign: "center", padding: "16px" }}>
+                <div style={{ fontSize: "32px", fontWeight: 700, color: "var(--primary)", marginBottom: "4px" }}>
+                  {tasks.length}
+                </div>
+                <div style={{ fontSize: "12px", color: "var(--text-secondary)", fontWeight: 600 }}>
+                  Total Tareas
+                </div>
+              </Card>
+              <Card style={{ textAlign: "center", padding: "16px" }}>
+                <div style={{ fontSize: "32px", fontWeight: 700, color: "var(--success)", marginBottom: "4px" }}>
+                  {tasks.filter((t) => t.status === "Done").length}
+                </div>
+                <div style={{ fontSize: "12px", color: "var(--text-secondary)", fontWeight: 600 }}>
+                  Completadas
+                </div>
+              </Card>
+              <Card style={{ textAlign: "center", padding: "16px" }}>
+                <div style={{ fontSize: "32px", fontWeight: 700, color: "var(--warning)", marginBottom: "4px" }}>
+                  {tasks.filter((t) => t.status === "In Progress").length}
+                </div>
+                <div style={{ fontSize: "12px", color: "var(--text-secondary)", fontWeight: 600 }}>
+                  En Progreso
+                </div>
+              </Card>
+              <Card style={{ textAlign: "center", padding: "16px" }}>
+                <div style={{ fontSize: "32px", fontWeight: 700, color: "var(--danger)", marginBottom: "4px" }}>
+                  {tasks.filter((t) => t.status === "Blocked").length}
+                </div>
+                <div style={{ fontSize: "12px", color: "var(--text-secondary)", fontWeight: 600 }}>
+                  Bloqueadas
+                </div>
+              </Card>
+            </div>
+          )}
 
           {/* Kanban Board */}
           {loading ? (
@@ -492,7 +538,7 @@ export default function Board() {
                                     {task.assignedToName ? (
                                       <>
                                         <span style={{ fontSize: "14px" }}>👤</span>
-                                        <span style={{ fontWeight: 600, color: "#495057" }}>
+                                        <span style={{ fontWeight: 600, color: "var(--text-primary)" }}>
                                           {task.assignedToName}
                                         </span>
                                       </>
@@ -556,11 +602,11 @@ export default function Board() {
                                     gap: "4px",
                                   }}
                                   onMouseEnter={(e) => {
-                                    e.currentTarget.style.backgroundColor = "#dee2e6";
+                                    e.currentTarget.style.backgroundColor = "var(--border-color)";
                                     e.currentTarget.style.transform = "scale(1.05)";
                                   }}
                                   onMouseLeave={(e) => {
-                                    e.currentTarget.style.backgroundColor = "#e9ecef";
+                                    e.currentTarget.style.backgroundColor = "var(--bg-tertiary)";
                                     e.currentTarget.style.transform = "scale(1)";
                                   }}
                                   title={`Mover a ${getPreviousStatus(task.status)}`}
