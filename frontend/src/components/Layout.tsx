@@ -154,13 +154,13 @@ export default function Layout({ children, organizationId }: LayoutProps) {
                   width: "48px",
                   height: "48px",
                   borderRadius: "10px",
-                  backgroundColor: theme === "dark" ? "transparent" : "#000000",
-                  border: theme === "dark" ? "none" : "2px solid #000000",
+                  backgroundColor: "transparent",
+                  border: "none",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
-                  padding: theme === "dark" ? "0" : "6px",
-                  boxShadow: theme === "dark" ? "0 3px 8px rgba(0, 0, 0, 0.15)" : "0 3px 12px rgba(0, 0, 0, 0.4)",
+                  padding: "0",
+                  boxShadow: "0 3px 8px rgba(0, 0, 0, 0.15)",
                   minHeight: "48px",
                   minWidth: "48px",
                 }}
@@ -169,8 +169,8 @@ export default function Layout({ children, organizationId }: LayoutProps) {
                   src="/logosidebar.png" 
                   alt="ChroneTask Logo" 
                   style={{
-                    width: theme === "dark" ? "100%" : "calc(100% - 12px)",
-                    height: theme === "dark" ? "100%" : "calc(100% - 12px)",
+                    width: "100%",
+                    height: "100%",
                     objectFit: "contain",
                     display: "block",
                   }}
@@ -187,13 +187,13 @@ export default function Layout({ children, organizationId }: LayoutProps) {
                 width: "48px",
                 height: "48px",
                 borderRadius: "10px",
-                backgroundColor: theme === "dark" ? "transparent" : "#000000",
-                border: theme === "dark" ? "none" : "2px solid #000000",
+                backgroundColor: "transparent",
+                border: "none",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
-                padding: theme === "dark" ? "0" : "6px",
-                boxShadow: theme === "dark" ? "0 3px 8px rgba(0, 0, 0, 0.15)" : "0 3px 12px rgba(0, 0, 0, 0.4)",
+                padding: "0",
+                boxShadow: "0 3px 8px rgba(0, 0, 0, 0.15)",
                 margin: "0 auto",
                 minHeight: "48px",
                 minWidth: "48px",
@@ -203,8 +203,8 @@ export default function Layout({ children, organizationId }: LayoutProps) {
                 src="/logosidebar.png" 
                 alt="ChroneTask Logo" 
                 style={{
-                  width: theme === "dark" ? "100%" : "calc(100% - 12px)",
-                  height: theme === "dark" ? "100%" : "calc(100% - 12px)",
+                  width: "100%",
+                  height: "100%",
                   objectFit: "contain",
                   display: "block",
                 }}
