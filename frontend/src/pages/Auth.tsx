@@ -270,7 +270,6 @@ export default function Auth() {
               value={fullName}
               onChange={(e) => setFullName(e.target.value)}
               disabled={loading}
-              required
             />
             <input
               type="email"
@@ -278,7 +277,6 @@ export default function Auth() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               disabled={loading}
-              required
             />
             <input
               type="password"
@@ -286,8 +284,6 @@ export default function Auth() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               disabled={loading}
-              required
-              minLength={6}
             />
             <input
               type="password"
@@ -295,7 +291,6 @@ export default function Auth() {
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
               disabled={loading}
-              required
             />
             <button type="submit" disabled={loading}>
               {loading ? "Signing Up..." : "Sign Up"}
@@ -326,7 +321,6 @@ export default function Auth() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               disabled={loading}
-              required
             />
             <input
               type="password"
@@ -334,7 +328,6 @@ export default function Auth() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               disabled={loading}
-              required
             />
             <a href="#" onClick={(e) => e.preventDefault()}>
               Forgot your password?
