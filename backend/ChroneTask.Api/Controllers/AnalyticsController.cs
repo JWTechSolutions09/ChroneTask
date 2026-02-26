@@ -95,9 +95,11 @@ public class AnalyticsController : ControllerBase
         // SLA Analysis
         var slaMet = 0;
         var slaMissed = 0;
-        foreach (var task in tasks.Where(t => t.Status == "Done" && t.Project.SlaHours.HasValue))
+        foreach (var task in tasks.Where(t => t.Status == "Done" && t.Project != null && t.Project.SlaHours.HasValue))
         {
-            if (task.CreatedAt.AddHours(task.Project.SlaHours.Value) >= task.UpdatedAt)
+            var updatedAt = task.UpdatedAt ?? task.CreatedAt;
+            var slaDeadline = task.CreatedAt.AddHours(task.Project.SlaHours.Value);
+            if (slaDeadline >= updatedAt)
             {
                 slaMet++;
             }
@@ -143,13 +145,13 @@ public class AnalyticsController : ControllerBase
 
         // Tasks Due Soon (next 48 hours)
         var tasksDueSoon = tasks
-            .Where(t => t.DueDate.HasValue && t.DueDate.Value > now && t.DueDate.Value <= now.AddHours(48) && t.Status != "Done")
+            .Where(t => t.DueDate.HasValue && t.DueDate.Value > now && t.DueDate.Value <= now.AddHours(48) && t.Status != "Done" && t.Project != null)
             .Select(t => new TaskDueSoonResponse
             {
                 TaskId = t.Id,
                 TaskTitle = t.Title,
                 ProjectId = t.ProjectId,
-                ProjectName = t.Project.Name,
+                ProjectName = t.Project != null ? t.Project.Name : "Unknown",
                 DueDate = t.DueDate,
                 HoursUntilDue = (int)(t.DueDate.Value - now).TotalHours
             })

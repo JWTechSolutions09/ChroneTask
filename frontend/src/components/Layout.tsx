@@ -372,6 +372,7 @@ export default function Layout({ children, organizationId }: LayoutProps) {
                   to={`/org/${organizationId}/dashboard`}
                   active={isActive(`/org/${organizationId}/dashboard`)}
                   collapsed={sidebarCollapsed}
+                  onNavigate={() => setSidebarOpen(false)}
                 />
                 <NavItem
                   icon="📁"
@@ -379,6 +380,7 @@ export default function Layout({ children, organizationId }: LayoutProps) {
                   to={`/org/${organizationId}/projects`}
                   active={isActive(`/org/${organizationId}/projects`)}
                   collapsed={sidebarCollapsed}
+                  onNavigate={() => setSidebarOpen(false)}
                 />
                 <NavItem
                   icon="🔔"
@@ -386,6 +388,7 @@ export default function Layout({ children, organizationId }: LayoutProps) {
                   to={`/org/${organizationId}/notifications`}
                   active={isActive(`/org/${organizationId}/notifications`)}
                   collapsed={sidebarCollapsed}
+                  onNavigate={() => setSidebarOpen(false)}
                 />
                 <NavItem
                   icon="📊"
@@ -393,6 +396,7 @@ export default function Layout({ children, organizationId }: LayoutProps) {
                   to={`/org/${organizationId}/analytics`}
                   active={isActive(`/org/${organizationId}/analytics`)}
                   collapsed={sidebarCollapsed}
+                  onNavigate={() => setSidebarOpen(false)}
                 />
                 <NavItem
                   icon="📅"
@@ -400,6 +404,7 @@ export default function Layout({ children, organizationId }: LayoutProps) {
                   to={`/org/${organizationId}/timeline`}
                   active={isActive(`/org/${organizationId}/timeline`) || isActive(`/org/${organizationId}/project/`) && location.pathname.includes("timeline")}
                   collapsed={sidebarCollapsed}
+                  onNavigate={() => setSidebarOpen(false)}
                 />
               </div>
 
@@ -428,6 +433,7 @@ export default function Layout({ children, organizationId }: LayoutProps) {
                       active={params.projectId === project.id}
                       collapsed={false}
                       indent
+                      onNavigate={() => setSidebarOpen(false)}
                     />
                   ))}
                 </div>
@@ -597,11 +603,14 @@ export default function Layout({ children, organizationId }: LayoutProps) {
 
       {/* Main Content */}
       <main
+        className="main-content"
         style={{
           flex: 1,
           display: "flex",
           flexDirection: "column",
           overflow: "hidden",
+          width: "100%",
+          minWidth: 0,
         }}
       >
         {children}
@@ -618,13 +627,17 @@ type NavItemProps = {
   collapsed: boolean;
   indent?: boolean;
   onClick?: () => void;
+  onNavigate?: () => void;
 };
 
-function NavItem({ icon, label, to, active, collapsed, indent, onClick }: NavItemProps) {
+function NavItem({ icon, label, to, active, collapsed, indent, onClick, onNavigate }: NavItemProps) {
   const handleClick = (e: React.MouseEvent) => {
     if (onClick) {
       e.preventDefault();
       onClick();
+    }
+    if (onNavigate) {
+      onNavigate();
     }
   };
 

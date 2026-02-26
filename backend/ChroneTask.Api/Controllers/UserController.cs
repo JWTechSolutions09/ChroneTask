@@ -38,10 +38,11 @@ public class UserController : ControllerBase
             var organizations = await _db.OrganizationMembers
                 .Where(m => m.UserId == userId)
                 .Include(m => m.Organization)
+                .Where(m => m.Organization != null)
                 .Select(m => new UserOrganizationResponse
                 {
                     OrganizationId = m.OrganizationId,
-                    OrganizationName = m.Organization.Name,
+                    OrganizationName = m.Organization != null ? m.Organization.Name : "Unknown",
                     Role = m.Role,
                     JoinedAt = m.JoinedAt
                 })
@@ -93,10 +94,11 @@ public class UserController : ControllerBase
             var organizations = await _db.OrganizationMembers
                 .Where(m => m.UserId == userId)
                 .Include(m => m.Organization)
+                .Where(m => m.Organization != null)
                 .Select(m => new UserOrganizationResponse
                 {
                     OrganizationId = m.OrganizationId,
-                    OrganizationName = m.Organization.Name,
+                    OrganizationName = m.Organization != null ? m.Organization.Name : "Unknown",
                     Role = m.Role,
                     JoinedAt = m.JoinedAt
                 })

@@ -453,6 +453,7 @@ a:hover {
     z-index: 1000;
     transform: translateX(-100%);
     transition: transform 0.3s ease;
+    width: 280px !important;
   }
 
   .sidebar.open {
@@ -465,6 +466,12 @@ a:hover {
 
   .mobile-overlay {
     display: block !important;
+  }
+
+  /* Asegurar que el contenido principal no se corte */
+  main {
+    margin-left: 0 !important;
+    width: 100% !important;
   }
 }
 
