@@ -134,8 +134,12 @@ public class AnalyticsController : ControllerBase
                 .ToList();
 
             // Projects with Blockages
-            var projectsWithBlockages = await _db.Projects
+            var projects = await _db.Projects
                 .Where(p => projectIds.Contains(p.Id))
+                .Select(p => new { p.Id, p.Name })
+                .ToListAsync();
+
+            var projectsWithBlockages = projects
                 .Select(p => new ProjectBlockedResponse
                 {
                     ProjectId = p.Id,
@@ -144,7 +148,7 @@ public class AnalyticsController : ControllerBase
                 })
                 .Where(p => p.BlockedTasksCount > 0)
                 .OrderByDescending(p => p.BlockedTasksCount)
-                .ToListAsync();
+                .ToList();
 
             // Tasks Due Soon (next 48 hours)
             var tasksDueSoon = tasks
