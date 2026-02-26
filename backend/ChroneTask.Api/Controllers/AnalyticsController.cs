@@ -29,180 +29,195 @@ public class AnalyticsController : ControllerBase
         [FromQuery] DateTime? startDate,
         [FromQuery] DateTime? endDate)
     {
-        var userId = UserContext.GetUserId(User);
-
-        // Verificar que el usuario es miembro de la organización
-        var isOrgMember = await _db.OrganizationMembers
-            .AnyAsync(m => m.OrganizationId == organizationId && m.UserId == userId);
-
-        if (!isOrgMember)
-            return StatusCode(403, new { message = "You are not a member of this organization" });
-
-        var now = DateTime.UtcNow;
-        var defaultStartDate = startDate ?? now.AddDays(-30);
-        var defaultEndDate = endDate ?? now;
-
-        // Obtener todos los proyectos de la organización
-        var projectIds = await _db.Projects
-            .Where(p => p.OrganizationId == organizationId && p.IsActive)
-            .Select(p => p.Id)
-            .ToListAsync();
-
-        if (projectId.HasValue)
+        try
         {
-            projectIds = projectIds.Where(p => p == projectId.Value).ToList();
-        }
+            var userId = UserContext.GetUserId(User);
 
-        // Obtener todas las tareas de los proyectos
-        var tasksQuery = _db.Tasks
-            .Where(t => projectIds.Contains(t.ProjectId))
-            .Where(t => t.CreatedAt >= defaultStartDate && t.CreatedAt <= defaultEndDate)
-            .AsQueryable();
+            // Verificar que el usuario es miembro de la organización
+            var isOrgMember = await _db.OrganizationMembers
+                .AnyAsync(m => m.OrganizationId == organizationId && m.UserId == userId);
 
-        if (memberId.HasValue)
-        {
-            tasksQuery = tasksQuery.Where(t => t.AssignedToId == memberId.Value);
-        }
+            if (!isOrgMember)
+                return StatusCode(403, new { message = "You are not a member of this organization" });
 
-        var tasks = await tasksQuery
-            .Include(t => t.Project)
-            .Include(t => t.AssignedTo)
-            .ToListAsync();
+            var now = DateTime.UtcNow;
+            var defaultStartDate = startDate ?? now.AddDays(-30);
+            var defaultEndDate = endDate ?? now;
 
-        // Si no hay proyectos, retornar datos vacíos
-        if (!projectIds.Any())
-        {
-            return Ok(new AnalyticsResponse
+            // Obtener todos los proyectos de la organización
+            var projectIds = await _db.Projects
+                .Where(p => p.OrganizationId == organizationId && p.IsActive)
+                .Select(p => p.Id)
+                .ToListAsync();
+
+            if (projectId.HasValue)
             {
-                TotalTasks = 0,
-                CompletedTasks = 0,
-                PendingTasks = 0,
-                OverdueTasks = 0,
-                SlaMet = 0,
-                SlaMissed = 0,
-                MemberActivities = new List<MemberActivityResponse>(),
-                ProjectsWithBlockages = new List<ProjectBlockedResponse>(),
-                TasksDueSoon = new List<TaskDueSoonResponse>(),
-                InactiveMembers = new List<MemberInactivityResponse>()
-            });
-        }
-
-        var totalTasks = tasks.Count;
-        var completedTasks = tasks.Count(t => t.Status == "Done");
-        var pendingTasks = tasks.Count(t => t.Status != "Done");
-        var overdueTasks = tasks.Count(t => t.DueDate.HasValue && t.DueDate.Value < now && t.Status != "Done");
-
-        // SLA Analysis
-        var slaMet = 0;
-        var slaMissed = 0;
-        foreach (var task in tasks.Where(t => t.Status == "Done" && t.Project != null && t.Project.SlaHours.HasValue))
-        {
-            var updatedAt = task.UpdatedAt ?? task.CreatedAt;
-            var slaDeadline = task.CreatedAt.AddHours(task.Project.SlaHours.Value);
-            if (slaDeadline >= updatedAt)
-            {
-                slaMet++;
+                projectIds = projectIds.Where(p => p == projectId.Value).ToList();
             }
-            else
+
+            // Obtener todas las tareas de los proyectos
+            var tasksQuery = _db.Tasks
+                .Where(t => projectIds.Contains(t.ProjectId))
+                .Where(t => t.CreatedAt >= defaultStartDate && t.CreatedAt <= defaultEndDate)
+                .AsQueryable();
+
+            if (memberId.HasValue)
             {
-                slaMissed++;
+                tasksQuery = tasksQuery.Where(t => t.AssignedToId == memberId.Value);
             }
-        }
 
-        // Member Activities
-        var projectMembers = await _db.ProjectMembers
-            .Where(pm => projectIds.Contains(pm.ProjectId))
-            .Include(pm => pm.User)
-            .Select(pm => new { pm.UserId, pm.User.FullName, pm.User.ProfilePictureUrl })
-            .Distinct()
-            .ToListAsync();
+            var tasks = await tasksQuery
+                .Include(t => t.Project)
+                .Include(t => t.AssignedTo)
+                .ToListAsync();
 
-        var memberActivities = projectMembers
-            .Select(pm => new MemberActivityResponse
+            // Si no hay proyectos, retornar datos vacíos
+            if (!projectIds.Any())
             {
-                UserId = pm.UserId,
-                UserName = pm.FullName,
-                UserAvatar = pm.ProfilePictureUrl,
-                CompletedTasks = tasks.Count(t => t.AssignedToId == pm.UserId && t.Status == "Done"),
-                PendingTasks = tasks.Count(t => t.AssignedToId == pm.UserId && t.Status != "Done"),
-                TotalMinutes = tasks.Where(t => t.AssignedToId == pm.UserId).Sum(t => (int?)t.TotalMinutes) ?? 0
-            })
-            .OrderByDescending(m => m.CompletedTasks)
-            .ToList();
+                return Ok(new AnalyticsResponse
+                {
+                    TotalTasks = 0,
+                    CompletedTasks = 0,
+                    PendingTasks = 0,
+                    OverdueTasks = 0,
+                    SlaMet = 0,
+                    SlaMissed = 0,
+                    MemberActivities = new List<MemberActivityResponse>(),
+                    ProjectsWithBlockages = new List<ProjectBlockedResponse>(),
+                    TasksDueSoon = new List<TaskDueSoonResponse>(),
+                    InactiveMembers = new List<MemberInactivityResponse>()
+                });
+            }
 
-        // Projects with Blockages
-        var projectsWithBlockages = await _db.Projects
-            .Where(p => projectIds.Contains(p.Id))
-            .Select(p => new ProjectBlockedResponse
+            var totalTasks = tasks.Count;
+            var completedTasks = tasks.Count(t => t.Status == "Done");
+            var pendingTasks = tasks.Count(t => t.Status != "Done");
+            var overdueTasks = tasks.Count(t => t.DueDate.HasValue && t.DueDate.Value < now && t.Status != "Done");
+
+            // SLA Analysis
+            var slaMet = 0;
+            var slaMissed = 0;
+            foreach (var task in tasks.Where(t => t.Status == "Done" && t.Project != null && t.Project.SlaHours.HasValue))
             {
-                ProjectId = p.Id,
-                ProjectName = p.Name,
-                BlockedTasksCount = tasks.Count(t => t.ProjectId == p.Id && t.Status == "Blocked")
-            })
-            .Where(p => p.BlockedTasksCount > 0)
-            .OrderByDescending(p => p.BlockedTasksCount)
-            .ToListAsync();
+                var updatedAt = task.UpdatedAt ?? task.CreatedAt;
+                var slaDeadline = task.CreatedAt.AddHours(task.Project!.SlaHours.Value);
+                if (slaDeadline >= updatedAt)
+                {
+                    slaMet++;
+                }
+                else
+                {
+                    slaMissed++;
+                }
+            }
 
-        // Tasks Due Soon (next 48 hours)
-        var tasksDueSoon = tasks
-            .Where(t => t.DueDate.HasValue && t.DueDate.Value > now && t.DueDate.Value <= now.AddHours(48) && t.Status != "Done" && t.Project != null)
-            .Select(t => new TaskDueSoonResponse
-            {
-                TaskId = t.Id,
-                TaskTitle = t.Title,
-                ProjectId = t.ProjectId,
-                ProjectName = t.Project != null ? t.Project.Name : "Unknown",
-                DueDate = t.DueDate,
-                HoursUntilDue = (int)(t.DueDate.Value - now).TotalHours
-            })
-            .OrderBy(t => t.DueDate)
-            .ToList();
+            // Member Activities
+            var projectMembers = await _db.ProjectMembers
+                .Where(pm => projectIds.Contains(pm.ProjectId))
+                .Include(pm => pm.User)
+                .Where(pm => pm.User != null)
+                .Select(pm => new { pm.UserId, pm.User!.FullName, pm.User.ProfilePictureUrl })
+                .Distinct()
+                .ToListAsync();
 
-        // Inactive Members (no activity in last 7 days)
-        var projectMembersForInactivity = await _db.ProjectMembers
-            .Where(pm => projectIds.Contains(pm.ProjectId))
-            .Include(pm => pm.User)
-            .Select(pm => new { pm.UserId, pm.User.FullName, pm.User.ProfilePictureUrl })
-            .Distinct()
-            .ToListAsync();
-
-        var inactiveMembers = projectMembersForInactivity
-            .Select(pm =>
-            {
-                var userTasks = tasks.Where(t => t.AssignedToId == pm.UserId).ToList();
-                var lastUpdate = userTasks.Any()
-                    ? userTasks
-                        .OrderByDescending(t => t.UpdatedAt ?? t.CreatedAt)
-                        .Select(t => t.UpdatedAt ?? t.CreatedAt)
-                        .FirstOrDefault()
-                    : default(DateTime);
-
-                return new MemberInactivityResponse
+            var memberActivities = projectMembers
+                .Select(pm => new MemberActivityResponse
                 {
                     UserId = pm.UserId,
-                    UserName = pm.FullName,
+                    UserName = pm.FullName ?? "Unknown",
                     UserAvatar = pm.ProfilePictureUrl,
-                    DaysSinceLastActivity = lastUpdate == default(DateTime)
-                        ? 999
-                        : (int)(now - lastUpdate).TotalDays
-                };
-            })
-            .Where(m => m.DaysSinceLastActivity >= 7)
-            .OrderByDescending(m => m.DaysSinceLastActivity)
-            .ToList();
+                    CompletedTasks = tasks.Count(t => t.AssignedToId == pm.UserId && t.Status == "Done"),
+                    PendingTasks = tasks.Count(t => t.AssignedToId == pm.UserId && t.Status != "Done"),
+                    TotalMinutes = tasks.Where(t => t.AssignedToId == pm.UserId).Sum(t => (int?)t.TotalMinutes) ?? 0
+                })
+                .OrderByDescending(m => m.CompletedTasks)
+                .ToList();
 
-        return Ok(new AnalyticsResponse
+            // Projects with Blockages
+            var projectsWithBlockages = await _db.Projects
+                .Where(p => projectIds.Contains(p.Id))
+                .Select(p => new ProjectBlockedResponse
+                {
+                    ProjectId = p.Id,
+                    ProjectName = p.Name ?? "Unknown",
+                    BlockedTasksCount = tasks.Count(t => t.ProjectId == p.Id && t.Status == "Blocked")
+                })
+                .Where(p => p.BlockedTasksCount > 0)
+                .OrderByDescending(p => p.BlockedTasksCount)
+                .ToListAsync();
+
+            // Tasks Due Soon (next 48 hours)
+            var tasksDueSoon = tasks
+                .Where(t => t.DueDate.HasValue && t.DueDate.Value > now && t.DueDate.Value <= now.AddHours(48) && t.Status != "Done" && t.Project != null)
+                .Select(t => new TaskDueSoonResponse
+                {
+                    TaskId = t.Id,
+                    TaskTitle = t.Title ?? "Untitled",
+                    ProjectId = t.ProjectId,
+                    ProjectName = t.Project != null ? (t.Project.Name ?? "Unknown") : "Unknown",
+                    DueDate = t.DueDate,
+                    HoursUntilDue = (int)(t.DueDate!.Value - now).TotalHours
+                })
+                .OrderBy(t => t.DueDate)
+                .ToList();
+
+            // Inactive Members (no activity in last 7 days)
+            var projectMembersForInactivity = await _db.ProjectMembers
+                .Where(pm => projectIds.Contains(pm.ProjectId))
+                .Include(pm => pm.User)
+                .Where(pm => pm.User != null)
+                .Select(pm => new { pm.UserId, pm.User!.FullName, pm.User.ProfilePictureUrl })
+                .Distinct()
+                .ToListAsync();
+
+            var inactiveMembers = projectMembersForInactivity
+                .Select(pm =>
+                {
+                    var userTasks = tasks.Where(t => t.AssignedToId == pm.UserId).ToList();
+                    var lastUpdate = userTasks.Any()
+                        ? userTasks
+                            .OrderByDescending(t => t.UpdatedAt ?? t.CreatedAt)
+                            .Select(t => t.UpdatedAt ?? t.CreatedAt)
+                            .FirstOrDefault()
+                        : default(DateTime);
+
+                    return new MemberInactivityResponse
+                    {
+                        UserId = pm.UserId,
+                        UserName = pm.FullName ?? "Unknown",
+                        UserAvatar = pm.ProfilePictureUrl,
+                        DaysSinceLastActivity = lastUpdate == default(DateTime)
+                            ? 999
+                            : (int)(now - lastUpdate).TotalDays
+                    };
+                })
+                .Where(m => m.DaysSinceLastActivity >= 7)
+                .OrderByDescending(m => m.DaysSinceLastActivity)
+                .ToList();
+
+            return Ok(new AnalyticsResponse
+            {
+                TotalTasks = totalTasks,
+                CompletedTasks = completedTasks,
+                PendingTasks = pendingTasks,
+                OverdueTasks = overdueTasks,
+                SlaMet = slaMet,
+                SlaMissed = slaMissed,
+                MemberActivities = memberActivities,
+                ProjectsWithBlockages = projectsWithBlockages,
+                TasksDueSoon = tasksDueSoon,
+                InactiveMembers = inactiveMembers
+            });
+        }
+        catch (Exception ex)
         {
-            TotalTasks = totalTasks,
-            CompletedTasks = completedTasks,
-            PendingTasks = pendingTasks,
-            OverdueTasks = overdueTasks,
-            SlaMet = slaMet,
-            SlaMissed = slaMissed,
-            MemberActivities = memberActivities,
-            ProjectsWithBlockages = projectsWithBlockages,
-            TasksDueSoon = tasksDueSoon,
-            InactiveMembers = inactiveMembers
-        });
+            Console.WriteLine($"❌ Error en GetAnalytics: {ex.Message}");
+            Console.WriteLine($"Stack Trace: {ex.StackTrace}");
+            return StatusCode(500, new { 
+                error = "Internal Server Error", 
+                message = ex.Message,
+                stackTrace = ex.StackTrace
+            });
+        }
     }
 }
