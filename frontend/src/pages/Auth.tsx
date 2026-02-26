@@ -248,7 +248,7 @@ export default function Auth() {
   };
 
   return (
-    <div className="auth-page-wrapper">
+    <div className="auth-page-wrapper" data-theme={theme}>
       <div className="jw-tech-signature">
         <span>JW TECH SOLUTIONS</span>
       </div>
@@ -361,13 +361,14 @@ export default function Auth() {
                   height: "160px",
                   marginBottom: "24px",
                   borderRadius: "20px",
-                  backgroundColor: theme === "dark" ? "transparent" : "#2d2d2d",
-                  border: theme === "dark" ? "none" : "3px solid #1a1a1a",
+                  backgroundColor: "rgba(255, 255, 255, 0.15)",
+                  border: "2px solid rgba(255, 255, 255, 0.2)",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
-                  padding: theme === "dark" ? "0" : "16px",
-                  boxShadow: theme === "dark" ? "0 8px 24px rgba(0, 0, 0, 0.4)" : "0 8px 24px rgba(0, 0, 0, 0.5), inset 0 2px 4px rgba(255, 255, 255, 0.1)",
+                  padding: "16px",
+                  boxShadow: "0 8px 24px rgba(0, 0, 0, 0.2)",
+                  backdropFilter: "blur(10px)",
                 }}
               >
                 <img 
@@ -379,7 +380,7 @@ export default function Auth() {
                     height: "200px",
                     objectFit: "contain",
                     transform: "scale(1.3)",
-                    filter: theme === "dark" ? "none" : "brightness(1.1) contrast(1.1)",
+                    filter: "brightness(1.1)",
                   }}
                 />
               </div>
@@ -398,13 +399,14 @@ export default function Auth() {
                   height: "160px",
                   marginBottom: "24px",
                   borderRadius: "20px",
-                  backgroundColor: theme === "dark" ? "transparent" : "#2d2d2d",
-                  border: theme === "dark" ? "none" : "3px solid #1a1a1a",
+                  backgroundColor: "rgba(255, 255, 255, 0.15)",
+                  border: "2px solid rgba(255, 255, 255, 0.2)",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
-                  padding: theme === "dark" ? "0" : "16px",
-                  boxShadow: theme === "dark" ? "0 8px 24px rgba(0, 0, 0, 0.4)" : "0 8px 24px rgba(0, 0, 0, 0.5), inset 0 2px 4px rgba(255, 255, 255, 0.1)",
+                  padding: "16px",
+                  boxShadow: "0 8px 24px rgba(0, 0, 0, 0.2)",
+                  backdropFilter: "blur(10px)",
                 }}
               >
                 <img 
@@ -416,7 +418,7 @@ export default function Auth() {
                     height: "200px",
                     objectFit: "contain",
                     transform: "scale(1.3)",
-                    filter: theme === "dark" ? "none" : "brightness(1.1) contrast(1.1)",
+                    filter: "brightness(1.1)",
                   }}
                 />
               </div>
