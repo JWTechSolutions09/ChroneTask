@@ -2,12 +2,13 @@ using ChroneTask.Api.Data;
 using ChroneTask.Api.Entities;
 using Microsoft.EntityFrameworkCore;
 using TaskEntity = ChroneTask.Api.Entities.Task;
+using SystemTask = System.Threading.Tasks.Task;
 
 namespace ChroneTask.Api.Helpers;
 
 public static class NotificationHelper
 {
-    public static async Task CreateNotificationAsync(
+    public static async SystemTask CreateNotificationAsync(
         ChroneTaskDbContext db,
         Guid userId,
         string type,
@@ -32,7 +33,7 @@ public static class NotificationHelper
         await db.SaveChangesAsync();
     }
 
-    public static async Task NotifyTaskStatusChangeAsync(
+    public static async SystemTask NotifyTaskStatusChangeAsync(
         ChroneTaskDbContext db,
         TaskEntity task,
         string oldStatus,
@@ -73,7 +74,7 @@ public static class NotificationHelper
         }
     }
 
-    public static async Task NotifyTaskCompletedAsync(
+    public static async SystemTask NotifyTaskCompletedAsync(
         ChroneTaskDbContext db,
         TaskEntity task,
         Guid triggeredByUserId)
@@ -98,7 +99,7 @@ public static class NotificationHelper
         }
     }
 
-    public static async Task NotifyTaskBlockedAsync(
+    public static async SystemTask NotifyTaskBlockedAsync(
         ChroneTaskDbContext db,
         TaskEntity task,
         Guid triggeredByUserId)
@@ -137,7 +138,7 @@ public static class NotificationHelper
         }
     }
 
-    public static async Task NotifyTaskOverdueAsync(
+    public static async SystemTask NotifyTaskOverdueAsync(
         ChroneTaskDbContext db,
         TaskEntity task)
     {
@@ -154,7 +155,7 @@ public static class NotificationHelper
         }
     }
 
-    public static async Task NotifySlaWarningAsync(
+    public static async SystemTask NotifySlaWarningAsync(
         ChroneTaskDbContext db,
         TaskEntity task,
         int hoursRemaining)
