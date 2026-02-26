@@ -100,7 +100,7 @@ public class AnalyticsController : ControllerBase
             foreach (var task in tasks.Where(t => t.Status == "Done" && t.Project != null && t.Project.SlaHours.HasValue))
             {
                 var updatedAt = task.UpdatedAt ?? task.CreatedAt;
-                var slaDeadline = task.CreatedAt.AddHours(task.Project!.SlaHours.Value);
+                var slaDeadline = task.CreatedAt.AddHours(task.Project!.SlaHours!.Value);
                 if (slaDeadline >= updatedAt)
                 {
                     slaMet++;
