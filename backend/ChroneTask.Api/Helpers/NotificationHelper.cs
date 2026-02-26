@@ -1,6 +1,7 @@
 using ChroneTask.Api.Data;
 using ChroneTask.Api.Entities;
 using Microsoft.EntityFrameworkCore;
+using TaskEntity = ChroneTask.Api.Entities.Task;
 
 namespace ChroneTask.Api.Helpers;
 
@@ -33,7 +34,7 @@ public static class NotificationHelper
 
     public static async Task NotifyTaskStatusChangeAsync(
         ChroneTaskDbContext db,
-        Task task,
+        TaskEntity task,
         string oldStatus,
         string newStatus,
         Guid triggeredByUserId)
@@ -74,7 +75,7 @@ public static class NotificationHelper
 
     public static async Task NotifyTaskCompletedAsync(
         ChroneTaskDbContext db,
-        Task task,
+        TaskEntity task,
         Guid triggeredByUserId)
     {
         // Notificar a miembros del proyecto
@@ -99,7 +100,7 @@ public static class NotificationHelper
 
     public static async Task NotifyTaskBlockedAsync(
         ChroneTaskDbContext db,
-        Task task,
+        TaskEntity task,
         Guid triggeredByUserId)
     {
         // Notificar al asignado si existe
@@ -138,7 +139,7 @@ public static class NotificationHelper
 
     public static async Task NotifyTaskOverdueAsync(
         ChroneTaskDbContext db,
-        Task task)
+        TaskEntity task)
     {
         if (task.AssignedToId.HasValue)
         {
@@ -155,7 +156,7 @@ public static class NotificationHelper
 
     public static async Task NotifySlaWarningAsync(
         ChroneTaskDbContext db,
-        Task task,
+        TaskEntity task,
         int hoursRemaining)
     {
         if (task.AssignedToId.HasValue)
