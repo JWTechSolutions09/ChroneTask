@@ -39,23 +39,41 @@ export default function ImageUpload({
     }
 
     setUploading(true);
+    setError(null);
 
     try {
       // Convertir a base64 para preview inmediato
       const reader = new FileReader();
       reader.onloadend = () => {
-        const base64String = reader.result as string;
-        setPreview(base64String);
-        onImageChange(base64String);
-        setUploading(false);
+        try {
+          const base64String = reader.result as string;
+          // Validar que el resultado sea válido
+          if (!base64String || !base64String.startsWith("data:image/")) {
+            setError("Formato de imagen no válido");
+            setUploading(false);
+            return;
+          }
+          setPreview(base64String);
+          onImageChange(base64String);
+          setUploading(false);
+        } catch (err) {
+          console.error("Error procesando imagen:", err);
+          setError("Error al procesar la imagen");
+          setUploading(false);
+        }
       };
       reader.onerror = () => {
         setError("Error al leer el archivo");
         setUploading(false);
       };
+      reader.onabort = () => {
+        setError("Lectura del archivo cancelada");
+        setUploading(false);
+      };
       reader.readAsDataURL(file);
-    } catch (err) {
-      setError("Error al procesar la imagen");
+    } catch (err: any) {
+      console.error("Error en handleFileSelect:", err);
+      setError(err?.message || "Error al procesar la imagen");
       setUploading(false);
     }
   };

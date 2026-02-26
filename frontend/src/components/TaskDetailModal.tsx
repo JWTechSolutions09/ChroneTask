@@ -15,6 +15,7 @@ type Task = {
   assignedToName?: string;
   estimatedMinutes?: number;
   totalMinutes: number;
+  startDate?: string;
   dueDate?: string;
   tags?: string;
 };
@@ -75,8 +76,15 @@ export default function TaskDetailModal({
   const [newComment, setNewComment] = useState("");
   const [replyingTo, setReplyingTo] = useState<string | null>(null);
   const [attachments, setAttachments] = useState<File[]>([]);
+  const [isEditing, setIsEditing] = useState(false);
+  const [editedTask, setEditedTask] = useState<Task>(task);
+  const [saving, setSaving] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { showToast } = useToast();
+
+  useEffect(() => {
+    setEditedTask(task);
+  }, [task]);
 
   const loadComments = useCallback(async () => {
     if (!isOpen) return;
@@ -352,13 +360,118 @@ export default function TaskDetailModal({
           </button>
         </div>
 
-        {task.description && (
+        <div style={{ marginBottom: "24px", display: "flex", gap: "12px", flexWrap: "wrap" }}>
+          <Button variant="secondary" onClick={() => setIsEditing(!isEditing)}>
+            {isEditing ? "Cancelar" : "✏️ Editar"}
+          </Button>
+        </div>
+
+        {isEditing ? (
           <div style={{ marginBottom: "24px", padding: "16px", backgroundColor: "var(--bg-secondary)", borderRadius: "8px" }}>
-            <h3 style={{ fontSize: "16px", fontWeight: 600, margin: "0 0 8px 0", color: "var(--text-primary)" }}>
-              Descripción
+            <h3 style={{ fontSize: "16px", fontWeight: 600, margin: "0 0 12px 0", color: "var(--text-primary)" }}>
+              Editar Tarea
             </h3>
-            <p style={{ margin: 0, color: "var(--text-primary)", whiteSpace: "pre-wrap" }}>{task.description}</p>
+            <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+              <div>
+                <label style={{ display: "block", marginBottom: "6px", fontSize: "14px", fontWeight: 500, color: "var(--text-primary)" }}>
+                  Fecha de inicio
+                </label>
+                <input
+                  type="datetime-local"
+                  value={editedTask.startDate ? new Date(editedTask.startDate).toISOString().slice(0, 16) : ""}
+                  onChange={(e) => setEditedTask({ ...editedTask, startDate: e.target.value ? new Date(e.target.value).toISOString() : undefined })}
+                  style={{
+                    width: "100%",
+                    padding: "8px",
+                    borderRadius: "6px",
+                    border: "1px solid var(--border-color)",
+                    backgroundColor: "var(--bg-primary)",
+                    color: "var(--text-primary)",
+                  }}
+                />
+              </div>
+              <div>
+                <label style={{ display: "block", marginBottom: "6px", fontSize: "14px", fontWeight: 500, color: "var(--text-primary)" }}>
+                  Fecha límite
+                </label>
+                <input
+                  type="datetime-local"
+                  value={editedTask.dueDate ? new Date(editedTask.dueDate).toISOString().slice(0, 16) : ""}
+                  onChange={(e) => setEditedTask({ ...editedTask, dueDate: e.target.value ? new Date(e.target.value).toISOString() : undefined })}
+                  style={{
+                    width: "100%",
+                    padding: "8px",
+                    borderRadius: "6px",
+                    border: "1px solid var(--border-color)",
+                    backgroundColor: "var(--bg-primary)",
+                    color: "var(--text-primary)",
+                  }}
+                />
+              </div>
+              <div style={{ display: "flex", gap: "8px" }}>
+                <Button
+                  variant="primary"
+                  onClick={async () => {
+                    setSaving(true);
+                    try {
+                      await http.patch(`/api/projects/${projectId}/tasks/${task.id}`, {
+                        title: editedTask.title,
+                        description: editedTask.description,
+                        type: editedTask.type,
+                        priority: editedTask.priority,
+                        estimatedMinutes: editedTask.estimatedMinutes,
+                        startDate: editedTask.startDate || null,
+                        dueDate: editedTask.dueDate || null,
+                      });
+                      showToast("Tarea actualizada exitosamente", "success");
+                      setIsEditing(false);
+                      onTaskUpdate();
+                    } catch (ex: any) {
+                      showToast("Error actualizando tarea", "error");
+                    } finally {
+                      setSaving(false);
+                    }
+                  }}
+                  disabled={saving}
+                >
+                  {saving ? "Guardando..." : "Guardar"}
+                </Button>
+                <Button variant="secondary" onClick={() => setIsEditing(false)}>
+                  Cancelar
+                </Button>
+              </div>
+            </div>
           </div>
+        ) : (
+          <>
+            {task.description && (
+              <div style={{ marginBottom: "24px", padding: "16px", backgroundColor: "var(--bg-secondary)", borderRadius: "8px" }}>
+                <h3 style={{ fontSize: "16px", fontWeight: 600, margin: "0 0 8px 0", color: "var(--text-primary)" }}>
+                  Descripción
+                </h3>
+                <p style={{ margin: 0, color: "var(--text-primary)", whiteSpace: "pre-wrap" }}>{task.description}</p>
+              </div>
+            )}
+            {(task.startDate || task.dueDate) && (
+              <div style={{ marginBottom: "24px", padding: "16px", backgroundColor: "var(--bg-secondary)", borderRadius: "8px" }}>
+                <h3 style={{ fontSize: "16px", fontWeight: 600, margin: "0 0 8px 0", color: "var(--text-primary)" }}>
+                  Fechas
+                </h3>
+                <div style={{ display: "flex", flexDirection: "column", gap: "8px", fontSize: "14px", color: "var(--text-primary)" }}>
+                  {task.startDate && (
+                    <div>
+                      <strong>Inicio:</strong> {new Date(task.startDate).toLocaleString("es-ES")}
+                    </div>
+                  )}
+                  {task.dueDate && (
+                    <div>
+                      <strong>Límite:</strong> {new Date(task.dueDate).toLocaleString("es-ES")}
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+          </>
         )}
 
         {/* Comments Section */}

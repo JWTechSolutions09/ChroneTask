@@ -24,6 +24,7 @@ type Task = {
   assignedToName?: string;
   estimatedMinutes?: number;
   totalMinutes: number;
+  startDate?: string;
   dueDate?: string;
   tags?: string;
 };

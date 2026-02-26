@@ -28,6 +28,8 @@ export default function PageHeader({ title, subtitle, breadcrumbs, actions }: Pa
           justifyContent: "space-between",
           alignItems: "flex-start",
           marginTop: breadcrumbs && breadcrumbs.length > 0 ? "12px" : 0,
+          flexWrap: "wrap",
+          gap: "12px",
         }}
       >
         <div>
@@ -56,7 +58,11 @@ export default function PageHeader({ title, subtitle, breadcrumbs, actions }: Pa
             </p>
           )}
         </div>
-        {actions && <div style={{ display: "flex", gap: "10px", alignItems: "center" }}>{actions}</div>}
+        {actions && (
+          <div style={{ display: "flex", gap: "10px", alignItems: "center", flexWrap: "wrap" }}>
+            {actions}
+          </div>
+        )}
       </div>
     </div>
   );

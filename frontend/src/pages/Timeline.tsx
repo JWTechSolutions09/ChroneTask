@@ -75,9 +75,9 @@ export default function Timeline() {
         }
       }
 
-      // Filter tasks with dates
-      allTasks = allTasks.filter((t) => t.startDate || t.dueDate);
-      setTasks(allTasks);
+      // Filter tasks with dates (but show all if none have dates)
+      const tasksWithDates = allTasks.filter((t) => t.startDate || t.dueDate);
+      setTasks(tasksWithDates.length > 0 ? tasksWithDates : allTasks);
     } catch (ex: any) {
       const errorMsg = ex?.response?.data?.message ?? ex.message ?? "Error cargando tareas";
       showToast(errorMsg, "error");

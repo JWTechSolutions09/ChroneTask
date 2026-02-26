@@ -155,7 +155,7 @@ export default function ProjectCommentsPanel({
           right: 0,
           bottom: 0,
           width: "500px",
-          maxWidth: "90vw",
+          maxWidth: "95vw",
           backgroundColor: "var(--bg-primary)",
           boxShadow: "-4px 0 20px rgba(0, 0, 0, 0.15)",
           zIndex: 1001,

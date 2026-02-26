@@ -69,6 +69,24 @@ public class AnalyticsController : ControllerBase
             .Include(t => t.AssignedTo)
             .ToListAsync();
 
+        // Si no hay proyectos, retornar datos vacíos
+        if (!projectIds.Any())
+        {
+            return Ok(new AnalyticsResponse
+            {
+                TotalTasks = 0,
+                CompletedTasks = 0,
+                PendingTasks = 0,
+                OverdueTasks = 0,
+                SlaMet = 0,
+                SlaMissed = 0,
+                MemberActivities = new List<MemberActivityResponse>(),
+                ProjectsWithBlockages = new List<ProjectBlockedResponse>(),
+                TasksDueSoon = new List<TaskDueSoonResponse>(),
+                InactiveMembers = new List<MemberInactivityResponse>()
+            });
+        }
+
         var totalTasks = tasks.Count;
         var completedTasks = tasks.Count(t => t.Status == "Done");
         var pendingTasks = tasks.Count(t => t.Status != "Done");
@@ -90,21 +108,25 @@ public class AnalyticsController : ControllerBase
         }
 
         // Member Activities
-        var memberActivities = await _db.ProjectMembers
+        var projectMembers = await _db.ProjectMembers
             .Where(pm => projectIds.Contains(pm.ProjectId))
             .Include(pm => pm.User)
-            .GroupBy(pm => new { pm.UserId, pm.User.FullName, pm.User.ProfilePictureUrl })
-            .Select(g => new MemberActivityResponse
+            .Select(pm => new { pm.UserId, pm.User.FullName, pm.User.ProfilePictureUrl })
+            .Distinct()
+            .ToListAsync();
+
+        var memberActivities = projectMembers
+            .Select(pm => new MemberActivityResponse
             {
-                UserId = g.Key.UserId,
-                UserName = g.Key.FullName,
-                UserAvatar = g.Key.ProfilePictureUrl,
-                CompletedTasks = tasks.Count(t => t.AssignedToId == g.Key.UserId && t.Status == "Done"),
-                PendingTasks = tasks.Count(t => t.AssignedToId == g.Key.UserId && t.Status != "Done"),
-                TotalMinutes = tasks.Where(t => t.AssignedToId == g.Key.UserId).Sum(t => t.TotalMinutes)
+                UserId = pm.UserId,
+                UserName = pm.FullName,
+                UserAvatar = pm.ProfilePictureUrl,
+                CompletedTasks = tasks.Count(t => t.AssignedToId == pm.UserId && t.Status == "Done"),
+                PendingTasks = tasks.Count(t => t.AssignedToId == pm.UserId && t.Status != "Done"),
+                TotalMinutes = tasks.Where(t => t.AssignedToId == pm.UserId).Sum(t => (int?)t.TotalMinutes) ?? 0
             })
             .OrderByDescending(m => m.CompletedTasks)
-            .ToListAsync();
+            .ToList();
 
         // Projects with Blockages
         var projectsWithBlockages = await _db.Projects
@@ -135,32 +157,37 @@ public class AnalyticsController : ControllerBase
             .ToList();
 
         // Inactive Members (no activity in last 7 days)
-        var inactiveMembers = await _db.ProjectMembers
+        var projectMembersForInactivity = await _db.ProjectMembers
             .Where(pm => projectIds.Contains(pm.ProjectId))
             .Include(pm => pm.User)
-            .Select(pm => new
-            {
-                pm.UserId,
-                pm.User.FullName,
-                pm.User.ProfilePictureUrl,
-                LastTaskUpdate = tasks
-                    .Where(t => t.AssignedToId == pm.UserId)
-                    .OrderByDescending(t => t.UpdatedAt ?? t.CreatedAt)
-                    .Select(t => t.UpdatedAt ?? t.CreatedAt)
-                    .FirstOrDefault()
-            })
-            .Where(m => m.LastTaskUpdate == default(DateTime) || m.LastTaskUpdate < now.AddDays(-7))
-            .Select(m => new MemberInactivityResponse
-            {
-                UserId = m.UserId,
-                UserName = m.FullName,
-                UserAvatar = m.ProfilePictureUrl,
-                DaysSinceLastActivity = m.LastTaskUpdate == default(DateTime)
-                    ? 999
-                    : (int)(now - m.LastTaskUpdate).TotalDays
-            })
-            .OrderByDescending(m => m.DaysSinceLastActivity)
+            .Select(pm => new { pm.UserId, pm.User.FullName, pm.User.ProfilePictureUrl })
+            .Distinct()
             .ToListAsync();
+
+        var inactiveMembers = projectMembersForInactivity
+            .Select(pm =>
+            {
+                var userTasks = tasks.Where(t => t.AssignedToId == pm.UserId).ToList();
+                var lastUpdate = userTasks.Any()
+                    ? userTasks
+                        .OrderByDescending(t => t.UpdatedAt ?? t.CreatedAt)
+                        .Select(t => t.UpdatedAt ?? t.CreatedAt)
+                        .FirstOrDefault()
+                    : default(DateTime);
+
+                return new MemberInactivityResponse
+                {
+                    UserId = pm.UserId,
+                    UserName = pm.FullName,
+                    UserAvatar = pm.ProfilePictureUrl,
+                    DaysSinceLastActivity = lastUpdate == default(DateTime)
+                        ? 999
+                        : (int)(now - lastUpdate).TotalDays
+                };
+            })
+            .Where(m => m.DaysSinceLastActivity >= 7)
+            .OrderByDescending(m => m.DaysSinceLastActivity)
+            .ToList();
 
         return Ok(new AnalyticsResponse
         {

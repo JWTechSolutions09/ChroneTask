@@ -26,6 +26,7 @@ export default function Layout({ children, organizationId }: LayoutProps) {
   const params = useParams();
   const { theme, toggleTheme } = useTheme();
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const [orgs, setOrgs] = useState<Org[]>([]);
   const [currentOrg, setCurrentOrg] = useState<Org | null>(null);
   const [projects, setProjects] = useState<Project[]>([]);
@@ -119,6 +120,47 @@ export default function Layout({ children, organizationId }: LayoutProps) {
 
   return (
     <div style={{ display: "flex", minHeight: "100vh", backgroundColor: "var(--bg-secondary)" }}>
+      {/* Mobile Menu Overlay */}
+      {sidebarOpen && (
+        <div
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: "rgba(0, 0, 0, 0.5)",
+            zIndex: 999,
+            display: "none",
+          }}
+          className="mobile-overlay"
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
+
+      {/* Mobile Menu Button */}
+      <button
+        onClick={() => setSidebarOpen(!sidebarOpen)}
+        style={{
+          position: "fixed",
+          top: "16px",
+          left: "16px",
+          zIndex: 1001,
+          background: "var(--bg-primary)",
+          border: "1px solid var(--border-color)",
+          borderRadius: "8px",
+          padding: "8px",
+          cursor: "pointer",
+          display: "none",
+          alignItems: "center",
+          justifyContent: "center",
+          boxShadow: "0 2px 8px rgba(0, 0, 0, 0.15)",
+        }}
+        className="mobile-menu-btn"
+      >
+        ☰
+      </button>
+
       {/* Sidebar */}
       <aside
         style={{
@@ -127,13 +169,15 @@ export default function Layout({ children, organizationId }: LayoutProps) {
           borderRight: "1px solid var(--border-color)",
           display: "flex",
           flexDirection: "column",
-          transition: "width 0.3s ease",
+          transition: "width 0.3s ease, transform 0.3s ease",
           position: "sticky",
           top: 0,
           height: "100vh",
           overflowY: "auto",
           boxShadow: theme === "dark" ? "2px 0 8px rgba(0, 0, 0, 0.3)" : "2px 0 8px rgba(0, 0, 0, 0.05)",
+          zIndex: 100,
         }}
+        className={`sidebar ${sidebarOpen ? "open" : ""}`}
       >
         {/* Logo/Header */}
         <div

@@ -18,6 +18,8 @@ export default function CreateTaskModal({
   const [type, setType] = useState("Task");
   const [priority, setPriority] = useState("");
   const [estimatedMinutes, setEstimatedMinutes] = useState("");
+  const [startDate, setStartDate] = useState("");
+  const [dueDate, setDueDate] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const { showToast } = useToast();
@@ -36,6 +38,8 @@ export default function CreateTaskModal({
         type,
         priority: priority || null,
         estimatedMinutes: estimatedMinutes ? parseInt(estimatedMinutes) : null,
+        startDate: startDate || null,
+        dueDate: dueDate || null,
       });
       showToast("Tarea creada exitosamente", "success");
       onSuccess();
@@ -209,6 +213,48 @@ export default function CreateTaskModal({
               placeholder="Ej: 120"
               min="0"
             />
+          </div>
+
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px" }}>
+            <div>
+              <label
+                style={{
+                  display: "block",
+                  marginBottom: "6px",
+                  fontSize: "14px",
+                  fontWeight: 500,
+                  color: "#495057",
+                }}
+              >
+                Fecha de inicio
+              </label>
+              <input
+                type="datetime-local"
+                value={startDate}
+                onChange={(e) => setStartDate(e.target.value)}
+                className="input"
+              />
+            </div>
+
+            <div>
+              <label
+                style={{
+                  display: "block",
+                  marginBottom: "6px",
+                  fontSize: "14px",
+                  fontWeight: 500,
+                  color: "#495057",
+                }}
+              >
+                Fecha límite
+              </label>
+              <input
+                type="datetime-local"
+                value={dueDate}
+                onChange={(e) => setDueDate(e.target.value)}
+                className="input"
+              />
+            </div>
           </div>
 
           {error && <div className="alert alert-error">{error}</div>}

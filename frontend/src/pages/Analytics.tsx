@@ -73,10 +73,39 @@ export default function Analytics() {
       if (endDate) params.append("endDate", endDate);
 
       const res = await http.get(`/api/orgs/${organizationId}/analytics?${params.toString()}`);
-      setAnalytics(res.data);
+      if (res.data) {
+        setAnalytics(res.data);
+      } else {
+        setAnalytics({
+          totalTasks: 0,
+          completedTasks: 0,
+          pendingTasks: 0,
+          overdueTasks: 0,
+          slaMet: 0,
+          slaMissed: 0,
+          memberActivities: [],
+          projectsWithBlockages: [],
+          tasksDueSoon: [],
+          inactiveMembers: [],
+        });
+      }
     } catch (ex: any) {
+      console.error("Error loading analytics:", ex);
       const errorMsg = ex?.response?.data?.message ?? ex.message ?? "Error cargando analíticas";
       showToast(errorMsg, "error");
+      // Set empty analytics on error
+      setAnalytics({
+        totalTasks: 0,
+        completedTasks: 0,
+        pendingTasks: 0,
+        overdueTasks: 0,
+        slaMet: 0,
+        slaMissed: 0,
+        memberActivities: [],
+        projectsWithBlockages: [],
+        tasksDueSoon: [],
+        inactiveMembers: [],
+      });
     } finally {
       setLoading(false);
     }
@@ -180,8 +209,8 @@ export default function Analytics() {
         <div style={{ padding: "24px" }}>
           {loading ? (
             <div className="loading">Cargando analíticas...</div>
-          ) : !analytics ? (
-            <div className="alert alert-error">No se pudieron cargar las analíticas</div>
+          ) : analytics === null ? (
+            <div className="alert alert-error">No se pudieron cargar las analíticas. Por favor, intenta de nuevo.</div>
           ) : (
             <>
               {/* Summary Cards */}

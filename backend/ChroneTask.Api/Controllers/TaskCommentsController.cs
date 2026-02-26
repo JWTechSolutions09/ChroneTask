@@ -107,30 +107,83 @@ public class TaskCommentsController : ControllerBase
             await _db.SaveChangesAsync();
         }
 
+        // Obtener la tarea para notificaciones
+        var task = await _db.Tasks
+            .Include(t => t.Project)
+            .FirstOrDefaultAsync(t => t.Id == taskId);
+
+        // Crear notificación para el asignado de la tarea (si existe y no es el que comentó)
+        if (task != null && task.AssignedToId.HasValue && task.AssignedToId.Value != userId)
+        {
+            var notification = new Notification
+            {
+                UserId = task.AssignedToId.Value,
+                Type = "new_comment",
+                Title = "Nuevo comentario en tarea",
+                Message = $"Nuevo comentario en la tarea: {task.Title}",
+                ProjectId = projectId,
+                TaskId = taskId,
+                TriggeredByUserId = userId
+            };
+            _db.Notifications.Add(notification);
+        }
+
+        // Crear notificaciones para miembros del proyecto (excepto el que comentó)
+        var projectMembers = await _db.ProjectMembers
+            .Where(pm => pm.ProjectId == projectId && pm.UserId != userId)
+            .Select(pm => pm.UserId)
+            .ToListAsync();
+
+        foreach (var memberId in projectMembers)
+        {
+            // No notificar al asignado dos veces
+            if (task != null && task.AssignedToId.HasValue && task.AssignedToId.Value == memberId)
+                continue;
+
+            var notification = new Notification
+            {
+                UserId = memberId,
+                Type = "new_comment",
+                Title = "Nuevo comentario en tarea",
+                Message = $"Nuevo comentario en la tarea: {task?.Title ?? "Tarea"}",
+                ProjectId = projectId,
+                TaskId = taskId,
+                TriggeredByUserId = userId
+            };
+            _db.Notifications.Add(notification);
+        }
+
         // Crear notificaciones para @mentions
         if (request.Mentions != null && request.Mentions.Any())
         {
             foreach (var mentionedUserId in request.Mentions)
             {
                 var mentionedUser = await _db.Users.FindAsync(Guid.Parse(mentionedUserId));
-                if (mentionedUser != null)
+                if (mentionedUser != null && mentionedUser.Id != userId)
                 {
-                    var task = await _db.Tasks.FindAsync(taskId);
-                    var notification = new Notification
+                    // Verificar si ya se creó una notificación para este usuario
+                    var alreadyNotified = projectMembers.Contains(mentionedUser.Id) || 
+                                        (task != null && task.AssignedToId == mentionedUser.Id);
+                    
+                    if (!alreadyNotified)
                     {
-                        UserId = mentionedUser.Id,
-                        Type = "new_comment",
-                        Title = "Mencionado en comentario",
-                        Message = $"Has sido mencionado en un comentario de la tarea: {task?.Title}",
-                        ProjectId = projectId,
-                        TaskId = taskId,
-                        TriggeredByUserId = userId
-                    };
-                    _db.Notifications.Add(notification);
+                        var notification = new Notification
+                        {
+                            UserId = mentionedUser.Id,
+                            Type = "new_comment",
+                            Title = "Mencionado en comentario",
+                            Message = $"Has sido mencionado en un comentario de la tarea: {task?.Title ?? "Tarea"}",
+                            ProjectId = projectId,
+                            TaskId = taskId,
+                            TriggeredByUserId = userId
+                        };
+                        _db.Notifications.Add(notification);
+                    }
                 }
             }
-            await _db.SaveChangesAsync();
         }
+
+        await _db.SaveChangesAsync();
 
         await _db.Entry(comment).Reference(c => c.User).LoadAsync();
         await _db.Entry(comment).Collection(c => c.Attachments).LoadAsync();
