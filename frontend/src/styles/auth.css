@@ -247,12 +247,14 @@
   padding: 0 50px;
   height: 100%;
   text-align: center;
-  border-right: 1px solid var(--landing-border, rgba(0, 0, 0, 0.1));
+  border-right: 1px solid var(--landing-border);
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .register-form-box form {
   border-right: none;
-  border-left: 1px solid var(--landing-border, rgba(0, 0, 0, 0.1));
+  border-left: 1px solid var(--landing-border);
 }
 
 .auth-wrapper input {
@@ -262,10 +264,12 @@
   padding: 14px 18px;
   margin: 8px 0;
   width: 100%;
+  max-width: 100%;
   font-size: 14px;
   transition: all 0.3s ease;
   font-family: 'Poppins', sans-serif;
   color: var(--landing-text);
+  box-sizing: border-box;
 }
 
 .auth-wrapper input:focus {
@@ -290,29 +294,39 @@
   top: 0;
   height: 100%;
   transition: all 0.6s ease-in-out;
+  overflow: hidden;
 }
 
 .login-form-box {
   left: 0;
   width: 50%;
   z-index: 2;
+  opacity: 1;
+  visibility: visible;
 }
 
 .auth-wrapper.panel-active .login-form-box {
   transform: translateX(100%);
+  opacity: 0;
+  visibility: hidden;
+  z-index: 1;
 }
 
 .register-form-box {
   left: 0;
   width: 50%;
   opacity: 0;
+  visibility: hidden;
   z-index: 1;
+  pointer-events: none;
 }
 
 .auth-wrapper.panel-active .register-form-box {
   transform: translateX(100%);
   opacity: 1;
+  visibility: visible;
   z-index: 5;
+  pointer-events: auto;
   animation: show 0.6s;
 }
 
@@ -504,19 +518,23 @@
     left: 0 !important;
     transform: none !important;
     opacity: 1 !important;
+    visibility: visible !important;
     z-index: 1 !important;
+    pointer-events: auto !important;
   }
 
   .register-form-box {
-    display: none;
+    display: none !important;
   }
 
   .auth-wrapper.panel-active .login-form-box {
-    display: none;
+    display: none !important;
+    visibility: hidden !important;
   }
 
   .auth-wrapper.panel-active .register-form-box {
-    display: block;
+    display: block !important;
+    visibility: visible !important;
   }
 
   .slide-panel-wrapper {
