@@ -157,7 +157,7 @@ export default function Analytics() {
             { label: "Resumen" },
           ]}
           actions={
-            <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
+            <div style={{ display: "flex", gap: "8px", flexWrap: "wrap", width: "100%" }}>
               <select
                 value={selectedProjectId}
                 onChange={(e) => setSelectedProjectId(e.target.value)}
@@ -167,6 +167,9 @@ export default function Analytics() {
                   border: "1px solid var(--border-color)",
                   backgroundColor: "var(--bg-primary)",
                   color: "var(--text-primary)",
+                  flex: "1 1 auto",
+                  minWidth: "150px",
+                  maxWidth: "100%",
                 }}
               >
                 <option value="">Todos los proyectos</option>
@@ -187,6 +190,9 @@ export default function Analytics() {
                   border: "1px solid var(--border-color)",
                   backgroundColor: "var(--bg-primary)",
                   color: "var(--text-primary)",
+                  flex: "1 1 auto",
+                  minWidth: "140px",
+                  maxWidth: "100%",
                 }}
               />
               <input
@@ -200,6 +206,9 @@ export default function Analytics() {
                   border: "1px solid var(--border-color)",
                   backgroundColor: "var(--bg-primary)",
                   color: "var(--text-primary)",
+                  flex: "1 1 auto",
+                  minWidth: "140px",
+                  maxWidth: "100%",
                 }}
               />
             </div>

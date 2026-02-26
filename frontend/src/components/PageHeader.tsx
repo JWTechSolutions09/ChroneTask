@@ -31,8 +31,9 @@ export default function PageHeader({ title, subtitle, breadcrumbs, actions }: Pa
           flexWrap: "wrap",
           gap: "12px",
         }}
+        className="page-header-content"
       >
-        <div>
+        <div style={{ flex: "1 1 100%", minWidth: 0, maxWidth: "100%" }}>
           <h1
             style={{
               fontSize: "28px",
@@ -41,6 +42,8 @@ export default function PageHeader({ title, subtitle, breadcrumbs, actions }: Pa
               color: "var(--text-primary)",
               marginBottom: subtitle ? "8px" : 0,
               letterSpacing: "-0.5px",
+              wordWrap: "break-word",
+              overflowWrap: "break-word",
             }}
           >
             {title}
@@ -52,6 +55,8 @@ export default function PageHeader({ title, subtitle, breadcrumbs, actions }: Pa
                 fontSize: "15px",
                 color: "var(--text-secondary)",
                 fontWeight: 400,
+                wordWrap: "break-word",
+                overflowWrap: "break-word",
               }}
             >
               {subtitle}
@@ -59,7 +64,17 @@ export default function PageHeader({ title, subtitle, breadcrumbs, actions }: Pa
           )}
         </div>
         {actions && (
-          <div style={{ display: "flex", gap: "10px", alignItems: "center", flexWrap: "wrap" }}>
+          <div 
+            style={{ 
+              display: "flex", 
+              gap: "8px", 
+              alignItems: "center", 
+              flexWrap: "wrap",
+              width: "100%",
+              justifyContent: "flex-start",
+            }}
+            className="page-header-actions"
+          >
             {actions}
           </div>
         )}

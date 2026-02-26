@@ -235,7 +235,7 @@ export default function Board() {
             { label: projectName || "Board" },
           ]}
           actions={
-            <div style={{ display: "flex", gap: "10px" }}>
+            <div style={{ display: "flex", gap: "8px", flexWrap: "wrap", width: "100%" }}>
               <Button variant="secondary" onClick={() => setShowCommentsPanel(true)}>
                 💬 Comentarios
               </Button>
@@ -318,11 +318,13 @@ export default function Board() {
             <div className="loading">Cargando tareas...</div>
           ) : (
             <div
+              className="kanban-board"
               style={{
                 display: "grid",
                 gridTemplateColumns: `repeat(${STATUSES.length}, 1fr)`,
                 gap: "16px",
                 overflowX: "auto",
+                minWidth: 0,
               }}
             >
               {STATUSES.map((status) => {
