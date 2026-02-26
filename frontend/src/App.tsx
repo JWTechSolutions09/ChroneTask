@@ -1,5 +1,6 @@
 import React from "react";
 import { Routes, Route, Navigate, useNavigate } from "react-router-dom";
+import Landing from "./pages/Landing";
 import Auth from "./pages/Auth";
 import Orgs from "./pages/Orgs";
 import OrgSelect from "./pages/OrgSelect";
@@ -87,6 +88,10 @@ function AppContent() {
     
     return (
         <Routes>
+            <Route
+                path="/"
+                element={<Landing />}
+            />
             <Route
                 path="/login"
                 element={
