@@ -22,6 +22,10 @@ public class Project
     [MaxLength(500)]
     public string? ImageUrl { get; set; } // URL de imagen del proyecto
 
+    // SLA Configuration
+    public int? SlaHours { get; set; } // SLA in hours (null = no SLA)
+    public int? SlaWarningThreshold { get; set; } // Warning threshold in hours (e.g., 80% of SLA)
+
     public bool IsActive { get; set; } = true;
 
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
@@ -30,4 +34,7 @@ public class Project
     // Navigation properties
     public ICollection<ProjectMember> ProjectMembers { get; set; } = new List<ProjectMember>();
     public ICollection<Task> Tasks { get; set; } = new List<Task>();
+    public ICollection<ProjectComment> Comments { get; set; } = new List<ProjectComment>();
+    public ICollection<ProjectNote> Notes { get; set; } = new List<ProjectNote>();
+    public ICollection<Notification> Notifications { get; set; } = new List<Notification>();
 }

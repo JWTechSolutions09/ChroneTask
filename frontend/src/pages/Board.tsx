@@ -7,6 +7,8 @@ import Card from "../components/Card";
 import TimeTracker from "../components/TimeTracker";
 import CreateTaskModal from "../components/CreateTaskModal";
 import AddProjectMemberModal from "../components/AddProjectMemberModal";
+import ProjectCommentsPanel from "../components/ProjectCommentsPanel";
+import TaskDetailModal from "../components/TaskDetailModal";
 import KeyboardShortcuts from "../components/KeyboardShortcuts";
 import Button from "../components/Button";
 import { useToast } from "../contexts/ToastContext";
@@ -52,6 +54,8 @@ export default function Board() {
   const [draggedTask, setDraggedTask] = useState<Task | null>(null);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showMemberModal, setShowMemberModal] = useState(false);
+  const [showCommentsPanel, setShowCommentsPanel] = useState(false);
+  const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const [assigningTaskId, setAssigningTaskId] = useState<string | null>(null);
   const { showToast } = useToast();
 
@@ -231,8 +235,27 @@ export default function Board() {
           ]}
           actions={
             <div style={{ display: "flex", gap: "10px" }}>
+              <Button variant="secondary" onClick={() => setShowCommentsPanel(true)}>
+                💬 Comentarios
+              </Button>
               <Button variant="secondary" onClick={() => setShowMemberModal(true)}>
                 👥 Miembros
+              </Button>
+              <Button
+                variant="secondary"
+                onClick={() => {
+                  window.location.href = `/org/${organizationId}/project/${projectId}/notes`;
+                }}
+              >
+                📝 Notas
+              </Button>
+              <Button
+                variant="secondary"
+                onClick={() => {
+                  window.location.href = `/org/${organizationId}/project/${projectId}/timeline`;
+                }}
+              >
+                📅 Cronograma
               </Button>
               <Button variant="primary" onClick={() => setShowCreateModal(true)}>
                 + Nueva Tarea
@@ -407,6 +430,7 @@ export default function Board() {
                           onDragEnd={(e) => {
                             e.currentTarget.style.opacity = "1";
                           }}
+                          onClick={() => setSelectedTask(task)}
                         >
                           <div style={{ marginBottom: "12px" }}>
                             <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "8px" }}>
@@ -742,6 +766,30 @@ export default function Board() {
                 loadProjectMembers();
                 showToast("Miembro agregado exitosamente", "success");
               }}
+            />
+          )}
+
+          {showCommentsPanel && organizationId && projectId && (
+            <ProjectCommentsPanel
+              organizationId={organizationId}
+              projectId={projectId}
+              projectName={projectName || "Proyecto"}
+              isOpen={showCommentsPanel}
+              onClose={() => setShowCommentsPanel(false)}
+            />
+          )}
+
+          {selectedTask && organizationId && projectId && (
+            <TaskDetailModal
+              task={selectedTask}
+              projectId={projectId}
+              organizationId={organizationId}
+              isOpen={!!selectedTask}
+              onClose={() => {
+                setSelectedTask(null);
+                loadTasks();
+              }}
+              onTaskUpdate={loadTasks}
             />
           )}
         </div>

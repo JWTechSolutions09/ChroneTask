@@ -3,6 +3,7 @@ using System;
 using ChroneTask.Api.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace ChroneTask.Api.Migrations
 {
     [DbContext(typeof(ChroneTaskDbContext))]
-    partial class ChroneTaskDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260226045738_AddCommentsNotificationsSLAAndNotes")]
+    partial class AddCommentsNotificationsSLAAndNotes
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

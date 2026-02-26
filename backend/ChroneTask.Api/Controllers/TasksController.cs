@@ -312,10 +312,28 @@ public class TasksController : ControllerBase
         if (status == "Done" && !task.AssignedToId.HasValue)
             return BadRequest(new { message = "Cannot close task without assignee" });
 
+        var oldStatus = task.Status;
         task.Status = status;
         task.UpdatedAt = DateTime.UtcNow;
 
         await _db.SaveChangesAsync();
+
+        // Crear notificaciones
+        if (oldStatus != status)
+        {
+            if (status == "Done")
+            {
+                await NotificationHelper.NotifyTaskCompletedAsync(_db, task, userId);
+            }
+            else if (status == "Blocked")
+            {
+                await NotificationHelper.NotifyTaskBlockedAsync(_db, task, userId);
+            }
+            else
+            {
+                await NotificationHelper.NotifyTaskStatusChangeAsync(_db, task, oldStatus, status, userId);
+            }
+        }
 
         return Ok(new TaskResponse
         {

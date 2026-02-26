@@ -48,7 +48,9 @@ public class ProjectsController : ControllerBase
                 UpdatedAt = p.UpdatedAt,
                 TaskCount = p.Tasks.Count,
                 ActiveTaskCount = p.Tasks.Count(t => t.Status != "Done"),
-                ImageUrl = p.ImageUrl
+                ImageUrl = p.ImageUrl,
+                SlaHours = p.SlaHours,
+                SlaWarningThreshold = p.SlaWarningThreshold
             })
             .ToListAsync();
 
@@ -87,7 +89,9 @@ public class ProjectsController : ControllerBase
             UpdatedAt = project.UpdatedAt,
             TaskCount = project.Tasks.Count,
             ActiveTaskCount = project.Tasks.Count(t => t.Status != "Done"),
-            ImageUrl = project.ImageUrl
+            ImageUrl = project.ImageUrl,
+            SlaHours = project.SlaHours,
+            SlaWarningThreshold = project.SlaWarningThreshold
         });
     }
 
@@ -114,7 +118,9 @@ public class ProjectsController : ControllerBase
             Description = string.IsNullOrWhiteSpace(request.Description) ? null : request.Description.Trim(),
             OrganizationId = organizationId,
             Template = string.IsNullOrWhiteSpace(request.Template) ? null : request.Template.Trim(),
-            ImageUrl = string.IsNullOrWhiteSpace(request.ImageUrl) ? null : request.ImageUrl.Trim()
+            ImageUrl = string.IsNullOrWhiteSpace(request.ImageUrl) ? null : request.ImageUrl.Trim(),
+            SlaHours = request.SlaHours,
+            SlaWarningThreshold = request.SlaWarningThreshold
         };
 
         _db.Projects.Add(project);
@@ -141,7 +147,9 @@ public class ProjectsController : ControllerBase
             UpdatedAt = project.UpdatedAt,
             TaskCount = 0,
             ActiveTaskCount = 0,
-            ImageUrl = project.ImageUrl
+            ImageUrl = project.ImageUrl,
+            SlaHours = project.SlaHours,
+            SlaWarningThreshold = project.SlaWarningThreshold
         });
     }
 
@@ -174,6 +182,8 @@ public class ProjectsController : ControllerBase
         project.Description = string.IsNullOrWhiteSpace(request.Description) ? null : request.Description.Trim();
         project.Template = string.IsNullOrWhiteSpace(request.Template) ? null : request.Template.Trim();
         project.ImageUrl = string.IsNullOrWhiteSpace(request.ImageUrl) ? null : request.ImageUrl.Trim();
+        project.SlaHours = request.SlaHours;
+        project.SlaWarningThreshold = request.SlaWarningThreshold;
         project.UpdatedAt = DateTime.UtcNow;
 
         await _db.SaveChangesAsync();
@@ -193,7 +203,9 @@ public class ProjectsController : ControllerBase
             UpdatedAt = project.UpdatedAt,
             TaskCount = taskCount,
             ActiveTaskCount = activeTaskCount,
-            ImageUrl = project.ImageUrl
+            ImageUrl = project.ImageUrl,
+            SlaHours = project.SlaHours,
+            SlaWarningThreshold = project.SlaWarningThreshold
         });
     }
 

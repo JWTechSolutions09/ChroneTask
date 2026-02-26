@@ -16,4 +16,7 @@ public class ProjectCreateRequest
 
     [MaxLength(500)]
     public string? ImageUrl { get; set; } // URL de imagen del proyecto
+
+    public int? SlaHours { get; set; } // SLA in hours
+    public int? SlaWarningThreshold { get; set; } // Warning threshold in hours
 }

@@ -336,6 +336,27 @@ export default function Layout({ children, organizationId }: LayoutProps) {
                   active={isActive(`/org/${organizationId}/projects`)}
                   collapsed={sidebarCollapsed}
                 />
+                <NavItem
+                  icon="🔔"
+                  label="Notificaciones"
+                  to={`/org/${organizationId}/notifications`}
+                  active={isActive(`/org/${organizationId}/notifications`)}
+                  collapsed={sidebarCollapsed}
+                />
+                <NavItem
+                  icon="📊"
+                  label="Resumen"
+                  to={`/org/${organizationId}/analytics`}
+                  active={isActive(`/org/${organizationId}/analytics`)}
+                  collapsed={sidebarCollapsed}
+                />
+                <NavItem
+                  icon="📅"
+                  label="Cronograma"
+                  to={`/org/${organizationId}/timeline`}
+                  active={isActive(`/org/${organizationId}/timeline`) || isActive(`/org/${organizationId}/project/`) && location.pathname.includes("timeline")}
+                  collapsed={sidebarCollapsed}
+                />
               </div>
 
               {/* Projects List */}

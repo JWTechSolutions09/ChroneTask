@@ -29,6 +29,8 @@ export default function Projects() {
   const [description, setDescription] = useState("");
   const [template, setTemplate] = useState("");
   const [imageUrl, setImageUrl] = useState("");
+  const [slaHours, setSlaHours] = useState("");
+  const [slaWarningThreshold, setSlaWarningThreshold] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
   const [filterTemplate, setFilterTemplate] = useState("");
   const [err, setErr] = useState<string | null>(null);
@@ -101,11 +103,15 @@ export default function Projects() {
         description: description.trim() || null,
         template: template.trim() || null,
         imageUrl: imageUrl.trim() || null,
+        slaHours: slaHours ? parseInt(slaHours) : null,
+        slaWarningThreshold: slaWarningThreshold ? parseInt(slaWarningThreshold) : null,
       });
       setName("");
       setDescription("");
       setTemplate("");
       setImageUrl("");
+      setSlaHours("");
+      setSlaWarningThreshold("");
       await loadProjects();
       showToast("Proyecto creado exitosamente", "success");
 
@@ -252,6 +258,63 @@ export default function Projects() {
                   disabled={creating}
                   className="input"
                 />
+              </div>
+              <div style={{ borderTop: "1px solid var(--border-color)", paddingTop: "16px", marginTop: "8px" }}>
+                <h3 style={{ fontSize: "16px", fontWeight: 600, marginBottom: "12px", color: "var(--text-primary)" }}>
+                  Configuración de SLA (Opcional)
+                </h3>
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px" }}>
+                  <div>
+                    <label
+                      style={{
+                        display: "block",
+                        marginBottom: "6px",
+                        fontSize: "14px",
+                        fontWeight: 500,
+                        color: "var(--text-primary)",
+                      }}
+                    >
+                      SLA en horas
+                    </label>
+                    <input
+                      type="number"
+                      placeholder="Ej: 48"
+                      value={slaHours}
+                      onChange={(e) => setSlaHours(e.target.value)}
+                      disabled={creating}
+                      min="1"
+                      className="input"
+                    />
+                    <div style={{ fontSize: "12px", color: "var(--text-secondary)", marginTop: "4px" }}>
+                      Tiempo máximo para completar tareas
+                    </div>
+                  </div>
+                  <div>
+                    <label
+                      style={{
+                        display: "block",
+                        marginBottom: "6px",
+                        fontSize: "14px",
+                        fontWeight: 500,
+                        color: "var(--text-primary)",
+                      }}
+                    >
+                      Umbral de advertencia (horas)
+                    </label>
+                    <input
+                      type="number"
+                      placeholder="Ej: 38"
+                      value={slaWarningThreshold}
+                      onChange={(e) => setSlaWarningThreshold(e.target.value)}
+                      disabled={creating}
+                      min="1"
+                      className="input"
+                    />
+                    <div style={{ fontSize: "12px", color: "var(--text-secondary)", marginTop: "4px" }}>
+                      Avisar cuando queden estas horas
+                    </div>
+                  </div>
+                </div>
               </div>
               <Button
                 type="submit"

@@ -45,4 +45,6 @@ public class Task
 
     // Navigation properties
     public ICollection<TimeEntry> TimeEntries { get; set; } = new List<TimeEntry>();
+    public ICollection<TaskComment> Comments { get; set; } = new List<TaskComment>();
+    public ICollection<Notification> Notifications { get; set; } = new List<Notification>();
 }

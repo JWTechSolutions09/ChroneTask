@@ -13,4 +13,6 @@ public class ProjectResponse
     public int TaskCount { get; set; }
     public int ActiveTaskCount { get; set; }
     public string? ImageUrl { get; set; }
+    public int? SlaHours { get; set; }
+    public int? SlaWarningThreshold { get; set; }
 }

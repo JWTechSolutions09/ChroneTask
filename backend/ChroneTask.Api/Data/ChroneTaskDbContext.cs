@@ -16,6 +16,12 @@ public class ChroneTaskDbContext : DbContext
     public DbSet<ProjectMember> ProjectMembers => Set<ProjectMember>();
     public DbSet<TaskEntity> Tasks => Set<TaskEntity>();
     public DbSet<TimeEntry> TimeEntries => Set<TimeEntry>();
+    public DbSet<ProjectComment> ProjectComments => Set<ProjectComment>();
+    public DbSet<TaskComment> TaskComments => Set<TaskComment>();
+    public DbSet<CommentAttachment> CommentAttachments => Set<CommentAttachment>();
+    public DbSet<CommentReaction> CommentReactions => Set<CommentReaction>();
+    public DbSet<Notification> Notifications => Set<Notification>();
+    public DbSet<ProjectNote> ProjectNotes => Set<ProjectNote>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -135,6 +141,133 @@ public class ChroneTaskDbContext : DbContext
             entity.HasOne(i => i.CreatedByUser)
                 .WithMany()
                 .HasForeignKey(i => i.CreatedByUserId)
+                .OnDelete(DeleteBehavior.Restrict);
+        });
+
+        // ProjectComment configuration
+        modelBuilder.Entity<ProjectComment>(entity =>
+        {
+            entity.HasKey(x => x.Id);
+            entity.Property(x => x.Content).IsRequired().HasMaxLength(5000);
+            entity.Property(x => x.Color).HasMaxLength(20);
+
+            entity.HasOne(c => c.Project)
+                .WithMany(p => p.Comments)
+                .HasForeignKey(c => c.ProjectId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasOne(c => c.User)
+                .WithMany()
+                .HasForeignKey(c => c.UserId)
+                .OnDelete(DeleteBehavior.Restrict);
+        });
+
+        // TaskComment configuration
+        modelBuilder.Entity<TaskComment>(entity =>
+        {
+            entity.HasKey(x => x.Id);
+            entity.Property(x => x.Content).IsRequired().HasMaxLength(5000);
+
+            entity.HasOne(c => c.Task)
+                .WithMany(t => t.Comments)
+                .HasForeignKey(c => c.TaskId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasOne(c => c.User)
+                .WithMany()
+                .HasForeignKey(c => c.UserId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasOne(c => c.ParentComment)
+                .WithMany(p => p.Replies)
+                .HasForeignKey(c => c.ParentCommentId)
+                .OnDelete(DeleteBehavior.Restrict);
+        });
+
+        // CommentAttachment configuration
+        modelBuilder.Entity<CommentAttachment>(entity =>
+        {
+            entity.HasKey(x => x.Id);
+            entity.Property(x => x.FileName).IsRequired().HasMaxLength(500);
+            entity.Property(x => x.FileUrl).IsRequired().HasMaxLength(1000);
+            entity.Property(x => x.FileType).HasMaxLength(50);
+
+            entity.HasOne(a => a.ProjectComment)
+                .WithMany(c => c.Attachments)
+                .HasForeignKey(a => a.ProjectCommentId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasOne(a => a.TaskComment)
+                .WithMany(c => c.Attachments)
+                .HasForeignKey(a => a.TaskCommentId)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        // CommentReaction configuration
+        modelBuilder.Entity<CommentReaction>(entity =>
+        {
+            entity.HasKey(x => x.Id);
+            entity.Property(x => x.Emoji).IsRequired().HasMaxLength(20);
+            entity.HasIndex(x => new { x.TaskCommentId, x.UserId, x.Emoji }).IsUnique();
+
+            entity.HasOne(r => r.TaskComment)
+                .WithMany(c => c.Reactions)
+                .HasForeignKey(r => r.TaskCommentId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasOne(r => r.User)
+                .WithMany()
+                .HasForeignKey(r => r.UserId)
+                .OnDelete(DeleteBehavior.Restrict);
+        });
+
+        // Notification configuration
+        modelBuilder.Entity<Notification>(entity =>
+        {
+            entity.HasKey(x => x.Id);
+            entity.Property(x => x.Type).IsRequired().HasMaxLength(50);
+            entity.Property(x => x.Title).HasMaxLength(200);
+            entity.Property(x => x.Message).HasMaxLength(1000);
+
+            entity.HasOne(n => n.User)
+                .WithMany()
+                .HasForeignKey(n => n.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasOne(n => n.Project)
+                .WithMany(p => p.Notifications)
+                .HasForeignKey(n => n.ProjectId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasOne(n => n.Task)
+                .WithMany(t => t.Notifications)
+                .HasForeignKey(n => n.TaskId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasOne(n => n.TriggeredByUser)
+                .WithMany()
+                .HasForeignKey(n => n.TriggeredByUserId)
+                .OnDelete(DeleteBehavior.Restrict);
+        });
+
+        // ProjectNote configuration
+        modelBuilder.Entity<ProjectNote>(entity =>
+        {
+            entity.HasKey(x => x.Id);
+            entity.Property(x => x.Title).HasMaxLength(500);
+            entity.Property(x => x.Content).HasMaxLength(5000);
+            entity.Property(x => x.Color).HasMaxLength(20);
+            entity.Property(x => x.CanvasData).HasMaxLength(1000);
+            entity.Property(x => x.ImageUrl).HasMaxLength(1000);
+
+            entity.HasOne(n => n.Project)
+                .WithMany(p => p.Notes)
+                .HasForeignKey(n => n.ProjectId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasOne(n => n.User)
+                .WithMany()
+                .HasForeignKey(n => n.UserId)
                 .OnDelete(DeleteBehavior.Restrict);
         });
     }

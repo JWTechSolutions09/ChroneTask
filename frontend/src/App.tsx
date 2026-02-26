@@ -7,6 +7,10 @@ import Dashboard from "./pages/Dashboard";
 import Projects from "./pages/Projects";
 import Board from "./pages/Board";
 import Settings from "./pages/Settings";
+import Notifications from "./pages/Notifications";
+import Analytics from "./pages/Analytics";
+import Timeline from "./pages/Timeline";
+import Notes from "./pages/Notes";
 import { isAuthed } from "./auth/token";
 import { setNavigateFunction } from "./api/http";
 import type { ReactElement } from "react";
@@ -136,6 +140,46 @@ function AppContent() {
                 element={
                     <PrivateRoute>
                         <Board />
+                    </PrivateRoute>
+                }
+            />
+            <Route
+                path="/org/:organizationId/notifications"
+                element={
+                    <PrivateRoute>
+                        <Notifications />
+                    </PrivateRoute>
+                }
+            />
+            <Route
+                path="/org/:organizationId/analytics"
+                element={
+                    <PrivateRoute>
+                        <Analytics />
+                    </PrivateRoute>
+                }
+            />
+            <Route
+                path="/org/:organizationId/timeline"
+                element={
+                    <PrivateRoute>
+                        <Timeline />
+                    </PrivateRoute>
+                }
+            />
+            <Route
+                path="/org/:organizationId/project/:projectId/timeline"
+                element={
+                    <PrivateRoute>
+                        <Timeline />
+                    </PrivateRoute>
+                }
+            />
+            <Route
+                path="/org/:organizationId/project/:projectId/notes"
+                element={
+                    <PrivateRoute>
+                        <Notes />
                     </PrivateRoute>
                 }
             />
