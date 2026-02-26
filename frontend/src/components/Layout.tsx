@@ -32,6 +32,25 @@ export default function Layout({ children, organizationId }: LayoutProps) {
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(false);
 
+  // Cerrar sidebar en móvil cuando cambia la ruta
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth > 768) {
+        setSidebarOpen(false);
+      }
+    };
+
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  // Cerrar sidebar al cambiar de ruta en móvil
+  useEffect(() => {
+    if (window.innerWidth <= 768) {
+      setSidebarOpen(false);
+    }
+  }, [location.pathname]);
+
   // Memoizar funciones para evitar recrearlas en cada render
   const loadOrgs = useCallback(async () => {
     try {
@@ -105,6 +124,25 @@ export default function Layout({ children, organizationId }: LayoutProps) {
     };
   }, [organizationId]); // Solo dependemos de organizationId
 
+  // Cerrar sidebar en móvil cuando cambia la ruta
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth > 768) {
+        setSidebarOpen(false);
+      }
+    };
+
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  // Cerrar sidebar al cambiar de ruta en móvil
+  useEffect(() => {
+    if (window.innerWidth <= 768) {
+      setSidebarOpen(false);
+    }
+  }, [location.pathname]);
+
   const handleLogout = () => {
     clearToken();
     navigate("/login", { replace: true });
@@ -140,7 +178,13 @@ export default function Layout({ children, organizationId }: LayoutProps) {
 
       {/* Mobile Menu Button */}
       <button
-        onClick={() => setSidebarOpen(!sidebarOpen)}
+        onClick={() => {
+          setSidebarOpen(!sidebarOpen);
+          // Si se está abriendo, no colapsar
+          if (!sidebarOpen) {
+            setSidebarCollapsed(false);
+          }
+        }}
         style={{
           position: "fixed",
           top: "16px",
@@ -149,16 +193,21 @@ export default function Layout({ children, organizationId }: LayoutProps) {
           background: "var(--bg-primary)",
           border: "1px solid var(--border-color)",
           borderRadius: "8px",
-          padding: "8px",
+          padding: "10px 12px",
           cursor: "pointer",
           display: "none",
           alignItems: "center",
           justifyContent: "center",
           boxShadow: "0 2px 8px rgba(0, 0, 0, 0.15)",
+          fontSize: "20px",
+          color: "var(--text-primary)",
+          minWidth: "44px",
+          minHeight: "44px",
         }}
         className="mobile-menu-btn"
+        aria-label="Toggle menu"
       >
-        ☰
+        {sidebarOpen ? "✕" : "☰"}
       </button>
 
       {/* Sidebar */}
@@ -178,6 +227,10 @@ export default function Layout({ children, organizationId }: LayoutProps) {
           zIndex: 100,
         }}
         className={`sidebar ${sidebarOpen ? "open" : ""}`}
+        onClick={(e) => {
+          // Prevenir que el clic en el sidebar cierre el menú
+          e.stopPropagation();
+        }}
       >
         {/* Logo/Header */}
         <div
@@ -256,7 +309,14 @@ export default function Layout({ children, organizationId }: LayoutProps) {
             </div>
           )}
           <button
-            onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
+            onClick={() => {
+              setSidebarCollapsed(!sidebarCollapsed);
+              // En móvil, también cerrar el sidebar al colapsar
+              if (window.innerWidth <= 768) {
+                setSidebarOpen(false);
+              }
+            }}
+            className="sidebar-toggle-btn"
             style={{
               background: "var(--hover-bg)",
               border: "1px solid var(--border-color)",
@@ -632,12 +692,13 @@ type NavItemProps = {
 
 function NavItem({ icon, label, to, active, collapsed, indent, onClick, onNavigate }: NavItemProps) {
   const handleClick = (e: React.MouseEvent) => {
+    // En móvil, cerrar el sidebar al navegar
+    if (onNavigate) {
+      onNavigate();
+    }
     if (onClick) {
       e.preventDefault();
       onClick();
-    }
-    if (onNavigate) {
-      onNavigate();
     }
   };
 
