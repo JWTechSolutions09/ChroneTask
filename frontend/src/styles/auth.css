@@ -504,6 +504,19 @@
     border-radius: 15px;
   }
 
+  .panel-content > div[style*="width: 160px"] {
+    width: 120px !important;
+    height: 120px !important;
+  }
+
+  .auth-logo {
+    width: 100% !important;
+    height: 100% !important;
+    max-width: 100% !important;
+    max-height: 100% !important;
+  }
+}
+
   .auth-form-box {
     position: static !important;
     width: 100% !important;

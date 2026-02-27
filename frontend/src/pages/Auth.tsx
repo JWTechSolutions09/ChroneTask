@@ -362,6 +362,7 @@ export default function Auth() {
                   padding: "16px",
                   boxShadow: "0 8px 24px rgba(0, 0, 0, 0.2)",
                   backdropFilter: "blur(10px)",
+                  overflow: "hidden",
                 }}
               >
                 <img 
@@ -369,10 +370,11 @@ export default function Auth() {
                   alt="ChroneTask Logo" 
                   className="auth-logo"
                   style={{
-                    width: "200px",
-                    height: "200px",
+                    width: "100%",
+                    height: "100%",
                     objectFit: "contain",
-                    transform: "scale(1.3)",
+                    maxWidth: "100%",
+                    maxHeight: "100%",
                     filter: "brightness(1.1)",
                   }}
                 />
@@ -400,6 +402,7 @@ export default function Auth() {
                   padding: "16px",
                   boxShadow: "0 8px 24px rgba(0, 0, 0, 0.2)",
                   backdropFilter: "blur(10px)",
+                  overflow: "hidden",
                 }}
               >
                 <img 
@@ -407,10 +410,11 @@ export default function Auth() {
                   alt="ChroneTask Logo" 
                   className="auth-logo"
                   style={{
-                    width: "200px",
-                    height: "200px",
+                    width: "100%",
+                    height: "100%",
                     objectFit: "contain",
-                    transform: "scale(1.3)",
+                    maxWidth: "100%",
+                    maxHeight: "100%",
                     filter: "brightness(1.1)",
                   }}
                 />

@@ -665,6 +665,113 @@ a:hover {
     -webkit-overflow-scrolling: touch;
   }
 
+  /* Timeline - Mejorar cuadro azul y vista móvil */
+  .timeline-container {
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch;
+    padding: 12px !important;
+  }
+
+  .timeline-container [style*="minWidth: 200px"] {
+    min-width: 120px !important;
+    font-size: 11px !important;
+    padding: 8px 6px !important;
+  }
+
+  .timeline-container [style*="minWidth: 150px"],
+  .timeline-container [style*="minWidth: 80px"] {
+    min-width: 80px !important;
+    font-size: 10px !important;
+    padding: 6px 3px !important;
+  }
+
+  /* Cuadro azul de tareas en Timeline - mejorado */
+  .timeline-container [style*="backgroundColor"][style*="#007bff"],
+  .timeline-container [style*="backgroundColor"][style*="#28a745"],
+  .timeline-container [style*="backgroundColor"][style*="#dc3545"] {
+    font-size: 9px !important;
+    padding: 4px 3px !important;
+    min-height: 28px !important;
+    word-break: break-word !important;
+    white-space: normal !important;
+    line-height: 1.2 !important;
+    max-width: 100% !important;
+    overflow: hidden !important;
+  }
+
+  /* Timeline day headers */
+  .timeline-container [style*="textAlign: center"] {
+    font-size: 10px !important;
+  }
+
+  /* Projects - Mejorar grid y cards */
+  .projects-grid,
+  [style*="grid-template-columns: repeat(auto-fit"][style*="minmax(300px"] {
+    grid-template-columns: 1fr !important;
+    gap: 16px !important;
+  }
+
+  .project-card,
+  .hover-lift {
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+
+  /* Project card images */
+  [style*="height: 120px"][style*="backgroundImage"] {
+    height: 100px !important;
+    margin: -16px -16px 12px -16px !important;
+  }
+
+  /* Board - Mejorar columnas kanban */
+  .kanban-column,
+  .kanban-board > div {
+    min-width: 240px !important;
+    max-width: 240px !important;
+  }
+
+  /* Board stats cards */
+  [style*="gridTemplateColumns: repeat(auto-fit"][style*="minmax(150px"] {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 12px !important;
+  }
+
+  [style*="gridTemplateColumns: repeat(auto-fit"][style*="minmax(150px"] > * {
+    padding: 12px !important;
+  }
+
+  [style*="fontSize: 32px"][style*="fontWeight: 700"] {
+    font-size: 24px !important;
+  }
+
+  /* PageHeader buttons en móvil */
+  .page-header-actions {
+    flex-wrap: wrap !important;
+    gap: 8px !important;
+  }
+
+  .page-header-actions button {
+    font-size: 11px !important;
+    padding: 6px 8px !important;
+    flex: 1 1 auto !important;
+    min-width: 80px !important;
+  }
+
+  /* Search bar en móvil */
+  .search-bar,
+  [style*="display: flex"][style*="gap"][style*="marginBottom"] {
+    flex-wrap: wrap !important;
+  }
+
+  /* Form inputs en móvil */
+  .input,
+  .textarea,
+  .select {
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
   /* Ajustar todos los divs principales */
   div[style*="padding"] {
     max-width: 100% !important;

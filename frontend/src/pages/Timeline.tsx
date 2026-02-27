@@ -177,7 +177,7 @@ export default function Timeline() {
             { label: "Cronograma" },
           ]}
           actions={
-            <div style={{ display: "flex", gap: "10px" }}>
+            <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
               <select
                 value={projectId || ""}
                 onChange={(e) => {
@@ -193,6 +193,8 @@ export default function Timeline() {
                   border: "1px solid var(--border-color)",
                   backgroundColor: "var(--bg-primary)",
                   color: "var(--text-primary)",
+                  minWidth: "120px",
+                  flex: "1 1 auto",
                 }}
               >
                 <option value="">Todos los proyectos</option>
@@ -205,30 +207,35 @@ export default function Timeline() {
               <Button
                 variant="secondary"
                 onClick={() => navigateDate("prev")}
+                style={{ flex: "1 1 auto", minWidth: "80px" }}
               >
                 ← Anterior
               </Button>
               <Button
                 variant="secondary"
                 onClick={() => setCurrentDate(new Date())}
+                style={{ flex: "1 1 auto", minWidth: "60px" }}
               >
                 Hoy
               </Button>
               <Button
                 variant="secondary"
                 onClick={() => navigateDate("next")}
+                style={{ flex: "1 1 auto", minWidth: "80px" }}
               >
                 Siguiente →
               </Button>
               <Button
                 variant={view === "week" ? "primary" : "secondary"}
                 onClick={() => setView("week")}
+                style={{ flex: "1 1 auto", minWidth: "80px" }}
               >
                 Semana
               </Button>
               <Button
                 variant={view === "month" ? "primary" : "secondary"}
                 onClick={() => setView("month")}
+                style={{ flex: "1 1 auto", minWidth: "80px" }}
               >
                 Mes
               </Button>
@@ -236,11 +243,11 @@ export default function Timeline() {
           }
         />
 
-        <div style={{ padding: "24px" }}>
+        <div style={{ padding: "24px" }} className="timeline-container">
           {loading ? (
             <div className="loading">Cargando cronograma...</div>
           ) : (
-            <Card style={{ overflowX: "auto" }}>
+            <Card style={{ overflowX: "auto", width: "100%" }}>
               <div style={{ display: "flex", minWidth: "100%" }}>
                 {/* Day Headers */}
                 <div style={{ minWidth: "200px", borderRight: "1px solid var(--border-color)", padding: "12px" }}>
@@ -332,6 +339,9 @@ export default function Timeline() {
                                   alignItems: "center",
                                   justifyContent: "center",
                                   width: `calc(${span * 100}% - ${(span - 1) * 1}px)`,
+                                  wordBreak: "break-word",
+                                  whiteSpace: "normal",
+                                  lineHeight: "1.3",
                                 }}
                               >
                                 {task.title}
