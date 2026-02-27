@@ -349,6 +349,7 @@ export default function Auth() {
           <div className="slide-panel">
             <div className="panel-content panel-content-left">
               <div
+                className="auth-logo-container"
                 style={{
                   width: "160px",
                   height: "160px",
@@ -363,6 +364,8 @@ export default function Auth() {
                   boxShadow: "0 8px 24px rgba(0, 0, 0, 0.2)",
                   backdropFilter: "blur(10px)",
                   overflow: "hidden",
+                  maxWidth: "100%",
+                  margin: "0 auto 24px auto",
                 }}
               >
                 <img 
@@ -389,6 +392,7 @@ export default function Auth() {
             </div>
             <div className="panel-content panel-content-right">
               <div
+                className="auth-logo-container"
                 style={{
                   width: "160px",
                   height: "160px",
@@ -403,6 +407,8 @@ export default function Auth() {
                   boxShadow: "0 8px 24px rgba(0, 0, 0, 0.2)",
                   backdropFilter: "blur(10px)",
                   overflow: "hidden",
+                  maxWidth: "100%",
+                  margin: "0 auto 24px auto",
                 }}
               >
                 <img 
