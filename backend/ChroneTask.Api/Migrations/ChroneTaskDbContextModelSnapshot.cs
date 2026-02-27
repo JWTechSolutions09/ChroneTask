@@ -22,132 +22,6 @@ namespace ChroneTask.Api.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("ChroneTask.Api.Entities.CommentAttachment", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("FileName")
-                        .IsRequired()
-                        .HasMaxLength(500)
-                        .HasColumnType("character varying(500)");
-
-                    b.Property<long?>("FileSize")
-                        .HasColumnType("bigint");
-
-                    b.Property<string>("FileType")
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)");
-
-                    b.Property<string>("FileUrl")
-                        .IsRequired()
-                        .HasMaxLength(1000)
-                        .HasColumnType("character varying(1000)");
-
-                    b.Property<Guid?>("ProjectCommentId")
-                        .HasMaxLength(36)
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid?>("TaskCommentId")
-                        .HasMaxLength(36)
-                        .HasColumnType("uuid");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ProjectCommentId");
-
-                    b.HasIndex("TaskCommentId");
-
-                    b.ToTable("CommentAttachments");
-                });
-
-            modelBuilder.Entity("ChroneTask.Api.Entities.CommentReaction", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("Emoji")
-                        .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("character varying(20)");
-
-                    b.Property<Guid>("TaskCommentId")
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uuid");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserId");
-
-                    b.HasIndex("TaskCommentId", "UserId", "Emoji")
-                        .IsUnique();
-
-                    b.ToTable("CommentReactions");
-                });
-
-            modelBuilder.Entity("ChroneTask.Api.Entities.Notification", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<bool>("IsRead")
-                        .HasColumnType("boolean");
-
-                    b.Property<string>("Message")
-                        .HasMaxLength(1000)
-                        .HasColumnType("character varying(1000)");
-
-                    b.Property<Guid?>("ProjectId")
-                        .HasMaxLength(36)
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid?>("TaskId")
-                        .HasMaxLength(36)
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("Title")
-                        .HasMaxLength(200)
-                        .HasColumnType("character varying(200)");
-
-                    b.Property<Guid?>("TriggeredByUserId")
-                        .HasMaxLength(36)
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("Type")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)");
-
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uuid");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ProjectId");
-
-                    b.HasIndex("TaskId");
-
-                    b.HasIndex("TriggeredByUserId");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("Notifications");
-                });
-
             modelBuilder.Entity("ChroneTask.Api.Entities.Organization", b =>
                 {
                     b.Property<Guid>("Id")
@@ -175,7 +49,7 @@ namespace ChroneTask.Api.Migrations
                         .IsUnique()
                         .HasFilter("\"Slug\" IS NOT NULL");
 
-                    b.ToTable("Organizations");
+                    b.ToTable("Organizations", (string)null);
                 });
 
             modelBuilder.Entity("ChroneTask.Api.Entities.OrganizationInvitation", b =>
@@ -228,7 +102,7 @@ namespace ChroneTask.Api.Migrations
                     b.HasIndex("Token")
                         .IsUnique();
 
-                    b.ToTable("OrganizationInvitations");
+                    b.ToTable("OrganizationInvitations", (string)null);
                 });
 
             modelBuilder.Entity("ChroneTask.Api.Entities.OrganizationMember", b =>
@@ -257,7 +131,7 @@ namespace ChroneTask.Api.Migrations
                     b.HasIndex("OrganizationId", "UserId")
                         .IsUnique();
 
-                    b.ToTable("OrganizationMembers");
+                    b.ToTable("OrganizationMembers", (string)null);
                 });
 
             modelBuilder.Entity("ChroneTask.Api.Entities.Project", b =>
@@ -288,12 +162,6 @@ namespace ChroneTask.Api.Migrations
                     b.Property<Guid>("OrganizationId")
                         .HasColumnType("uuid");
 
-                    b.Property<int?>("SlaHours")
-                        .HasColumnType("integer");
-
-                    b.Property<int?>("SlaWarningThreshold")
-                        .HasColumnType("integer");
-
                     b.Property<string>("Template")
                         .HasMaxLength(50)
                         .HasColumnType("character varying(50)");
@@ -305,46 +173,7 @@ namespace ChroneTask.Api.Migrations
 
                     b.HasIndex("OrganizationId");
 
-                    b.ToTable("Projects");
-                });
-
-            modelBuilder.Entity("ChroneTask.Api.Entities.ProjectComment", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("Color")
-                        .HasMaxLength(20)
-                        .HasColumnType("character varying(20)");
-
-                    b.Property<string>("Content")
-                        .IsRequired()
-                        .HasMaxLength(5000)
-                        .HasColumnType("character varying(5000)");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<bool>("IsPinned")
-                        .HasColumnType("boolean");
-
-                    b.Property<Guid>("ProjectId")
-                        .HasColumnType("uuid");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uuid");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ProjectId");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("ProjectComments");
+                    b.ToTable("Projects", (string)null);
                 });
 
             modelBuilder.Entity("ChroneTask.Api.Entities.ProjectMember", b =>
@@ -373,66 +202,7 @@ namespace ChroneTask.Api.Migrations
                     b.HasIndex("ProjectId", "UserId")
                         .IsUnique();
 
-                    b.ToTable("ProjectMembers");
-                });
-
-            modelBuilder.Entity("ChroneTask.Api.Entities.ProjectNote", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("CanvasData")
-                        .HasMaxLength(1000)
-                        .HasColumnType("character varying(1000)");
-
-                    b.Property<string>("Color")
-                        .HasMaxLength(20)
-                        .HasColumnType("character varying(20)");
-
-                    b.Property<string>("Content")
-                        .HasMaxLength(5000)
-                        .HasColumnType("character varying(5000)");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<double?>("Height")
-                        .HasColumnType("double precision");
-
-                    b.Property<string>("ImageUrl")
-                        .HasMaxLength(1000)
-                        .HasColumnType("character varying(1000)");
-
-                    b.Property<double?>("PositionX")
-                        .HasColumnType("double precision");
-
-                    b.Property<double?>("PositionY")
-                        .HasColumnType("double precision");
-
-                    b.Property<Guid>("ProjectId")
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("Title")
-                        .HasMaxLength(500)
-                        .HasColumnType("character varying(500)");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uuid");
-
-                    b.Property<double?>("Width")
-                        .HasColumnType("double precision");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ProjectId");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("ProjectNotes");
+                    b.ToTable("ProjectMembers", (string)null);
                 });
 
             modelBuilder.Entity("ChroneTask.Api.Entities.Task", b =>
@@ -498,45 +268,7 @@ namespace ChroneTask.Api.Migrations
 
                     b.HasIndex("ProjectId");
 
-                    b.ToTable("Tasks");
-                });
-
-            modelBuilder.Entity("ChroneTask.Api.Entities.TaskComment", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("Content")
-                        .IsRequired()
-                        .HasMaxLength(5000)
-                        .HasColumnType("character varying(5000)");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<Guid?>("ParentCommentId")
-                        .HasMaxLength(36)
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid>("TaskId")
-                        .HasColumnType("uuid");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uuid");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ParentCommentId");
-
-                    b.HasIndex("TaskId");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("TaskComments");
+                    b.ToTable("Tasks", (string)null);
                 });
 
             modelBuilder.Entity("ChroneTask.Api.Entities.TimeEntry", b =>
@@ -576,7 +308,7 @@ namespace ChroneTask.Api.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("TimeEntries");
+                    b.ToTable("TimeEntries", (string)null);
                 });
 
             modelBuilder.Entity("ChroneTask.Api.Entities.User", b =>
@@ -611,75 +343,7 @@ namespace ChroneTask.Api.Migrations
                     b.HasIndex("Email")
                         .IsUnique();
 
-                    b.ToTable("Users");
-                });
-
-            modelBuilder.Entity("ChroneTask.Api.Entities.CommentAttachment", b =>
-                {
-                    b.HasOne("ChroneTask.Api.Entities.ProjectComment", "ProjectComment")
-                        .WithMany("Attachments")
-                        .HasForeignKey("ProjectCommentId")
-                        .OnDelete(DeleteBehavior.Cascade);
-
-                    b.HasOne("ChroneTask.Api.Entities.TaskComment", "TaskComment")
-                        .WithMany("Attachments")
-                        .HasForeignKey("TaskCommentId")
-                        .OnDelete(DeleteBehavior.Cascade);
-
-                    b.Navigation("ProjectComment");
-
-                    b.Navigation("TaskComment");
-                });
-
-            modelBuilder.Entity("ChroneTask.Api.Entities.CommentReaction", b =>
-                {
-                    b.HasOne("ChroneTask.Api.Entities.TaskComment", "TaskComment")
-                        .WithMany("Reactions")
-                        .HasForeignKey("TaskCommentId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("ChroneTask.Api.Entities.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("TaskComment");
-
-                    b.Navigation("User");
-                });
-
-            modelBuilder.Entity("ChroneTask.Api.Entities.Notification", b =>
-                {
-                    b.HasOne("ChroneTask.Api.Entities.Project", "Project")
-                        .WithMany("Notifications")
-                        .HasForeignKey("ProjectId")
-                        .OnDelete(DeleteBehavior.Cascade);
-
-                    b.HasOne("ChroneTask.Api.Entities.Task", "Task")
-                        .WithMany("Notifications")
-                        .HasForeignKey("TaskId")
-                        .OnDelete(DeleteBehavior.Cascade);
-
-                    b.HasOne("ChroneTask.Api.Entities.User", "TriggeredByUser")
-                        .WithMany()
-                        .HasForeignKey("TriggeredByUserId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.HasOne("ChroneTask.Api.Entities.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Project");
-
-                    b.Navigation("Task");
-
-                    b.Navigation("TriggeredByUser");
-
-                    b.Navigation("User");
+                    b.ToTable("Users", (string)null);
                 });
 
             modelBuilder.Entity("ChroneTask.Api.Entities.OrganizationInvitation", b =>
@@ -731,48 +395,10 @@ namespace ChroneTask.Api.Migrations
                     b.Navigation("Organization");
                 });
 
-            modelBuilder.Entity("ChroneTask.Api.Entities.ProjectComment", b =>
-                {
-                    b.HasOne("ChroneTask.Api.Entities.Project", "Project")
-                        .WithMany("Comments")
-                        .HasForeignKey("ProjectId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("ChroneTask.Api.Entities.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Project");
-
-                    b.Navigation("User");
-                });
-
             modelBuilder.Entity("ChroneTask.Api.Entities.ProjectMember", b =>
                 {
                     b.HasOne("ChroneTask.Api.Entities.Project", "Project")
                         .WithMany("ProjectMembers")
-                        .HasForeignKey("ProjectId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("ChroneTask.Api.Entities.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Project");
-
-                    b.Navigation("User");
-                });
-
-            modelBuilder.Entity("ChroneTask.Api.Entities.ProjectNote", b =>
-                {
-                    b.HasOne("ChroneTask.Api.Entities.Project", "Project")
-                        .WithMany("Notes")
                         .HasForeignKey("ProjectId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -806,32 +432,6 @@ namespace ChroneTask.Api.Migrations
                     b.Navigation("Project");
                 });
 
-            modelBuilder.Entity("ChroneTask.Api.Entities.TaskComment", b =>
-                {
-                    b.HasOne("ChroneTask.Api.Entities.TaskComment", "ParentComment")
-                        .WithMany("Replies")
-                        .HasForeignKey("ParentCommentId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.HasOne("ChroneTask.Api.Entities.Task", "Task")
-                        .WithMany("Comments")
-                        .HasForeignKey("TaskId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("ChroneTask.Api.Entities.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("ParentComment");
-
-                    b.Navigation("Task");
-
-                    b.Navigation("User");
-                });
-
             modelBuilder.Entity("ChroneTask.Api.Entities.TimeEntry", b =>
                 {
                     b.HasOne("ChroneTask.Api.Entities.Task", "Task")
@@ -858,38 +458,14 @@ namespace ChroneTask.Api.Migrations
 
             modelBuilder.Entity("ChroneTask.Api.Entities.Project", b =>
                 {
-                    b.Navigation("Comments");
-
-                    b.Navigation("Notes");
-
-                    b.Navigation("Notifications");
-
                     b.Navigation("ProjectMembers");
 
                     b.Navigation("Tasks");
                 });
 
-            modelBuilder.Entity("ChroneTask.Api.Entities.ProjectComment", b =>
-                {
-                    b.Navigation("Attachments");
-                });
-
             modelBuilder.Entity("ChroneTask.Api.Entities.Task", b =>
                 {
-                    b.Navigation("Comments");
-
-                    b.Navigation("Notifications");
-
                     b.Navigation("TimeEntries");
-                });
-
-            modelBuilder.Entity("ChroneTask.Api.Entities.TaskComment", b =>
-                {
-                    b.Navigation("Attachments");
-
-                    b.Navigation("Reactions");
-
-                    b.Navigation("Replies");
                 });
 #pragma warning restore 612, 618
         }

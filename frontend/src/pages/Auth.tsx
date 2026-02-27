@@ -365,7 +365,7 @@ export default function Auth() {
                 }}
               >
                 <img 
-                  src="/logo.png" 
+                  src="/logolanding.png" 
                   alt="ChroneTask Logo" 
                   className="auth-logo"
                   style={{
@@ -403,7 +403,7 @@ export default function Auth() {
                 }}
               >
                 <img 
-                  src="/logo.png" 
+                  src="/logolanding.png" 
                   alt="ChroneTask Logo" 
                   className="auth-logo"
                   style={{

@@ -8,6 +8,7 @@ export default function Landing() {
   const { theme, toggleTheme } = useTheme();
   const [scrollY, setScrollY] = useState(0);
   const [activeSection, setActiveSection] = useState(0);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const heroRef = useRef<HTMLDivElement>(null);
   const featuresRef = useRef<HTMLDivElement>(null);
   const techRef = useRef<HTMLDivElement>(null);
@@ -72,19 +73,28 @@ export default function Landing() {
       <nav className="landing-nav">
         <div className="nav-container">
           <div className="nav-logo">
-            <img src="/logosidebar.png" alt="ChroneTask" />
+            <img src="/logolanding.png" alt="ChroneTask" />
             <span>ChroneTask</span>
           </div>
-          <div className="nav-links">
-            <button onClick={() => scrollToSection(heroRef)}>Inicio</button>
-            <button onClick={() => scrollToSection(featuresRef)}>Características</button>
-            <button onClick={() => scrollToSection(techRef)}>Tecnologías</button>
-            <button onClick={() => scrollToSection(benefitsRef)}>Ventajas</button>
+          <button 
+            className="mobile-menu-toggle" 
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            aria-label="Toggle menu"
+          >
+            <span className={mobileMenuOpen ? "open" : ""}></span>
+            <span className={mobileMenuOpen ? "open" : ""}></span>
+            <span className={mobileMenuOpen ? "open" : ""}></span>
+          </button>
+          <div className={`nav-links ${mobileMenuOpen ? "mobile-open" : ""}`}>
+            <button onClick={() => { scrollToSection(heroRef); setMobileMenuOpen(false); }}>🏠 Inicio</button>
+            <button onClick={() => { scrollToSection(featuresRef); setMobileMenuOpen(false); }}>✨ Características</button>
+            <button onClick={() => { scrollToSection(techRef); setMobileMenuOpen(false); }}>⚙️ Tecnologías</button>
+            <button onClick={() => { scrollToSection(benefitsRef); setMobileMenuOpen(false); }}>🎯 Ventajas</button>
             <button className="theme-toggle" onClick={toggleTheme}>
               {theme === "dark" ? "☀️" : "🌙"}
             </button>
             <button className="btn-login" onClick={() => navigate("/login")}>
-              Iniciar Sesión
+              🚀 Iniciar Sesión
             </button>
           </div>
         </div>
@@ -99,7 +109,7 @@ export default function Landing() {
         </div>
         <div className="hero-content">
           <div className="hero-logo-container">
-            <img src="/logo.png" alt="ChroneTask Logo" className="hero-logo" />
+            <img src="/logolanding.png" alt="ChroneTask Logo" className="hero-logo" />
           </div>
           <h1 className="hero-title">
             <span className="title-line">Gestiona tus proyectos</span>
@@ -110,10 +120,10 @@ export default function Landing() {
           </p>
           <div className="hero-cta">
             <button className="cta-primary" onClick={() => navigate("/login")}>
-              Comenzar Ahora
+              🚀 Comenzar Ahora
             </button>
             <button className="cta-secondary" onClick={() => scrollToSection(featuresRef)}>
-              Conocer Más
+              📖 Conocer Más
             </button>
           </div>
           <div className="hero-stats">
@@ -251,42 +261,42 @@ export default function Landing() {
               <h2 className="section-title">¿Por qué elegir ChroneTask?</h2>
               <div className="benefit-list">
                 <div className="benefit-item">
-                  <div className="benefit-icon">✅</div>
+                  <div className="benefit-icon">🎯</div>
                   <div>
                     <h3>Gestión Centralizada</h3>
                     <p>Todo en un solo lugar: proyectos, tareas, equipos y métricas</p>
                   </div>
                 </div>
                 <div className="benefit-item">
-                  <div className="benefit-icon">✅</div>
+                  <div className="benefit-icon">⚡</div>
                   <div>
                     <h3>Colaboración en Tiempo Real</h3>
                     <p>Comentarios, notificaciones y actualizaciones instantáneas</p>
                   </div>
                 </div>
                 <div className="benefit-item">
-                  <div className="benefit-icon">✅</div>
+                  <div className="benefit-icon">🔄</div>
                   <div>
                     <h3>Flexibilidad Total</h3>
                     <p>Adapta el sistema a tu flujo de trabajo, no al revés</p>
                   </div>
                 </div>
                 <div className="benefit-item">
-                  <div className="benefit-icon">✅</div>
+                  <div className="benefit-icon">📈</div>
                   <div>
                     <h3>Escalable y Confiable</h3>
                     <p>Crece con tu empresa sin límites de usuarios o proyectos</p>
                   </div>
                 </div>
                 <div className="benefit-item">
-                  <div className="benefit-icon">✅</div>
+                  <div className="benefit-icon">✨</div>
                   <div>
                     <h3>Interfaz Intuitiva</h3>
                     <p>Diseño moderno y fácil de usar, sin curva de aprendizaje</p>
                   </div>
                 </div>
                 <div className="benefit-item">
-                  <div className="benefit-icon">✅</div>
+                  <div className="benefit-icon">🏢</div>
                   <div>
                     <h3>Soporte Multi-Organización</h3>
                     <p>Gestiona múltiples organizaciones desde una sola cuenta</p>
@@ -331,10 +341,10 @@ export default function Landing() {
             </p>
             <div className="cta-buttons">
               <button className="cta-primary-large" onClick={() => navigate("/login")}>
-                Comenzar Gratis
+                🎉 Comenzar Gratis
               </button>
               <button className="cta-secondary-large" onClick={() => scrollToSection(featuresRef)}>
-                Ver Demo
+                👀 Ver Demo
               </button>
             </div>
             <div className="cta-footer">
@@ -348,7 +358,7 @@ export default function Landing() {
       <footer className="landing-footer">
         <div className="footer-container">
           <div className="footer-brand">
-            <img src="/logosidebar.png" alt="ChroneTask" />
+            <img src="/logolanding.png" alt="ChroneTask" />
             <span>ChroneTask</span>
           </div>
           <div className="footer-links">
