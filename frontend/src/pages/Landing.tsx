@@ -86,15 +86,15 @@ export default function Landing() {
             <span className={mobileMenuOpen ? "open" : ""}></span>
           </button>
           <div className={`nav-links ${mobileMenuOpen ? "mobile-open" : ""}`}>
-            <button onClick={() => { scrollToSection(heroRef); setMobileMenuOpen(false); }}>🏠 Inicio</button>
-            <button onClick={() => { scrollToSection(featuresRef); setMobileMenuOpen(false); }}>✨ Características</button>
-            <button onClick={() => { scrollToSection(techRef); setMobileMenuOpen(false); }}>⚙️ Tecnologías</button>
-            <button onClick={() => { scrollToSection(benefitsRef); setMobileMenuOpen(false); }}>🎯 Ventajas</button>
+            <button onClick={() => { scrollToSection(heroRef); setMobileMenuOpen(false); }}>Inicio</button>
+            <button onClick={() => { scrollToSection(featuresRef); setMobileMenuOpen(false); }}>Características</button>
+            <button onClick={() => { scrollToSection(techRef); setMobileMenuOpen(false); }}>Tecnologías</button>
+            <button onClick={() => { scrollToSection(benefitsRef); setMobileMenuOpen(false); }}>Ventajas</button>
             <button className="theme-toggle" onClick={toggleTheme}>
-              {theme === "dark" ? "☀️" : "🌙"}
+              {theme === "dark" ? <i className="fas fa-sun"></i> : <i className="fas fa-moon"></i>}
             </button>
             <button className="btn-login" onClick={() => navigate("/login")}>
-              🚀 Iniciar Sesión
+              <i className="fas fa-sign-in-alt"></i> Iniciar Sesión
             </button>
           </div>
         </div>
@@ -120,10 +120,10 @@ export default function Landing() {
           </p>
           <div className="hero-cta">
             <button className="cta-primary" onClick={() => navigate("/login")}>
-              🚀 Comenzar Ahora
+              <i className="fas fa-rocket"></i> Comenzar Ahora
             </button>
             <button className="cta-secondary" onClick={() => scrollToSection(featuresRef)}>
-              📖 Conocer Más
+              <i className="fas fa-book-open"></i> Conocer Más
             </button>
           </div>
           <div className="hero-stats">
@@ -158,7 +158,7 @@ export default function Landing() {
           </div>
           <div className="features-grid">
             <div className="feature-card" data-aos="fade-up">
-              <div className="feature-icon">📊</div>
+              <div className="feature-icon"><i className="fas fa-chart-line"></i></div>
               <h3>Dashboard Inteligente</h3>
               <p>
                 Visualiza el estado de todos tus proyectos en un solo lugar.
@@ -166,7 +166,7 @@ export default function Landing() {
               </p>
             </div>
             <div className="feature-card" data-aos="fade-up" data-aos-delay="100">
-              <div className="feature-icon">👥</div>
+              <div className="feature-icon"><i className="fas fa-users"></i></div>
               <h3>Colaboración en Equipo</h3>
               <p>
                 Trabaja junto a tu equipo con comentarios, notificaciones en tiempo real
@@ -174,7 +174,7 @@ export default function Landing() {
               </p>
             </div>
             <div className="feature-card" data-aos="fade-up" data-aos-delay="200">
-              <div className="feature-icon">📅</div>
+              <div className="feature-icon"><i className="fas fa-calendar-alt"></i></div>
               <h3>Cronograma Visual</h3>
               <p>
                 Planifica y visualiza tus proyectos con vistas tipo Gantt.
@@ -182,7 +182,7 @@ export default function Landing() {
               </p>
             </div>
             <div className="feature-card" data-aos="fade-up" data-aos-delay="300">
-              <div className="feature-icon">🔔</div>
+              <div className="feature-icon"><i className="fas fa-bell"></i></div>
               <h3>Sistema de Notificaciones</h3>
               <p>
                 Mantente al día con notificaciones inteligentes sobre cambios,
@@ -190,7 +190,7 @@ export default function Landing() {
               </p>
             </div>
             <div className="feature-card" data-aos="fade-up" data-aos-delay="400">
-              <div className="feature-icon">📈</div>
+              <div className="feature-icon"><i className="fas fa-chart-bar"></i></div>
               <h3>Analíticas Avanzadas</h3>
               <p>
                 Analiza el rendimiento de tu equipo con métricas detalladas,
@@ -198,7 +198,7 @@ export default function Landing() {
               </p>
             </div>
             <div className="feature-card" data-aos="fade-up" data-aos-delay="500">
-              <div className="feature-icon">⚡</div>
+              <div className="feature-icon"><i className="fas fa-bolt"></i></div>
               <h3>SLA y Seguimiento</h3>
               <p>
                 Configura SLAs por proyecto y recibe alertas cuando se acerquen
@@ -220,32 +220,32 @@ export default function Landing() {
           </div>
           <div className="tech-grid">
             <div className="tech-card">
-              <div className="tech-icon">⚛️</div>
+              <div className="tech-icon"><i className="fab fa-react"></i></div>
               <h3>React</h3>
               <p>Interfaz moderna y reactiva</p>
             </div>
             <div className="tech-card">
-              <div className="tech-icon">🔷</div>
+              <div className="tech-icon"><i className="fab fa-js-square"></i></div>
               <h3>TypeScript</h3>
               <p>Código robusto y escalable</p>
             </div>
             <div className="tech-card">
-              <div className="tech-icon">⚡</div>
+              <div className="tech-icon"><i className="fas fa-server"></i></div>
               <h3>ASP.NET Core</h3>
               <p>Backend de alto rendimiento</p>
             </div>
             <div className="tech-card">
-              <div className="tech-icon">🗄️</div>
+              <div className="tech-icon"><i className="fas fa-database"></i></div>
               <h3>Entity Framework</h3>
               <p>Gestión eficiente de datos</p>
             </div>
             <div className="tech-card">
-              <div className="tech-icon">🔐</div>
+              <div className="tech-icon"><i className="fas fa-lock"></i></div>
               <h3>Autenticación Segura</h3>
               <p>JWT y OAuth integrados</p>
             </div>
             <div className="tech-card">
-              <div className="tech-icon">☁️</div>
+              <div className="tech-icon"><i className="fas fa-cloud"></i></div>
               <h3>Cloud Ready</h3>
               <p>Despliegue en la nube</p>
             </div>
@@ -261,42 +261,42 @@ export default function Landing() {
               <h2 className="section-title">¿Por qué elegir ChroneTask?</h2>
               <div className="benefit-list">
                 <div className="benefit-item">
-                  <div className="benefit-icon">🎯</div>
+                  <div className="benefit-icon"><i className="fas fa-bullseye"></i></div>
                   <div>
                     <h3>Gestión Centralizada</h3>
                     <p>Todo en un solo lugar: proyectos, tareas, equipos y métricas</p>
                   </div>
                 </div>
                 <div className="benefit-item">
-                  <div className="benefit-icon">⚡</div>
+                  <div className="benefit-icon"><i className="fas fa-bolt"></i></div>
                   <div>
                     <h3>Colaboración en Tiempo Real</h3>
                     <p>Comentarios, notificaciones y actualizaciones instantáneas</p>
                   </div>
                 </div>
                 <div className="benefit-item">
-                  <div className="benefit-icon">🔄</div>
+                  <div className="benefit-icon"><i className="fas fa-sync-alt"></i></div>
                   <div>
                     <h3>Flexibilidad Total</h3>
                     <p>Adapta el sistema a tu flujo de trabajo, no al revés</p>
                   </div>
                 </div>
                 <div className="benefit-item">
-                  <div className="benefit-icon">📈</div>
+                  <div className="benefit-icon"><i className="fas fa-chart-line"></i></div>
                   <div>
                     <h3>Escalable y Confiable</h3>
                     <p>Crece con tu empresa sin límites de usuarios o proyectos</p>
                   </div>
                 </div>
                 <div className="benefit-item">
-                  <div className="benefit-icon">✨</div>
+                  <div className="benefit-icon"><i className="fas fa-sparkles"></i></div>
                   <div>
                     <h3>Interfaz Intuitiva</h3>
                     <p>Diseño moderno y fácil de usar, sin curva de aprendizaje</p>
                   </div>
                 </div>
                 <div className="benefit-item">
-                  <div className="benefit-icon">🏢</div>
+                  <div className="benefit-icon"><i className="fas fa-building"></i></div>
                   <div>
                     <h3>Soporte Multi-Organización</h3>
                     <p>Gestiona múltiples organizaciones desde una sola cuenta</p>
@@ -307,19 +307,19 @@ export default function Landing() {
             <div className="benefits-visual">
               <div className="floating-card card-1">
                 <div className="card-content">
-                  <div className="card-icon">📊</div>
+                  <div className="card-icon"><i className="fas fa-chart-bar"></i></div>
                   <div className="card-title">Analíticas</div>
                 </div>
               </div>
               <div className="floating-card card-2">
                 <div className="card-content">
-                  <div className="card-icon">👥</div>
+                  <div className="card-icon"><i className="fas fa-users"></i></div>
                   <div className="card-title">Equipo</div>
                 </div>
               </div>
               <div className="floating-card card-3">
                 <div className="card-content">
-                  <div className="card-icon">⚡</div>
+                  <div className="card-icon"><i className="fas fa-bolt"></i></div>
                   <div className="card-title">Rápido</div>
                 </div>
               </div>
@@ -341,10 +341,10 @@ export default function Landing() {
             </p>
             <div className="cta-buttons">
               <button className="cta-primary-large" onClick={() => navigate("/login")}>
-                🎉 Comenzar Gratis
+                <i className="fas fa-gift"></i> Comenzar Gratis
               </button>
               <button className="cta-secondary-large" onClick={() => scrollToSection(featuresRef)}>
-                👀 Ver Demo
+                <i className="fas fa-eye"></i> Ver Demo
               </button>
             </div>
             <div className="cta-footer">
