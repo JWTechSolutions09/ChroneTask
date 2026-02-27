@@ -220,32 +220,32 @@ export default function Landing() {
           </div>
           <div className="tech-grid">
             <div className="tech-card">
-              <div className="tech-icon"><i className="fab fa-react"></i></div>
+              <div className="tech-icon">⚛️</div>
               <h3>React</h3>
               <p>Interfaz moderna y reactiva</p>
             </div>
             <div className="tech-card">
-              <div className="tech-icon"><i className="fab fa-js-square"></i></div>
+              <div className="tech-icon">🔷</div>
               <h3>TypeScript</h3>
               <p>Código robusto y escalable</p>
             </div>
             <div className="tech-card">
-              <div className="tech-icon"><i className="fas fa-server"></i></div>
+              <div className="tech-icon">⚡</div>
               <h3>ASP.NET Core</h3>
               <p>Backend de alto rendimiento</p>
             </div>
             <div className="tech-card">
-              <div className="tech-icon"><i className="fas fa-database"></i></div>
+              <div className="tech-icon">🗄️</div>
               <h3>Entity Framework</h3>
               <p>Gestión eficiente de datos</p>
             </div>
             <div className="tech-card">
-              <div className="tech-icon"><i className="fas fa-lock"></i></div>
+              <div className="tech-icon">🔐</div>
               <h3>Autenticación Segura</h3>
               <p>JWT y OAuth integrados</p>
             </div>
             <div className="tech-card">
-              <div className="tech-icon"><i className="fas fa-cloud"></i></div>
+              <div className="tech-icon">☁️</div>
               <h3>Cloud Ready</h3>
               <p>Despliegue en la nube</p>
             </div>

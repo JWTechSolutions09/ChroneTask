@@ -677,11 +677,6 @@
   font-size: 48px;
   margin-bottom: 16px;
   display: inline-block;
-  color: var(--landing-text);
-}
-
-.tech-icon i {
-  font-size: 48px;
 }
 
 .tech-card h3 {

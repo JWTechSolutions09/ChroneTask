@@ -242,10 +242,11 @@ export default function Layout({ children, organizationId }: LayoutProps) {
             justifyContent: "space-between",
             minHeight: "72px",
             backgroundColor: "var(--bg-primary)",
+            position: "relative",
           }}
         >
           {!sidebarCollapsed && (
-            <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: "10px", flex: 1 }}>
               <div
                 style={{
                   width: "48px",
@@ -260,6 +261,7 @@ export default function Layout({ children, organizationId }: LayoutProps) {
                   boxShadow: "0 3px 8px rgba(0, 0, 0, 0.15)",
                   minHeight: "48px",
                   minWidth: "48px",
+                  flexShrink: 0,
                 }}
               >
                 <img 
@@ -273,7 +275,7 @@ export default function Layout({ children, organizationId }: LayoutProps) {
                   }}
                 />
               </div>
-              <span style={{ fontWeight: 700, fontSize: "18px", color: "var(--text-primary)", letterSpacing: "-0.5px" }}>
+              <span style={{ fontWeight: 700, fontSize: "18px", color: "var(--text-primary)", letterSpacing: "-0.5px", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
                 ChroneTask
               </span>
             </div>
@@ -308,6 +310,29 @@ export default function Layout({ children, organizationId }: LayoutProps) {
               />
             </div>
           )}
+          {/* Botón de cerrar en móvil */}
+          <button
+            onClick={() => setSidebarOpen(false)}
+            className="mobile-close-btn"
+            style={{
+              background: "var(--hover-bg)",
+              border: "1px solid var(--border-color)",
+              cursor: "pointer",
+              padding: "8px",
+              borderRadius: "8px",
+              color: "var(--text-secondary)",
+              display: "none",
+              alignItems: "center",
+              justifyContent: "center",
+              transition: "all 0.2s",
+              width: "36px",
+              height: "36px",
+              flexShrink: 0,
+            }}
+            aria-label="Cerrar menú"
+          >
+            ✕
+          </button>
           <button
             onClick={() => {
               setSidebarCollapsed(!sidebarCollapsed);
@@ -330,6 +355,7 @@ export default function Layout({ children, organizationId }: LayoutProps) {
               transition: "all 0.2s",
               width: "36px",
               height: "36px",
+              flexShrink: 0,
             }}
             onMouseEnter={(e) => {
               e.currentTarget.style.backgroundColor = "var(--bg-tertiary)";
