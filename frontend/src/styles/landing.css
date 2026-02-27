@@ -348,10 +348,14 @@
   justify-content: center;
   flex-wrap: wrap;
   animation: fadeInUp 1s ease-out 0.8s both;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 .stat-item {
   text-align: center;
+  flex: 0 1 auto;
+  min-width: 0;
 }
 
 .stat-number {
@@ -359,6 +363,8 @@
   font-weight: 800;
   color: var(--landing-primary);
   margin-bottom: 8px;
+  line-height: 1.2;
+  word-break: break-word;
 }
 
 .stat-label {
@@ -366,6 +372,7 @@
   color: var(--landing-text-secondary);
   text-transform: uppercase;
   letter-spacing: 1px;
+  line-height: 1.3;
 }
 
 .scroll-indicator {
@@ -912,24 +919,53 @@
 
   .hero-section {
     padding: 100px 20px 60px;
+    min-height: auto;
+  }
+
+  .hero-content {
+    max-width: 100%;
+    padding: 0 10px;
   }
 
   .hero-title {
     font-size: 36px;
+    margin-bottom: 20px;
   }
 
   .hero-subtitle {
     font-size: 16px;
+    margin-bottom: 30px;
+    line-height: 1.5;
+  }
+
+  .hero-cta {
+    margin-bottom: 40px;
+    gap: 16px;
   }
 
   .hero-stats {
-    gap: 24px;
+    gap: 20px;
     flex-wrap: wrap;
+    justify-content: space-around;
+    width: 100%;
+    margin-top: 20px;
+    padding: 0;
   }
 
   .stat-item {
-    flex: 1;
-    min-width: 100px;
+    flex: 1 1 auto;
+    min-width: 90px;
+    max-width: 120px;
+  }
+
+  .stat-number {
+    font-size: 32px;
+    margin-bottom: 6px;
+  }
+
+  .stat-label {
+    font-size: 11px;
+    letter-spacing: 0.5px;
   }
 
   .features-section,
@@ -1014,6 +1050,8 @@
   .hero-cta {
     flex-direction: column;
     gap: 12px;
+    width: 100%;
+    margin-bottom: 30px;
   }
 
   .cta-primary,
@@ -1023,18 +1061,36 @@
     width: 100%;
     padding: 14px 24px;
     font-size: 14px;
+    box-sizing: border-box;
   }
 
   .tech-grid {
     grid-template-columns: 1fr;
   }
 
+  .hero-stats {
+    gap: 16px;
+    justify-content: space-between;
+    width: 100%;
+    margin-top: 30px;
+    padding: 0 10px;
+  }
+
+  .stat-item {
+    flex: 1 1 0;
+    min-width: 0;
+    padding: 0 4px;
+  }
+
   .stat-number {
-    font-size: 36px;
+    font-size: 28px;
+    line-height: 1.2;
   }
 
   .stat-label {
-    font-size: 12px;
+    font-size: 10px;
+    margin-top: 4px;
+    line-height: 1.3;
   }
 
   .section-title {
