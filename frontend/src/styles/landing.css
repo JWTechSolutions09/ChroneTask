@@ -207,6 +207,14 @@
 
 /* Móvil: Orbes fijos y simplificados */
 @media (max-width: 768px) {
+  .hero-section {
+    background: linear-gradient(180deg, #1e3a8a 0%, #1e40af 25%, #2563eb 50%, #1e293b 75%, #0f172a 100%) !important;
+  }
+
+  .hero-background {
+    background: linear-gradient(180deg, #1e3a8a 0%, #1e40af 25%, #2563eb 50%, #1e293b 75%, #0f172a 100%) !important;
+  }
+
   .gradient-orb {
     animation: none !important;
     opacity: 0.4 !important;
@@ -238,6 +246,14 @@
 }
 
 @media (max-width: 480px) {
+  .hero-section {
+    background: linear-gradient(180deg, #1e3a8a 0%, #1e40af 20%, #2563eb 40%, #1e293b 70%, #0f172a 100%) !important;
+  }
+
+  .hero-background {
+    background: linear-gradient(180deg, #1e3a8a 0%, #1e40af 20%, #2563eb 40%, #1e293b 70%, #0f172a 100%) !important;
+  }
+
   .gradient-orb {
     opacity: 0.3 !important;
     filter: blur(60px) !important;
