@@ -17,11 +17,11 @@ export default function Landing() {
   useEffect(() => {
     const handleScroll = () => {
       setScrollY(window.scrollY);
-      
+
       // Determinar sección activa
       const sections = [heroRef, featuresRef, techRef, benefitsRef];
       const scrollPosition = window.scrollY + window.innerHeight / 2;
-      
+
       sections.forEach((ref, index) => {
         if (ref.current) {
           const { offsetTop, offsetHeight } = ref.current;
@@ -34,7 +34,7 @@ export default function Landing() {
 
     window.addEventListener("scroll", handleScroll, { passive: true });
     handleScroll(); // Ejecutar una vez al montar
-    
+
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
@@ -76,8 +76,8 @@ export default function Landing() {
             <img src="/logolanding.png" alt="ChroneTask" />
             <span>ChroneTask</span>
           </div>
-          <button 
-            className="mobile-menu-toggle" 
+          <button
+            className="mobile-menu-toggle"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             aria-label="Toggle menu"
           >
@@ -136,7 +136,7 @@ export default function Landing() {
               <div className="stat-label">Disponible</div>
             </div>
             <div className="stat-item">
-              <div className="stat-number">1000+</div>
+              <div className="stat-number">100+</div>
               <div className="stat-label">Proyectos</div>
             </div>
           </div>
@@ -161,7 +161,7 @@ export default function Landing() {
               <div className="feature-icon">📊</div>
               <h3>Dashboard Inteligente</h3>
               <p>
-                Visualiza el estado de todos tus proyectos en un solo lugar. 
+                Visualiza el estado de todos tus proyectos en un solo lugar.
                 Métricas en tiempo real y análisis profundo de rendimiento.
               </p>
             </div>
@@ -169,7 +169,7 @@ export default function Landing() {
               <div className="feature-icon">👥</div>
               <h3>Colaboración en Equipo</h3>
               <p>
-                Trabaja junto a tu equipo con comentarios, notificaciones en tiempo real 
+                Trabaja junto a tu equipo con comentarios, notificaciones en tiempo real
                 y gestión de miembros por proyecto.
               </p>
             </div>
@@ -177,7 +177,7 @@ export default function Landing() {
               <div className="feature-icon">📅</div>
               <h3>Cronograma Visual</h3>
               <p>
-                Planifica y visualiza tus proyectos con vistas tipo Gantt. 
+                Planifica y visualiza tus proyectos con vistas tipo Gantt.
                 Arrastra tareas, gestiona dependencias y cumple plazos.
               </p>
             </div>
@@ -185,7 +185,7 @@ export default function Landing() {
               <div className="feature-icon">🔔</div>
               <h3>Sistema de Notificaciones</h3>
               <p>
-                Mantente al día con notificaciones inteligentes sobre cambios, 
+                Mantente al día con notificaciones inteligentes sobre cambios,
                 comentarios y recordatorios importantes.
               </p>
             </div>
@@ -193,7 +193,7 @@ export default function Landing() {
               <div className="feature-icon">📈</div>
               <h3>Analíticas Avanzadas</h3>
               <p>
-                Analiza el rendimiento de tu equipo con métricas detalladas, 
+                Analiza el rendimiento de tu equipo con métricas detalladas,
                 gráficos interactivos y reportes personalizables.
               </p>
             </div>
@@ -201,7 +201,7 @@ export default function Landing() {
               <div className="feature-icon">⚡</div>
               <h3>SLA y Seguimiento</h3>
               <p>
-                Configura SLAs por proyecto y recibe alertas cuando se acerquen 
+                Configura SLAs por proyecto y recibe alertas cuando se acerquen
                 los plazos límite. Cumple siempre a tiempo.
               </p>
             </div>
