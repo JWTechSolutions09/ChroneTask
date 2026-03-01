@@ -27,7 +27,13 @@ export default function Layout({ children, organizationId }: LayoutProps) {
   const { theme, toggleTheme } = useTheme();
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [isMobile, setIsMobile] = useState(false);
+  const [isMobile, setIsMobile] = useState(() => {
+    // Inicializar isMobile correctamente desde el inicio
+    if (typeof window !== 'undefined') {
+      return window.innerWidth <= 768;
+    }
+    return false;
+  });
   const [orgs, setOrgs] = useState<Org[]>([]);
   
   const [currentOrg, setCurrentOrg] = useState<Org | null>(null);
@@ -51,20 +57,26 @@ export default function Layout({ children, organizationId }: LayoutProps) {
   
   // En móvil, cuando el menú está abierto, forzar que no esté colapsado
   // Usar useMemo para evitar re-renderizados innecesarios
+  // En móvil con menú abierto, SIEMPRE mostrar todo (no colapsado)
   const effectiveCollapsed = useMemo(() => {
-    return isMobile && sidebarOpen ? false : sidebarCollapsed;
+    // Si estamos en móvil Y el sidebar está abierto, NUNCA colapsar
+    if (isMobile && sidebarOpen) {
+      return false;
+    }
+    // En desktop o cuando el sidebar está cerrado, usar el estado normal
+    return sidebarCollapsed;
   }, [isMobile, sidebarOpen, sidebarCollapsed]);
 
   // Cerrar sidebar al cambiar de ruta en móvil (pero no inmediatamente para evitar parpadeo)
   useEffect(() => {
     if (isMobile && sidebarOpen) {
-      // Usar un pequeño delay para evitar que se cierre antes de que se complete la navegación
+      // Usar un delay más largo para evitar parpadeo
       const timer = setTimeout(() => {
         setSidebarOpen(false);
-      }, 100);
+      }, 300);
       return () => clearTimeout(timer);
     }
-  }, [location.pathname, isMobile]);
+  }, [location.pathname, isMobile, sidebarOpen]);
 
   // Memoizar funciones para evitar recrearlas en cada render
   const loadOrgs = useCallback(async () => {
@@ -449,7 +461,23 @@ export default function Layout({ children, organizationId }: LayoutProps) {
         </div>
 
         {/* Navigation */}
-        <nav style={{ flex: 1, padding: "12px", overflowY: "auto", overflowX: "hidden", display: "flex", flexDirection: "column", WebkitOverflowScrolling: "touch" }}>
+        <nav 
+          style={{ 
+            flex: 1, 
+            padding: "12px", 
+            overflowY: "auto", 
+            overflowX: "hidden", 
+            display: "flex", 
+            flexDirection: "column", 
+            WebkitOverflowScrolling: "touch",
+            // En móvil cuando está abierto, forzar visibilidad
+            ...(isMobile && sidebarOpen ? {
+              opacity: 1,
+              visibility: 'visible',
+            } : {})
+          }}
+          className={isMobile && sidebarOpen ? "mobile-nav-open" : ""}
+        >
           {organizationId ? (
             <>
               {/* Organization Info */}
@@ -487,6 +515,7 @@ export default function Layout({ children, organizationId }: LayoutProps) {
                   to={`/org/${organizationId}/projects`}
                   active={isActive(`/org/${organizationId}/projects`) && location.search.includes("new")}
                   collapsed={effectiveCollapsed}
+                  forceShowLabel={isMobile && sidebarOpen}
                   onNavigate={closeMobileMenu}
                   onClick={() => {
                     // Scroll to create form
@@ -502,6 +531,7 @@ export default function Layout({ children, organizationId }: LayoutProps) {
                   to={`/org/${organizationId}/dashboard`}
                   active={false}
                   collapsed={effectiveCollapsed}
+                  forceShowLabel={isMobile && sidebarOpen}
                   onNavigate={closeMobileMenu}
                   onClick={() => {
                     navigate(`/org/${organizationId}/dashboard`);
@@ -517,6 +547,7 @@ export default function Layout({ children, organizationId }: LayoutProps) {
                   to={`/org/${organizationId}/dashboard`}
                   active={false}
                   collapsed={effectiveCollapsed}
+                  forceShowLabel={isMobile && sidebarOpen}
                   onNavigate={closeMobileMenu}
                   onClick={() => {
                     navigate(`/org/${organizationId}/dashboard`);
@@ -539,6 +570,7 @@ export default function Layout({ children, organizationId }: LayoutProps) {
                   to={`/org/${organizationId}/dashboard`}
                   active={isActive(`/org/${organizationId}/dashboard`)}
                   collapsed={effectiveCollapsed}
+                  forceShowLabel={isMobile && sidebarOpen}
                   onNavigate={closeMobileMenu}
                 />
                 <NavItem
@@ -547,6 +579,7 @@ export default function Layout({ children, organizationId }: LayoutProps) {
                   to={`/org/${organizationId}/projects`}
                   active={isActive(`/org/${organizationId}/projects`)}
                   collapsed={effectiveCollapsed}
+                  forceShowLabel={isMobile && sidebarOpen}
                   onNavigate={closeMobileMenu}
                 />
                 <NavItem
@@ -555,6 +588,7 @@ export default function Layout({ children, organizationId }: LayoutProps) {
                   to={`/org/${organizationId}/notifications`}
                   active={isActive(`/org/${organizationId}/notifications`)}
                   collapsed={effectiveCollapsed}
+                  forceShowLabel={isMobile && sidebarOpen}
                   onNavigate={closeMobileMenu}
                 />
                 <NavItem
@@ -563,6 +597,7 @@ export default function Layout({ children, organizationId }: LayoutProps) {
                   to={`/org/${organizationId}/analytics`}
                   active={isActive(`/org/${organizationId}/analytics`)}
                   collapsed={effectiveCollapsed}
+                  forceShowLabel={isMobile && sidebarOpen}
                   onNavigate={closeMobileMenu}
                 />
                 <NavItem
@@ -571,6 +606,7 @@ export default function Layout({ children, organizationId }: LayoutProps) {
                   to={`/org/${organizationId}/timeline`}
                   active={isActive(`/org/${organizationId}/timeline`) || isActive(`/org/${organizationId}/project/`) && location.pathname.includes("timeline")}
                   collapsed={effectiveCollapsed}
+                  forceShowLabel={isMobile && sidebarOpen}
                   onNavigate={closeMobileMenu}
                 />
               </div>
@@ -843,9 +879,10 @@ type NavItemProps = {
   indent?: boolean;
   onClick?: () => void;
   onNavigate?: () => void;
+  forceShowLabel?: boolean; // Nueva prop para forzar mostrar el label
 };
 
-function NavItem({ icon, label, to, active, collapsed, indent, onClick, onNavigate }: NavItemProps) {
+function NavItem({ icon, label, to, active, collapsed, indent, onClick, onNavigate, forceShowLabel }: NavItemProps) {
   const handleClick = (e: React.MouseEvent) => {
     // Llamar al callback de navegación primero para cerrar el menú
     if (onNavigate) {
@@ -856,6 +893,9 @@ function NavItem({ icon, label, to, active, collapsed, indent, onClick, onNaviga
       onClick();
     }
   };
+
+  // Si forceShowLabel es true, siempre mostrar el label (para móvil cuando el menú está abierto)
+  const shouldShowLabel = !collapsed || forceShowLabel;
 
   return (
     <Link
@@ -879,7 +919,7 @@ function NavItem({ icon, label, to, active, collapsed, indent, onClick, onNaviga
         fontSize: "14px",
         transition: "all 0.2s",
         paddingLeft: indent ? "36px" : "12px",
-        justifyContent: collapsed ? "center" : "flex-start",
+        justifyContent: collapsed && !forceShowLabel ? "center" : "flex-start",
         border: active ? "1px solid rgba(0, 123, 255, 0.2)" : "1px solid transparent",
         touchAction: "manipulation",
         WebkitTapHighlightColor: "rgba(0, 0, 0, 0.1)",
@@ -897,10 +937,11 @@ function NavItem({ icon, label, to, active, collapsed, indent, onClick, onNaviga
           e.currentTarget.style.transform = "translateX(0)";
         }
       }}
-      title={collapsed ? label : undefined}
+      title={collapsed && !forceShowLabel ? label : undefined}
+      className={forceShowLabel ? "mobile-nav-item-open" : ""}
     >
       <span style={{ fontSize: "20px", minWidth: "24px", textAlign: "center", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>{icon}</span>
-      {!collapsed && <span style={{ whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{label}</span>}
+      {shouldShowLabel && <span style={{ whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{label}</span>}
     </Link>
   );
 }
