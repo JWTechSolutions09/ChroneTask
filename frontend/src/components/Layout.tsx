@@ -30,40 +30,41 @@ export default function Layout({ children, organizationId }: LayoutProps) {
   const [isMobile, setIsMobile] = useState(false);
   const [orgs, setOrgs] = useState<Org[]>([]);
   
-  // Detectar si estamos en móvil
-  useEffect(() => {
-    const checkMobile = () => {
-      setIsMobile(window.innerWidth <= 768);
-    };
-    checkMobile();
-    window.addEventListener('resize', checkMobile);
-    return () => window.removeEventListener('resize', checkMobile);
-  }, []);
-  
-  // En móvil, cuando el menú está abierto, forzar que no esté colapsado
-  const effectiveCollapsed = isMobile && sidebarOpen ? false : sidebarCollapsed;
   const [currentOrg, setCurrentOrg] = useState<Org | null>(null);
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(false);
 
-  // Cerrar sidebar en móvil cuando cambia la ruta
+  // Detectar si estamos en móvil y manejar resize
   useEffect(() => {
-    const handleResize = () => {
-      if (window.innerWidth > 768) {
+    const checkMobile = () => {
+      const mobile = window.innerWidth <= 768;
+      setIsMobile(mobile);
+      // Solo cerrar el sidebar si cambiamos de móvil a desktop
+      if (!mobile && sidebarOpen) {
         setSidebarOpen(false);
       }
     };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, [sidebarOpen]);
+  
+  // En móvil, cuando el menú está abierto, forzar que no esté colapsado
+  // Usar useMemo para evitar re-renderizados innecesarios
+  const effectiveCollapsed = useMemo(() => {
+    return isMobile && sidebarOpen ? false : sidebarCollapsed;
+  }, [isMobile, sidebarOpen, sidebarCollapsed]);
 
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
-
-  // Cerrar sidebar al cambiar de ruta en móvil
+  // Cerrar sidebar al cambiar de ruta en móvil (pero no inmediatamente para evitar parpadeo)
   useEffect(() => {
-    if (window.innerWidth <= 768) {
-      setSidebarOpen(false);
+    if (isMobile && sidebarOpen) {
+      // Usar un pequeño delay para evitar que se cierre antes de que se complete la navegación
+      const timer = setTimeout(() => {
+        setSidebarOpen(false);
+      }, 100);
+      return () => clearTimeout(timer);
     }
-  }, [location.pathname]);
+  }, [location.pathname, isMobile]);
 
   // Memoizar funciones para evitar recrearlas en cada render
   const loadOrgs = useCallback(async () => {
@@ -138,24 +139,6 @@ export default function Layout({ children, organizationId }: LayoutProps) {
     };
   }, [organizationId]); // Solo dependemos de organizationId
 
-  // Cerrar sidebar en móvil cuando cambia la ruta
-  useEffect(() => {
-    const handleResize = () => {
-      if (window.innerWidth > 768) {
-        setSidebarOpen(false);
-      }
-    };
-
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
-
-  // Cerrar sidebar al cambiar de ruta en móvil
-  useEffect(() => {
-    if (window.innerWidth <= 768) {
-      setSidebarOpen(false);
-    }
-  }, [location.pathname]);
 
   const handleLogout = () => {
     clearToken();
@@ -594,7 +577,7 @@ export default function Layout({ children, organizationId }: LayoutProps) {
 
               {/* Projects List */}
               {projects.length > 0 && (
-                <div style={{ marginTop: "16px", paddingTop: "16px", borderTop: "1px solid var(--border-color)", display: sidebarCollapsed ? "none" : "block" }}>
+                <div style={{ marginTop: "16px", paddingTop: "16px", borderTop: "1px solid var(--border-color)", display: effectiveCollapsed ? "none" : "block" }}>
                   <div
                     style={{
                       fontSize: "11px",
@@ -630,7 +613,7 @@ export default function Layout({ children, organizationId }: LayoutProps) {
                 label="Organizaciones"
                 to="/orgs"
                 active={isActive("/orgs")}
-                collapsed={sidebarCollapsed}
+                collapsed={effectiveCollapsed}
                 onNavigate={closeMobileMenu}
               />
               <NavItem
@@ -638,7 +621,7 @@ export default function Layout({ children, organizationId }: LayoutProps) {
                 label="Seleccionar Org"
                 to="/org-select"
                 active={isActive("/org-select")}
-                collapsed={sidebarCollapsed}
+                collapsed={effectiveCollapsed}
                 onNavigate={closeMobileMenu}
               />
             </>

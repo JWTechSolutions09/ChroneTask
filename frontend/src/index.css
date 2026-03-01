@@ -585,10 +585,27 @@ input, textarea, select {
     border-right: none !important;
     border-bottom: 2px solid var(--border-color) !important;
     border-radius: 0 0 16px 16px !important;
+    opacity: 1 !important;
+    visibility: visible !important;
   }
 
   .sidebar.mobile-dropdown-menu.open {
     transform: translateY(0) !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+  }
+
+  /* Asegurar que el contenido del sidebar sea visible cuando está abierto */
+  .sidebar.mobile-dropdown-menu.open nav {
+    opacity: 1 !important;
+    visibility: visible !important;
+    display: flex !important;
+  }
+
+  .sidebar.mobile-dropdown-menu.open nav > * {
+    opacity: 1 !important;
+    visibility: visible !important;
+    display: flex !important;
   }
 
   .mobile-menu-btn {
@@ -661,6 +678,19 @@ input, textarea, select {
   .sidebar.mobile-dropdown-menu > * {
     width: 100% !important;
     flex-shrink: 0 !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+  }
+
+  /* Prevenir parpadeo de elementos del sidebar en móvil */
+  .sidebar.mobile-dropdown-menu.open nav,
+  .sidebar.mobile-dropdown-menu.open nav > *,
+  .sidebar.mobile-dropdown-menu.open nav a,
+  .sidebar.mobile-dropdown-menu.open nav button {
+    opacity: 1 !important;
+    visibility: visible !important;
+    display: flex !important;
+    pointer-events: auto !important;
   }
 
   /* Mejorar el header del sidebar en móvil */
@@ -700,6 +730,10 @@ input, textarea, select {
     display: flex !important;
     align-items: center !important;
     flex-wrap: nowrap !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    pointer-events: auto !important;
+    will-change: auto !important;
   }
 
   /* Prevenir que los links se queden enganchados */
@@ -715,6 +749,10 @@ input, textarea, select {
     width: 100% !important;
     display: flex !important;
     flex-direction: column !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    pointer-events: auto !important;
+    will-change: auto !important;
   }
 
   /* Títulos de sección */
