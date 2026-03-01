@@ -156,8 +156,43 @@ export default function Layout({ children, organizationId }: LayoutProps) {
     return <>{children}</>;
   }
 
+  // Prevenir scroll del body cuando el sidebar está abierto en móvil
+  React.useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth <= 768) {
+        if (sidebarOpen) {
+          document.body.classList.add("sidebar-open");
+          document.body.style.overflow = "hidden";
+          document.body.style.position = "fixed";
+          document.body.style.width = "100%";
+        } else {
+          document.body.classList.remove("sidebar-open");
+          document.body.style.overflow = "";
+          document.body.style.position = "";
+          document.body.style.width = "";
+        }
+      } else {
+        document.body.classList.remove("sidebar-open");
+        document.body.style.overflow = "";
+        document.body.style.position = "";
+        document.body.style.width = "";
+      }
+    };
+
+    handleResize();
+    window.addEventListener("resize", handleResize);
+
+    return () => {
+      document.body.classList.remove("sidebar-open");
+      document.body.style.overflow = "";
+      document.body.style.position = "";
+      document.body.style.width = "";
+      window.removeEventListener("resize", handleResize);
+    };
+  }, [sidebarOpen]);
+
   return (
-    <div style={{ display: "flex", minHeight: "100vh", backgroundColor: "var(--bg-secondary)" }}>
+    <div style={{ display: "flex", minHeight: "100vh", backgroundColor: "var(--bg-secondary)", position: "relative" }}>
       {/* Mobile Menu Overlay */}
       {sidebarOpen && (
         <div
@@ -173,6 +208,10 @@ export default function Layout({ children, organizationId }: LayoutProps) {
           }}
           className="mobile-overlay"
           onClick={() => setSidebarOpen(false)}
+          onTouchStart={(e) => {
+            e.preventDefault();
+            setSidebarOpen(false);
+          }}
         />
       )}
 
@@ -223,12 +262,17 @@ export default function Layout({ children, organizationId }: LayoutProps) {
           top: 0,
           height: "100vh",
           overflowY: "auto",
+          overflowX: "hidden",
           boxShadow: theme === "dark" ? "2px 0 8px rgba(0, 0, 0, 0.3)" : "2px 0 8px rgba(0, 0, 0, 0.05)",
           zIndex: 100,
         }}
         className={`sidebar ${sidebarOpen ? "open" : ""}`}
         onClick={(e) => {
           // Prevenir que el clic en el sidebar cierre el menú
+          e.stopPropagation();
+        }}
+        onTouchStart={(e) => {
+          // Prevenir que el touch en el sidebar cierre el menú
           e.stopPropagation();
         }}
       >
@@ -372,7 +416,7 @@ export default function Layout({ children, organizationId }: LayoutProps) {
         </div>
 
         {/* Navigation */}
-        <nav style={{ flex: 1, padding: "12px", overflowY: "auto", display: "flex", flexDirection: "column" }}>
+        <nav style={{ flex: 1, padding: "12px", overflowY: "auto", overflowX: "hidden", display: "flex", flexDirection: "column", WebkitOverflowScrolling: "touch" }}>
           {organizationId ? (
             <>
               {/* Organization Info */}
@@ -408,6 +452,7 @@ export default function Layout({ children, organizationId }: LayoutProps) {
                     to={`/org/${organizationId}/projects`}
                     active={isActive(`/org/${organizationId}/projects`) && location.search.includes("new")}
                     collapsed={false}
+                    onNavigate={() => setSidebarOpen(false)}
                     onClick={() => {
                       // Scroll to create form
                       setTimeout(() => {
@@ -422,6 +467,7 @@ export default function Layout({ children, organizationId }: LayoutProps) {
                     to={`/org/${organizationId}/dashboard`}
                     active={false}
                     collapsed={false}
+                    onNavigate={() => setSidebarOpen(false)}
                     onClick={() => {
                       navigate(`/org/${organizationId}/dashboard`);
                       setTimeout(() => {
@@ -436,6 +482,7 @@ export default function Layout({ children, organizationId }: LayoutProps) {
                     to={`/org/${organizationId}/dashboard`}
                     active={false}
                     collapsed={false}
+                    onNavigate={() => setSidebarOpen(false)}
                     onClick={() => {
                       navigate(`/org/${organizationId}/dashboard`);
                       setTimeout(() => {
@@ -533,6 +580,7 @@ export default function Layout({ children, organizationId }: LayoutProps) {
                 to="/orgs"
                 active={isActive("/orgs")}
                 collapsed={sidebarCollapsed}
+                onNavigate={() => setSidebarOpen(false)}
               />
               <NavItem
                 icon="🔀"
@@ -540,6 +588,7 @@ export default function Layout({ children, organizationId }: LayoutProps) {
                 to="/org-select"
                 active={isActive("/org-select")}
                 collapsed={sidebarCollapsed}
+                onNavigate={() => setSidebarOpen(false)}
               />
             </>
           )}
@@ -554,7 +603,12 @@ export default function Layout({ children, organizationId }: LayoutProps) {
             
             {/* Theme Toggle */}
             <button
-              onClick={toggleTheme}
+              onClick={() => {
+                toggleTheme();
+                if (window.innerWidth <= 768) {
+                  setSidebarOpen(false);
+                }
+              }}
               style={{
                 width: "100%",
                 padding: "10px 12px",
@@ -571,14 +625,20 @@ export default function Layout({ children, organizationId }: LayoutProps) {
                 justifyContent: sidebarCollapsed ? "center" : "flex-start",
                 transition: "all 0.2s",
                 fontWeight: 500,
+                touchAction: "manipulation",
+                WebkitTapHighlightColor: "rgba(0, 0, 0, 0.1)",
               }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = "var(--bg-tertiary)";
-                e.currentTarget.style.transform = "translateX(2px)";
+                if (window.innerWidth > 768) {
+                  e.currentTarget.style.backgroundColor = "var(--bg-tertiary)";
+                  e.currentTarget.style.transform = "translateX(2px)";
+                }
               }}
               onMouseLeave={(e) => {
-                e.currentTarget.style.backgroundColor = "var(--hover-bg)";
-                e.currentTarget.style.transform = "translateX(0)";
+                if (window.innerWidth > 768) {
+                  e.currentTarget.style.backgroundColor = "var(--hover-bg)";
+                  e.currentTarget.style.transform = "translateX(0)";
+                }
               }}
               title={sidebarCollapsed ? (theme === "dark" ? "Modo Claro" : "Modo Oscuro") : undefined}
             >
@@ -588,7 +648,12 @@ export default function Layout({ children, organizationId }: LayoutProps) {
 
             {!sidebarCollapsed && organizationId && (
               <button
-                onClick={() => navigate("/org-select")}
+                onClick={() => {
+                  navigate("/org-select");
+                  if (window.innerWidth <= 768) {
+                    setSidebarOpen(false);
+                  }
+                }}
                 style={{
                   width: "100%",
                   padding: "10px 12px",
@@ -604,14 +669,20 @@ export default function Layout({ children, organizationId }: LayoutProps) {
                   gap: "10px",
                   transition: "all 0.2s",
                   fontWeight: 500,
+                  touchAction: "manipulation",
+                  WebkitTapHighlightColor: "rgba(0, 0, 0, 0.1)",
                 }}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor = "var(--bg-tertiary)";
-                  e.currentTarget.style.transform = "translateX(2px)";
+                  if (window.innerWidth > 768) {
+                    e.currentTarget.style.backgroundColor = "var(--bg-tertiary)";
+                    e.currentTarget.style.transform = "translateX(2px)";
+                  }
                 }}
                 onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor = "var(--hover-bg)";
-                  e.currentTarget.style.transform = "translateX(0)";
+                  if (window.innerWidth > 768) {
+                    e.currentTarget.style.backgroundColor = "var(--hover-bg)";
+                    e.currentTarget.style.transform = "translateX(0)";
+                  }
                 }}
               >
                 <span style={{ fontSize: "18px" }}>🔄</span>
@@ -620,7 +691,12 @@ export default function Layout({ children, organizationId }: LayoutProps) {
             )}
             
             <button
-              onClick={() => navigate("/settings")}
+              onClick={() => {
+                navigate("/settings");
+                if (window.innerWidth <= 768) {
+                  setSidebarOpen(false);
+                }
+              }}
               style={{
                 width: "100%",
                 padding: "10px 12px",
@@ -637,14 +713,20 @@ export default function Layout({ children, organizationId }: LayoutProps) {
                 justifyContent: sidebarCollapsed ? "center" : "flex-start",
                 transition: "all 0.2s",
                 fontWeight: 500,
+                touchAction: "manipulation",
+                WebkitTapHighlightColor: "rgba(0, 0, 0, 0.1)",
               }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = "var(--bg-tertiary)";
-                e.currentTarget.style.transform = "translateX(2px)";
+                if (window.innerWidth > 768) {
+                  e.currentTarget.style.backgroundColor = "var(--bg-tertiary)";
+                  e.currentTarget.style.transform = "translateX(2px)";
+                }
               }}
               onMouseLeave={(e) => {
-                e.currentTarget.style.backgroundColor = "var(--hover-bg)";
-                e.currentTarget.style.transform = "translateX(0)";
+                if (window.innerWidth > 768) {
+                  e.currentTarget.style.backgroundColor = "var(--hover-bg)";
+                  e.currentTarget.style.transform = "translateX(0)";
+                }
               }}
               title={sidebarCollapsed ? "Configuración" : undefined}
             >
@@ -653,7 +735,12 @@ export default function Layout({ children, organizationId }: LayoutProps) {
             </button>
             
             <button
-              onClick={handleLogout}
+              onClick={() => {
+                handleLogout();
+                if (window.innerWidth <= 768) {
+                  setSidebarOpen(false);
+                }
+              }}
               style={{
                 width: "100%",
                 padding: "10px 12px",
@@ -669,14 +756,20 @@ export default function Layout({ children, organizationId }: LayoutProps) {
                 justifyContent: sidebarCollapsed ? "center" : "flex-start",
                 transition: "all 0.2s",
                 fontWeight: 500,
+                touchAction: "manipulation",
+                WebkitTapHighlightColor: "rgba(0, 0, 0, 0.1)",
               }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = theme === "dark" ? "rgba(220, 53, 69, 0.3)" : "rgba(220, 53, 69, 0.15)";
-                e.currentTarget.style.transform = "translateX(2px)";
+                if (window.innerWidth > 768) {
+                  e.currentTarget.style.backgroundColor = theme === "dark" ? "rgba(220, 53, 69, 0.3)" : "rgba(220, 53, 69, 0.15)";
+                  e.currentTarget.style.transform = "translateX(2px)";
+                }
               }}
               onMouseLeave={(e) => {
-                e.currentTarget.style.backgroundColor = theme === "dark" ? "rgba(220, 53, 69, 0.2)" : "rgba(220, 53, 69, 0.1)";
-                e.currentTarget.style.transform = "translateX(0)";
+                if (window.innerWidth > 768) {
+                  e.currentTarget.style.backgroundColor = theme === "dark" ? "rgba(220, 53, 69, 0.2)" : "rgba(220, 53, 69, 0.1)";
+                  e.currentTarget.style.transform = "translateX(0)";
+                }
               }}
               title={sidebarCollapsed ? "Salir" : undefined}
             >
@@ -694,9 +787,11 @@ export default function Layout({ children, organizationId }: LayoutProps) {
           flex: 1,
           display: "flex",
           flexDirection: "column",
-          overflow: "hidden",
+          overflowX: "hidden",
+          overflowY: "auto",
           width: "100%",
           minWidth: 0,
+          WebkitOverflowScrolling: "touch",
         }}
       >
         {children}
@@ -719,6 +814,18 @@ type NavItemProps = {
 function NavItem({ icon, label, to, active, collapsed, indent, onClick, onNavigate }: NavItemProps) {
   const handleClick = (e: React.MouseEvent) => {
     // En móvil, cerrar el sidebar al navegar
+    if (window.innerWidth <= 768) {
+      // Cerrar sidebar inmediatamente
+      const sidebar = document.querySelector('.sidebar');
+      if (sidebar) {
+        sidebar.classList.remove('open');
+      }
+      document.body.classList.remove('sidebar-open');
+      document.body.style.overflow = '';
+      document.body.style.position = '';
+      document.body.style.width = '';
+    }
+    
     if (onNavigate) {
       onNavigate();
     }
@@ -732,6 +839,10 @@ function NavItem({ icon, label, to, active, collapsed, indent, onClick, onNaviga
     <Link
       to={to}
       onClick={handleClick}
+      onTouchEnd={(e) => {
+        // Prevenir que el touch cause problemas
+        e.stopPropagation();
+      }}
       style={{
         display: "flex",
         alignItems: "center",
@@ -748,23 +859,26 @@ function NavItem({ icon, label, to, active, collapsed, indent, onClick, onNaviga
         paddingLeft: indent ? "36px" : "12px",
         justifyContent: collapsed ? "center" : "flex-start",
         border: active ? "1px solid rgba(0, 123, 255, 0.2)" : "1px solid transparent",
+        touchAction: "manipulation",
+        WebkitTapHighlightColor: "rgba(0, 0, 0, 0.1)",
+        userSelect: "none",
       }}
       onMouseEnter={(e) => {
-        if (!active) {
+        if (!active && window.innerWidth > 768) {
           e.currentTarget.style.backgroundColor = "var(--hover-bg)";
           e.currentTarget.style.transform = "translateX(4px)";
         }
       }}
       onMouseLeave={(e) => {
-        if (!active) {
+        if (!active && window.innerWidth > 768) {
           e.currentTarget.style.backgroundColor = "transparent";
           e.currentTarget.style.transform = "translateX(0)";
         }
       }}
       title={collapsed ? label : undefined}
     >
-      <span style={{ fontSize: "20px", minWidth: "24px", textAlign: "center", display: "flex", alignItems: "center", justifyContent: "center" }}>{icon}</span>
-      {!collapsed && <span>{label}</span>}
+      <span style={{ fontSize: "20px", minWidth: "24px", textAlign: "center", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>{icon}</span>
+      {!collapsed && <span style={{ whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{label}</span>}
     </Link>
   );
 }

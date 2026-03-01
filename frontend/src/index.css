@@ -475,20 +475,30 @@ a:hover {
 }
 
 @media (max-width: 768px) {
+  /* Prevenir scroll del body cuando sidebar está abierto */
+  body.sidebar-open {
+    overflow: hidden !important;
+    position: fixed !important;
+    width: 100% !important;
+  }
+
   .sidebar {
     position: fixed !important;
-    left: 0;
-    top: 0;
+    left: 0 !important;
+    top: 0 !important;
     z-index: 1000 !important;
-    transform: translateX(-100%);
-    transition: transform 0.3s ease;
+    transform: translateX(-100%) !important;
+    transition: transform 0.3s ease !important;
     width: 280px !important;
     max-width: 85vw !important;
     height: 100vh !important;
+    height: 100dvh !important; /* Dynamic viewport height para móviles */
     overflow-y: auto !important;
     overflow-x: hidden !important;
-    -webkit-overflow-scrolling: touch;
+    -webkit-overflow-scrolling: touch !important;
     box-shadow: 2px 0 10px rgba(0, 0, 0, 0.3) !important;
+    display: flex !important;
+    flex-direction: column !important;
   }
 
   .sidebar.open {
@@ -519,13 +529,17 @@ a:hover {
     margin-left: 0 !important;
     width: 100% !important;
     padding-top: 60px !important;
+    overflow-x: hidden !important;
   }
 
   /* Mejorar padding del sidebar en móvil */
   .sidebar > nav {
     padding: 12px 8px !important;
     overflow-y: auto !important;
-    -webkit-overflow-scrolling: touch;
+    overflow-x: hidden !important;
+    -webkit-overflow-scrolling: touch !important;
+    flex: 1 !important;
+    min-height: 0 !important;
   }
 
   /* Asegurar que los elementos del sidebar no se desborden */
@@ -538,11 +552,20 @@ a:hover {
   .sidebar > div:first-child {
     padding: 16px 12px !important;
     min-height: 64px !important;
-    position: sticky !important;
-    top: 0 !important;
+    flex-shrink: 0 !important;
     background: var(--bg-primary) !important;
-    z-index: 10 !important;
     border-bottom: 1px solid var(--border-color) !important;
+    position: relative !important;
+    z-index: 1 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+  }
+
+  /* Asegurar que el sidebar tenga un fondo uniforme */
+  .sidebar {
+    background: var(--bg-primary) !important;
+    background-color: var(--bg-primary) !important;
   }
 
   /* Mejorar los items de navegación en móvil */
@@ -554,6 +577,15 @@ a:hover {
     white-space: nowrap !important;
     overflow: hidden !important;
     text-overflow: ellipsis !important;
+    touch-action: manipulation !important;
+    -webkit-tap-highlight-color: transparent !important;
+  }
+
+  /* Prevenir que los links se queden enganchados */
+  .sidebar nav a:active,
+  .sidebar nav button:active {
+    transform: none !important;
+    transition: none !important;
   }
 
   /* Mejorar secciones del sidebar */
@@ -567,6 +599,82 @@ a:hover {
     font-size: 11px !important;
     text-transform: uppercase !important;
     letter-spacing: 0.5px !important;
+  }
+
+  /* Prevenir problemas con tarjetas y elementos interactivos */
+  .card,
+  [class*="card"],
+  button,
+  a {
+    touch-action: manipulation !important;
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0.1) !important;
+    user-select: none !important;
+  }
+
+  /* Prevenir que elementos se queden enganchados al hacer scroll */
+  * {
+    -webkit-overflow-scrolling: touch !important;
+  }
+
+  /* Asegurar que no haya problemas de scroll anidado */
+  .sidebar,
+  .sidebar nav,
+  .main-content {
+    overscroll-behavior: contain !important;
+  }
+
+  /* Prevenir que las tarjetas se queden enganchadas */
+  .card:active,
+  button:active,
+  a:active {
+    transform: scale(0.98) !important;
+    transition: transform 0.1s !important;
+  }
+
+  /* Asegurar que los links y botones funcionen correctamente */
+  a,
+  button {
+    cursor: pointer !important;
+    -webkit-user-select: none !important;
+    user-select: none !important;
+  }
+
+  /* Mejorar el scroll del contenido principal */
+  .main-content {
+    overscroll-behavior-y: contain !important;
+    -webkit-overflow-scrolling: touch !important;
+    position: relative !important;
+  }
+
+  /* Asegurar que el sidebar se vea completo y no dividido */
+  .sidebar {
+    border-right: 1px solid var(--border-color) !important;
+    will-change: transform !important;
+  }
+
+  /* Asegurar que el contenido sea accesible */
+  .main-content {
+    pointer-events: auto !important;
+  }
+
+  /* Prevenir problemas de scroll con tarjetas */
+  .card {
+    will-change: transform !important;
+    backface-visibility: hidden !important;
+    -webkit-backface-visibility: hidden !important;
+  }
+
+  /* Prevenir que elementos se queden enganchados durante scroll */
+  * {
+    -webkit-transform: translateZ(0) !important;
+    transform: translateZ(0) !important;
+  }
+
+  /* Mejorar el rendimiento del scroll */
+  .main-content,
+  .sidebar,
+  .sidebar nav {
+    contain: layout style paint !important;
   }
 }
 
@@ -588,6 +696,22 @@ a:hover {
   .sidebar nav button {
     padding: 10px 8px !important;
     font-size: 13px !important;
+  }
+
+  /* Mejorar interacción táctil en móviles pequeños */
+  .card,
+  button,
+  a {
+    min-height: 44px !important;
+    min-width: 44px !important;
+  }
+
+  /* Prevenir problemas de scroll en móviles pequeños */
+  html,
+  body {
+    overflow-x: hidden !important;
+    width: 100% !important;
+    max-width: 100vw !important;
   }
 }
 
