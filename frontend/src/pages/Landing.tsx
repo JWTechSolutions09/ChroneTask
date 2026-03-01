@@ -1,11 +1,9 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { useTheme } from "../contexts/ThemeContext";
 import "../styles/landing.css";
 
 export default function Landing() {
   const navigate = useNavigate();
-  const { theme, toggleTheme } = useTheme();
   const [scrollY, setScrollY] = useState(0);
   const [activeSection, setActiveSection] = useState(0);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -63,12 +61,12 @@ export default function Landing() {
     };
   }, []);
 
-  const scrollToSection = (ref: React.RefObject<HTMLDivElement>) => {
+  const scrollToSection = (ref: React.RefObject<HTMLDivElement | null>) => {
     ref.current?.scrollIntoView({ behavior: "smooth" });
   };
 
   return (
-    <div className={`landing-page ${theme}`} data-theme={theme}>
+    <div className="landing-page dark" data-theme="dark">
       {/* Navigation Bar */}
       <nav className="landing-nav">
         <div className="nav-container">
@@ -90,9 +88,6 @@ export default function Landing() {
             <button onClick={() => { scrollToSection(featuresRef); setMobileMenuOpen(false); }}>Características</button>
             <button onClick={() => { scrollToSection(techRef); setMobileMenuOpen(false); }}>Tecnologías</button>
             <button onClick={() => { scrollToSection(benefitsRef); setMobileMenuOpen(false); }}>Ventajas</button>
-            <button className="theme-toggle" onClick={toggleTheme}>
-              {theme === "dark" ? <i className="fas fa-sun"></i> : <i className="fas fa-moon"></i>}
-            </button>
             <button className="btn-login" onClick={() => navigate("/login")}>
               <i className="fas fa-sign-in-alt"></i> Iniciar Sesión
             </button>

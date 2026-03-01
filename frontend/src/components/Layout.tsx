@@ -615,7 +615,7 @@ export default function Layout({ children, organizationId }: LayoutProps) {
                 to="/orgs"
                 active={isActive("/orgs")}
                 collapsed={sidebarCollapsed}
-                onNavigate={() => setSidebarOpen(false)}
+                onNavigate={closeMobileMenu}
               />
               <NavItem
                 icon="🔀"
@@ -623,7 +623,7 @@ export default function Layout({ children, organizationId }: LayoutProps) {
                 to="/org-select"
                 active={isActive("/org-select")}
                 collapsed={sidebarCollapsed}
-                onNavigate={() => setSidebarOpen(false)}
+                onNavigate={closeMobileMenu}
               />
             </>
           )}

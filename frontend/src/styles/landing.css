@@ -1054,7 +1054,7 @@
     min-height: clamp(40px, 8vw, 44px);
   }
 
-  .nav-links button:not(.btn-login):not(.theme-toggle) {
+  .nav-links button:not(.btn-login) {
     display: flex;
   }
 
