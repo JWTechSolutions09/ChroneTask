@@ -152,6 +152,15 @@ export default function Layout({ children, organizationId }: LayoutProps) {
     return location.pathname === path || location.pathname.startsWith(path + "/");
   };
 
+  // Función helper para cerrar el sidebar en móvil
+  const closeMobileMenu = useCallback(() => {
+    setSidebarOpen(false);
+    document.body.classList.remove('sidebar-open');
+    document.body.style.overflow = '';
+    document.body.style.position = '';
+    document.body.style.width = '';
+  }, []);
+
   if (!isAuthed()) {
     return <>{children}</>;
   }
@@ -207,10 +216,10 @@ export default function Layout({ children, organizationId }: LayoutProps) {
             display: "none",
           }}
           className="mobile-overlay"
-          onClick={() => setSidebarOpen(false)}
+          onClick={closeMobileMenu}
           onTouchStart={(e) => {
             e.preventDefault();
-            setSidebarOpen(false);
+            closeMobileMenu();
           }}
         />
       )}
@@ -249,7 +258,7 @@ export default function Layout({ children, organizationId }: LayoutProps) {
         {sidebarOpen ? "✕" : "☰"}
       </button>
 
-      {/* Sidebar */}
+      {/* Sidebar / Mobile Dropdown Menu */}
       <aside
         style={{
           width: sidebarCollapsed ? "70px" : "280px",
@@ -266,7 +275,7 @@ export default function Layout({ children, organizationId }: LayoutProps) {
           boxShadow: theme === "dark" ? "2px 0 8px rgba(0, 0, 0, 0.3)" : "2px 0 8px rgba(0, 0, 0, 0.05)",
           zIndex: 100,
         }}
-        className={`sidebar ${sidebarOpen ? "open" : ""}`}
+        className={`sidebar ${sidebarOpen ? "open" : ""} mobile-dropdown-menu`}
         onClick={(e) => {
           // Prevenir que el clic en el sidebar cierre el menú
           e.stopPropagation();
@@ -356,7 +365,7 @@ export default function Layout({ children, organizationId }: LayoutProps) {
           )}
           {/* Botón de cerrar en móvil */}
           <button
-            onClick={() => setSidebarOpen(false)}
+            onClick={closeMobileMenu}
             className="mobile-close-btn"
             style={{
               background: "var(--hover-bg)",
@@ -372,6 +381,8 @@ export default function Layout({ children, organizationId }: LayoutProps) {
               width: "36px",
               height: "36px",
               flexShrink: 0,
+              minWidth: "36px",
+              minHeight: "36px",
             }}
             aria-label="Cerrar menú"
           >
@@ -452,7 +463,7 @@ export default function Layout({ children, organizationId }: LayoutProps) {
                     to={`/org/${organizationId}/projects`}
                     active={isActive(`/org/${organizationId}/projects`) && location.search.includes("new")}
                     collapsed={false}
-                    onNavigate={() => setSidebarOpen(false)}
+                    onNavigate={closeMobileMenu}
                     onClick={() => {
                       // Scroll to create form
                       setTimeout(() => {
@@ -467,7 +478,7 @@ export default function Layout({ children, organizationId }: LayoutProps) {
                     to={`/org/${organizationId}/dashboard`}
                     active={false}
                     collapsed={false}
-                    onNavigate={() => setSidebarOpen(false)}
+                    onNavigate={closeMobileMenu}
                     onClick={() => {
                       navigate(`/org/${organizationId}/dashboard`);
                       setTimeout(() => {
@@ -482,7 +493,7 @@ export default function Layout({ children, organizationId }: LayoutProps) {
                     to={`/org/${organizationId}/dashboard`}
                     active={false}
                     collapsed={false}
-                    onNavigate={() => setSidebarOpen(false)}
+                    onNavigate={closeMobileMenu}
                     onClick={() => {
                       navigate(`/org/${organizationId}/dashboard`);
                       setTimeout(() => {
@@ -566,7 +577,7 @@ export default function Layout({ children, organizationId }: LayoutProps) {
                       active={params.projectId === project.id}
                       collapsed={false}
                       indent
-                      onNavigate={() => setSidebarOpen(false)}
+                      onNavigate={closeMobileMenu}
                     />
                   ))}
                 </div>
@@ -606,7 +617,7 @@ export default function Layout({ children, organizationId }: LayoutProps) {
               onClick={() => {
                 toggleTheme();
                 if (window.innerWidth <= 768) {
-                  setSidebarOpen(false);
+                  closeMobileMenu();
                 }
               }}
               style={{
@@ -651,7 +662,7 @@ export default function Layout({ children, organizationId }: LayoutProps) {
                 onClick={() => {
                   navigate("/org-select");
                   if (window.innerWidth <= 768) {
-                    setSidebarOpen(false);
+                    closeMobileMenu();
                   }
                 }}
                 style={{
@@ -694,7 +705,7 @@ export default function Layout({ children, organizationId }: LayoutProps) {
               onClick={() => {
                 navigate("/settings");
                 if (window.innerWidth <= 768) {
-                  setSidebarOpen(false);
+                  closeMobileMenu();
                 }
               }}
               style={{
@@ -738,7 +749,7 @@ export default function Layout({ children, organizationId }: LayoutProps) {
               onClick={() => {
                 handleLogout();
                 if (window.innerWidth <= 768) {
-                  setSidebarOpen(false);
+                  closeMobileMenu();
                 }
               }}
               style={{
@@ -826,6 +837,7 @@ function NavItem({ icon, label, to, active, collapsed, indent, onClick, onNaviga
       document.body.style.width = '';
     }
     
+    // Llamar al callback de navegación primero para cerrar el menú
     if (onNavigate) {
       onNavigate();
     }
