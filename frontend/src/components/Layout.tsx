@@ -27,7 +27,21 @@ export default function Layout({ children, organizationId }: LayoutProps) {
   const { theme, toggleTheme } = useTheme();
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
   const [orgs, setOrgs] = useState<Org[]>([]);
+  
+  // Detectar si estamos en móvil
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+  
+  // En móvil, cuando el menú está abierto, forzar que no esté colapsado
+  const effectiveCollapsed = isMobile && sidebarOpen ? false : sidebarCollapsed;
   const [currentOrg, setCurrentOrg] = useState<Org | null>(null);
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(false);
@@ -251,9 +265,10 @@ export default function Layout({ children, organizationId }: LayoutProps) {
       {/* Mobile Menu Button */}
       <button
         onClick={() => {
+          const isMobile = window.innerWidth <= 768;
           setSidebarOpen(!sidebarOpen);
-          // Si se está abriendo, no colapsar
-          if (!sidebarOpen) {
+          // Si se está abriendo en móvil, asegurar que no esté colapsado
+          if (!sidebarOpen && isMobile) {
             setSidebarCollapsed(false);
           }
         }}
@@ -285,7 +300,7 @@ export default function Layout({ children, organizationId }: LayoutProps) {
       {/* Sidebar / Mobile Dropdown Menu */}
       <aside
         style={{
-          width: sidebarCollapsed ? "70px" : "280px",
+          width: effectiveCollapsed ? "70px" : "280px",
           backgroundColor: "var(--bg-primary)",
           borderRight: "1px solid var(--border-color)",
           display: "flex",
@@ -322,7 +337,7 @@ export default function Layout({ children, organizationId }: LayoutProps) {
             position: "relative",
           }}
         >
-          {!sidebarCollapsed && (
+          {!effectiveCollapsed && (
             <div style={{ display: "flex", alignItems: "center", gap: "10px", flex: 1 }}>
               <div
                 style={{
@@ -357,7 +372,7 @@ export default function Layout({ children, organizationId }: LayoutProps) {
               </span>
             </div>
           )}
-          {sidebarCollapsed && (
+          {effectiveCollapsed && (
             <div
               style={{
                 width: "48px",
@@ -455,7 +470,7 @@ export default function Layout({ children, organizationId }: LayoutProps) {
           {organizationId ? (
             <>
               {/* Organization Info */}
-              {currentOrg && !sidebarCollapsed && (
+              {currentOrg && (
                 <div
                   style={{
                     padding: "14px",
@@ -464,6 +479,7 @@ export default function Layout({ children, organizationId }: LayoutProps) {
                     borderRadius: "10px",
                     border: "1px solid var(--border-color)",
                     boxShadow: "0 2px 4px rgba(0, 0, 0, 0.05)",
+                    display: effectiveCollapsed ? "none" : "block",
                   }}
                 >
                   <div style={{ fontSize: "11px", color: "var(--text-secondary)", marginBottom: "6px", textTransform: "uppercase", letterSpacing: "0.5px", fontWeight: 600 }}>
@@ -476,70 +492,70 @@ export default function Layout({ children, organizationId }: LayoutProps) {
               )}
 
               {/* Quick Actions */}
-              {!sidebarCollapsed && (
-                <div style={{ marginBottom: "16px" }}>
+              <div style={{ marginBottom: "16px" }}>
+                {!effectiveCollapsed && (
                   <div style={{ fontSize: "11px", fontWeight: 600, color: "var(--text-secondary)", textTransform: "uppercase", letterSpacing: "0.5px", padding: "8px 12px", marginBottom: "4px" }}>
                     Accesos Rápidos
                   </div>
-                  <NavItem
-                    icon="➕"
-                    label="Nuevo Proyecto"
-                    to={`/org/${organizationId}/projects`}
-                    active={isActive(`/org/${organizationId}/projects`) && location.search.includes("new")}
-                    collapsed={false}
-                    onNavigate={closeMobileMenu}
-                    onClick={() => {
-                      // Scroll to create form
-                      setTimeout(() => {
-                        const form = document.querySelector('form');
-                        if (form) form.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                      }, 100);
-                    }}
-                  />
-                  <NavItem
-                    icon="✉️"
-                    label="Invitar Miembros"
-                    to={`/org/${organizationId}/dashboard`}
-                    active={false}
-                    collapsed={false}
-                    onNavigate={closeMobileMenu}
-                    onClick={() => {
-                      navigate(`/org/${organizationId}/dashboard`);
-                      setTimeout(() => {
-                        const inviteBtn = document.querySelector('[title="Invitar miembros a la organización"]');
-                        if (inviteBtn) (inviteBtn as HTMLElement).click();
-                      }, 300);
-                    }}
-                  />
-                  <NavItem
-                    icon="👥"
-                    label="Ver Miembros"
-                    to={`/org/${organizationId}/dashboard`}
-                    active={false}
-                    collapsed={false}
-                    onNavigate={closeMobileMenu}
-                    onClick={() => {
-                      navigate(`/org/${organizationId}/dashboard`);
-                      setTimeout(() => {
-                        const membersBtn = document.querySelector('[title="Ver miembros de la organización"]');
-                        if (membersBtn) (membersBtn as HTMLElement).click();
-                      }, 300);
-                    }}
-                  />
-                </div>
-              )}
+                )}
+                <NavItem
+                  icon="➕"
+                  label="Nuevo Proyecto"
+                  to={`/org/${organizationId}/projects`}
+                  active={isActive(`/org/${organizationId}/projects`) && location.search.includes("new")}
+                  collapsed={effectiveCollapsed}
+                  onNavigate={closeMobileMenu}
+                  onClick={() => {
+                    // Scroll to create form
+                    setTimeout(() => {
+                      const form = document.querySelector('form');
+                      if (form) form.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }, 100);
+                  }}
+                />
+                <NavItem
+                  icon="✉️"
+                  label="Invitar Miembros"
+                  to={`/org/${organizationId}/dashboard`}
+                  active={false}
+                  collapsed={effectiveCollapsed}
+                  onNavigate={closeMobileMenu}
+                  onClick={() => {
+                    navigate(`/org/${organizationId}/dashboard`);
+                    setTimeout(() => {
+                      const inviteBtn = document.querySelector('[title="Invitar miembros a la organización"]');
+                      if (inviteBtn) (inviteBtn as HTMLElement).click();
+                    }, 300);
+                  }}
+                />
+                <NavItem
+                  icon="👥"
+                  label="Ver Miembros"
+                  to={`/org/${organizationId}/dashboard`}
+                  active={false}
+                  collapsed={effectiveCollapsed}
+                  onNavigate={closeMobileMenu}
+                  onClick={() => {
+                    navigate(`/org/${organizationId}/dashboard`);
+                    setTimeout(() => {
+                      const membersBtn = document.querySelector('[title="Ver miembros de la organización"]');
+                      if (membersBtn) (membersBtn as HTMLElement).click();
+                    }, 300);
+                  }}
+                />
+              </div>
 
               {/* Main Navigation */}
               <div style={{ marginBottom: "16px" }}>
                 <div style={{ fontSize: "11px", fontWeight: 600, color: "var(--text-secondary)", textTransform: "uppercase", letterSpacing: "0.5px", padding: "8px 12px", marginBottom: "4px" }}>
-                  {sidebarCollapsed ? "" : "Navegación"}
+                  {effectiveCollapsed ? "" : "Navegación"}
                 </div>
                 <NavItem
                   icon="📊"
                   label="Dashboard"
                   to={`/org/${organizationId}/dashboard`}
                   active={isActive(`/org/${organizationId}/dashboard`)}
-                  collapsed={sidebarCollapsed}
+                  collapsed={effectiveCollapsed}
                   onNavigate={closeMobileMenu}
                 />
                 <NavItem
@@ -547,7 +563,7 @@ export default function Layout({ children, organizationId }: LayoutProps) {
                   label="Proyectos"
                   to={`/org/${organizationId}/projects`}
                   active={isActive(`/org/${organizationId}/projects`)}
-                  collapsed={sidebarCollapsed}
+                  collapsed={effectiveCollapsed}
                   onNavigate={closeMobileMenu}
                 />
                 <NavItem
@@ -555,7 +571,7 @@ export default function Layout({ children, organizationId }: LayoutProps) {
                   label="Notificaciones"
                   to={`/org/${organizationId}/notifications`}
                   active={isActive(`/org/${organizationId}/notifications`)}
-                  collapsed={sidebarCollapsed}
+                  collapsed={effectiveCollapsed}
                   onNavigate={closeMobileMenu}
                 />
                 <NavItem
@@ -563,7 +579,7 @@ export default function Layout({ children, organizationId }: LayoutProps) {
                   label="Resumen"
                   to={`/org/${organizationId}/analytics`}
                   active={isActive(`/org/${organizationId}/analytics`)}
-                  collapsed={sidebarCollapsed}
+                  collapsed={effectiveCollapsed}
                   onNavigate={closeMobileMenu}
                 />
                 <NavItem
@@ -571,14 +587,14 @@ export default function Layout({ children, organizationId }: LayoutProps) {
                   label="Cronograma"
                   to={`/org/${organizationId}/timeline`}
                   active={isActive(`/org/${organizationId}/timeline`) || isActive(`/org/${organizationId}/project/`) && location.pathname.includes("timeline")}
-                  collapsed={sidebarCollapsed}
+                  collapsed={effectiveCollapsed}
                   onNavigate={closeMobileMenu}
                 />
               </div>
 
               {/* Projects List */}
-              {!sidebarCollapsed && projects.length > 0 && (
-                <div style={{ marginTop: "16px", paddingTop: "16px", borderTop: "1px solid var(--border-color)" }}>
+              {projects.length > 0 && (
+                <div style={{ marginTop: "16px", paddingTop: "16px", borderTop: "1px solid var(--border-color)", display: sidebarCollapsed ? "none" : "block" }}>
                   <div
                     style={{
                       fontSize: "11px",
@@ -599,7 +615,7 @@ export default function Layout({ children, organizationId }: LayoutProps) {
                       label={project.name}
                       to={`/org/${organizationId}/project/${project.id}/board`}
                       active={params.projectId === project.id}
-                      collapsed={false}
+                      collapsed={effectiveCollapsed}
                       indent
                       onNavigate={closeMobileMenu}
                     />
@@ -630,7 +646,7 @@ export default function Layout({ children, organizationId }: LayoutProps) {
 
           {/* Bottom Actions */}
           <div style={{ marginTop: "auto", paddingTop: "16px", borderTop: "1px solid var(--border-color)" }}>
-            {!sidebarCollapsed && (
+            {!effectiveCollapsed && (
               <div style={{ fontSize: "11px", fontWeight: 600, color: "var(--text-secondary)", textTransform: "uppercase", letterSpacing: "0.5px", padding: "8px 12px", marginBottom: "8px" }}>
                 Configuración
               </div>
@@ -657,7 +673,7 @@ export default function Layout({ children, organizationId }: LayoutProps) {
                 display: "flex",
                 alignItems: "center",
                 gap: "10px",
-                justifyContent: sidebarCollapsed ? "center" : "flex-start",
+                justifyContent: effectiveCollapsed ? "center" : "flex-start",
                 transition: "all 0.2s",
                 fontWeight: 500,
                 touchAction: "manipulation",
@@ -675,13 +691,13 @@ export default function Layout({ children, organizationId }: LayoutProps) {
                   e.currentTarget.style.transform = "translateX(0)";
                 }
               }}
-              title={sidebarCollapsed ? (theme === "dark" ? "Modo Claro" : "Modo Oscuro") : undefined}
+              title={effectiveCollapsed ? (theme === "dark" ? "Modo Claro" : "Modo Oscuro") : undefined}
             >
               <span style={{ fontSize: "18px" }}>{theme === "dark" ? "☀️" : "🌙"}</span>
-              {!sidebarCollapsed && <span>{theme === "dark" ? "Modo Claro" : "Modo Oscuro"}</span>}
+              {!effectiveCollapsed && <span>{theme === "dark" ? "Modo Claro" : "Modo Oscuro"}</span>}
             </button>
 
-            {!sidebarCollapsed && organizationId && (
+            {!effectiveCollapsed && organizationId && (
               <button
                 onClick={() => {
                   navigate("/org-select");
@@ -745,7 +761,7 @@ export default function Layout({ children, organizationId }: LayoutProps) {
                 display: "flex",
                 alignItems: "center",
                 gap: "10px",
-                justifyContent: sidebarCollapsed ? "center" : "flex-start",
+                justifyContent: effectiveCollapsed ? "center" : "flex-start",
                 transition: "all 0.2s",
                 fontWeight: 500,
                 touchAction: "manipulation",
@@ -763,10 +779,10 @@ export default function Layout({ children, organizationId }: LayoutProps) {
                   e.currentTarget.style.transform = "translateX(0)";
                 }
               }}
-              title={sidebarCollapsed ? "Configuración" : undefined}
+              title={effectiveCollapsed ? "Configuración" : undefined}
             >
               <span style={{ fontSize: "18px" }}>⚙️</span>
-              {!sidebarCollapsed && <span>Configuración</span>}
+              {!effectiveCollapsed && <span>Configuración</span>}
             </button>
             
             <button
@@ -788,7 +804,7 @@ export default function Layout({ children, organizationId }: LayoutProps) {
                 display: "flex",
                 alignItems: "center",
                 gap: "10px",
-                justifyContent: sidebarCollapsed ? "center" : "flex-start",
+                justifyContent: effectiveCollapsed ? "center" : "flex-start",
                 transition: "all 0.2s",
                 fontWeight: 500,
                 touchAction: "manipulation",
@@ -806,10 +822,10 @@ export default function Layout({ children, organizationId }: LayoutProps) {
                   e.currentTarget.style.transform = "translateX(0)";
                 }
               }}
-              title={sidebarCollapsed ? "Salir" : undefined}
+              title={effectiveCollapsed ? "Salir" : undefined}
             >
               <span style={{ fontSize: "18px" }}>🚪</span>
-              {!sidebarCollapsed && <span>Salir</span>}
+              {!effectiveCollapsed && <span>Salir</span>}
             </button>
           </div>
         </nav>
