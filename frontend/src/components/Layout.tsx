@@ -295,15 +295,18 @@ export default function Layout({ children, organizationId }: LayoutProps) {
       {/* Sidebar / Mobile Dropdown Menu */}
       <aside
         style={{
-          width: effectiveCollapsed ? "70px" : "280px",
+          // En desktop, usar estos estilos
+          ...(!isMobile && {
+            width: effectiveCollapsed ? "70px" : "280px",
+            position: "sticky",
+            height: "100vh",
+            borderRight: "1px solid var(--border-color)",
+            transition: "width 0.3s ease",
+          }),
           backgroundColor: "var(--bg-primary)",
-          borderRight: "1px solid var(--border-color)",
           display: "flex",
           flexDirection: "column",
-          transition: "width 0.3s ease, transform 0.3s ease",
-          position: "sticky",
           top: 0,
-          height: "100vh",
           overflowY: "auto",
           overflowX: "hidden",
           boxShadow: theme === "dark" ? "2px 0 8px rgba(0, 0, 0, 0.3)" : "2px 0 8px rgba(0, 0, 0, 0.05)",

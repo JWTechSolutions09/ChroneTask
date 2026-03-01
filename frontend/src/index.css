@@ -562,7 +562,7 @@ input, textarea, select {
     left: 0 !important;
   }
 
-  /* Convertir sidebar en menú desplegable desde arriba */
+  /* ===== SIDEBAR MÓVIL - ESTILOS CONSOLIDADOS ===== */
   .sidebar.mobile-dropdown-menu {
     position: fixed !important;
     left: 0 !important;
@@ -570,12 +570,11 @@ input, textarea, select {
     right: 0 !important;
     z-index: 1000 !important;
     transform: translateY(-100%) !important;
-    transition: transform 0.3s ease !important;
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
     width: 100% !important;
     max-width: 100vw !important;
     max-height: 90vh !important;
     height: auto !important;
-    min-height: auto !important;
     overflow-y: auto !important;
     overflow-x: hidden !important;
     -webkit-overflow-scrolling: touch !important;
@@ -585,102 +584,97 @@ input, textarea, select {
     border-right: none !important;
     border-bottom: 2px solid var(--border-color) !important;
     border-radius: 0 0 16px 16px !important;
-    opacity: 1 !important;
-    visibility: visible !important;
+    background: var(--bg-primary) !important;
+    background-color: var(--bg-primary) !important;
+    will-change: transform !important;
+    backface-visibility: hidden !important;
   }
 
   .sidebar.mobile-dropdown-menu.open {
     transform: translateY(0) !important;
-    opacity: 1 !important;
-    visibility: visible !important;
+  }
+
+  /* Header del sidebar */
+  .sidebar.mobile-dropdown-menu > div:first-child {
+    padding: clamp(0.875rem, 3vw, 1rem) clamp(0.75rem, 2.5vw, 0.875rem) !important;
+    min-height: clamp(56px, 10vw, 64px) !important;
+    flex-shrink: 0 !important;
+    background: var(--bg-primary) !important;
+    border-bottom: 1px solid var(--border-color) !important;
+    position: sticky !important;
+    top: 0 !important;
+    z-index: 1 !important;
     display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
   }
 
-  /* CRÍTICO: Forzar que todos los elementos sean visibles cuando el menú está abierto */
-  .sidebar.mobile-dropdown-menu.open nav,
-  .sidebar.mobile-dropdown-menu.open nav > div {
-    opacity: 1 !important;
-    visibility: visible !important;
-    display: flex !important;
-  }
-
-  .sidebar.mobile-dropdown-menu.open nav a,
-  .sidebar.mobile-dropdown-menu.open nav button {
-    display: flex !important;
-    opacity: 1 !important;
-    visibility: visible !important;
-  }
-
-  /* Forzar que los textos de los NavItems sean siempre visibles en móvil cuando el menú está abierto */
-  .sidebar.mobile-dropdown-menu.open nav a span:last-child,
-  .sidebar.mobile-dropdown-menu.open nav a.mobile-nav-item-open span:last-child {
-    display: inline !important;
-    visibility: visible !important;
-    opacity: 1 !important;
-    white-space: nowrap !important;
-  }
-
-  /* Asegurar que los divs de sección sean visibles */
-  .sidebar.mobile-dropdown-menu.open nav > div {
+  /* Nav container */
+  .sidebar.mobile-dropdown-menu > nav {
+    padding: clamp(0.75rem, 2vw, 0.875rem) clamp(0.5rem, 1.5vw, 0.625rem) !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    -webkit-overflow-scrolling: touch !important;
+    flex: 1 !important;
+    min-height: 0 !important;
+    max-height: calc(90vh - 70px) !important;
     display: flex !important;
     flex-direction: column !important;
-    opacity: 1 !important;
-    visibility: visible !important;
+    width: 100% !important;
   }
 
-  /* Asegurar que el contenido del sidebar sea visible cuando está abierto */
-  .sidebar.mobile-dropdown-menu.open nav {
-    opacity: 1 !important;
-    visibility: visible !important;
+  /* Secciones del nav */
+  .sidebar.mobile-dropdown-menu nav > div {
+    margin-bottom: clamp(0.75rem, 2vw, 1rem) !important;
+    width: 100% !important;
     display: flex !important;
+    flex-direction: column !important;
   }
 
-  .sidebar.mobile-dropdown-menu.open nav > * {
+  /* Links y botones de navegación */
+  .sidebar.mobile-dropdown-menu nav a,
+  .sidebar.mobile-dropdown-menu nav button {
+    padding: clamp(0.625rem, 2vw, 0.75rem) clamp(0.5rem, 2vw, 0.625rem) !important;
+    font-size: clamp(0.75rem, 2.5vw, 0.875rem) !important;
+    min-height: clamp(40px, 8vw, 44px) !important;
+    width: 100% !important;
+    display: flex !important;
+    align-items: center !important;
+    flex-wrap: nowrap !important;
+    white-space: nowrap !important;
+    touch-action: manipulation !important;
+    -webkit-tap-highlight-color: transparent !important;
+  }
+
+  /* ICONOS - Siempre visibles (incluso cuando el menú está cerrado) */
+  .sidebar.mobile-dropdown-menu nav a span:first-child,
+  .sidebar.mobile-dropdown-menu.open nav a span:first-child {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    font-size: 20px !important;
+    min-width: 24px !important;
+    flex-shrink: 0 !important;
     opacity: 1 !important;
     visibility: visible !important;
-    display: flex !important;
   }
 
-  /* Forzar que todos los elementos de navegación sean visibles cuando el menú está abierto */
+  /* TEXTOS - Siempre visibles cuando el menú está abierto */
+  .sidebar.mobile-dropdown-menu.open nav a span:last-child {
+    display: inline !important;
+    white-space: nowrap !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+  }
+
+  /* Todos los elementos visibles cuando está abierto */
   .sidebar.mobile-dropdown-menu.open nav,
-  .sidebar.mobile-dropdown-menu.open nav.mobile-nav-open,
+  .sidebar.mobile-dropdown-menu.open nav > div,
   .sidebar.mobile-dropdown-menu.open nav a,
-  .sidebar.mobile-dropdown-menu.open nav button,
-  .sidebar.mobile-dropdown-menu.open nav > div {
-    display: flex !important;
+  .sidebar.mobile-dropdown-menu.open nav button {
     opacity: 1 !important;
     visibility: visible !important;
     pointer-events: auto !important;
-  }
-
-  /* Forzar que los textos de los NavItems sean visibles */
-  .sidebar.mobile-dropdown-menu.open nav a span,
-  .sidebar.mobile-dropdown-menu.open nav a span:last-child,
-  .sidebar.mobile-dropdown-menu.open nav a.mobile-nav-item-open span,
-  .sidebar.mobile-dropdown-menu.open nav a.mobile-nav-item-open span:last-child {
-    display: inline !important;
-    opacity: 1 !important;
-    visibility: visible !important;
-    white-space: nowrap !important;
-  }
-
-  /* Asegurar que los NavItems en móvil muestren siempre el texto cuando el menú está abierto */
-  .sidebar.mobile-dropdown-menu.open nav a.mobile-nav-item-open {
-    justifyContent: flex-start !important;
-  }
-
-  .sidebar.mobile-dropdown-menu.open nav a.mobile-nav-item-open span:last-child {
-    display: inline !important;
-    visibility: visible !important;
-    opacity: 1 !important;
-  }
-
-  /* Asegurar que las secciones del nav sean visibles */
-  .sidebar.mobile-dropdown-menu.open nav > div {
-    display: flex !important;
-    flex-direction: column !important;
-    opacity: 1 !important;
-    visibility: visible !important;
   }
 
   .mobile-menu-btn {
@@ -745,97 +739,9 @@ input, textarea, select {
     box-sizing: border-box !important;
   }
 
-  /* Prevenir que el sidebar se divida */
-  .sidebar.mobile-dropdown-menu {
-    contain: layout style !important;
-  }
-
   .sidebar.mobile-dropdown-menu > * {
     width: 100% !important;
     flex-shrink: 0 !important;
-    opacity: 1 !important;
-    visibility: visible !important;
-  }
-
-  /* Prevenir parpadeo de elementos del sidebar en móvil */
-  .sidebar.mobile-dropdown-menu.open nav,
-  .sidebar.mobile-dropdown-menu.open nav > *,
-  .sidebar.mobile-dropdown-menu.open nav a,
-  .sidebar.mobile-dropdown-menu.open nav button,
-  .sidebar.mobile-dropdown-menu.open nav > div,
-  .sidebar.mobile-dropdown-menu.open nav > div > * {
-    opacity: 1 !important;
-    visibility: visible !important;
-    display: flex !important;
-    pointer-events: auto !important;
-    will-change: auto !important;
-    transform: none !important;
-  }
-
-  /* Forzar que los NavItems se muestren en móvil cuando el menú está abierto */
-  .sidebar.mobile-dropdown-menu.open nav a[href],
-  .sidebar.mobile-dropdown-menu.open nav a {
-    display: flex !important;
-    opacity: 1 !important;
-    visibility: visible !important;
-  }
-
-  .sidebar.mobile-dropdown-menu.open nav a span:last-child {
-    display: inline !important;
-    opacity: 1 !important;
-    visibility: visible !important;
-  }
-
-  /* Mejorar el header del sidebar en móvil */
-  .sidebar.mobile-dropdown-menu > div:first-child {
-    padding: clamp(0.875rem, 3vw, 1rem) clamp(0.75rem, 2.5vw, 0.875rem) !important;
-    min-height: clamp(56px, 10vw, 64px) !important;
-    flex-shrink: 0 !important;
-    background: var(--bg-primary) !important;
-    border-bottom: 1px solid var(--border-color) !important;
-    position: sticky !important;
-    top: 0 !important;
-    z-index: 1 !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: space-between !important;
-    backdrop-filter: blur(10px) !important;
-  }
-
-  /* Asegurar que el sidebar tenga un fondo uniforme */
-  .sidebar.mobile-dropdown-menu {
-    background: var(--bg-primary) !important;
-    background-color: var(--bg-primary) !important;
-  }
-
-  /* Mejorar los items de navegación en móvil */
-  .sidebar.mobile-dropdown-menu nav a,
-  .sidebar.mobile-dropdown-menu nav button {
-    padding: clamp(0.625rem, 2vw, 0.75rem) clamp(0.5rem, 2vw, 0.625rem) !important;
-    font-size: clamp(0.75rem, 2.5vw, 0.875rem) !important;
-    min-height: clamp(40px, 8vw, 44px) !important;
-    white-space: nowrap !important;
-    overflow: hidden !important;
-    text-overflow: ellipsis !important;
-    touch-action: manipulation !important;
-    -webkit-tap-highlight-color: transparent !important;
-    width: 100% !important;
-    display: flex !important;
-    align-items: center !important;
-    flex-wrap: nowrap !important;
-    opacity: 1 !important;
-    visibility: visible !important;
-    pointer-events: auto !important;
-    will-change: auto !important;
-  }
-
-  /* Cuando el menú está abierto, forzar visibilidad de todos los elementos */
-  .sidebar.mobile-dropdown-menu.open nav a span,
-  .sidebar.mobile-dropdown-menu.open nav a span:last-child {
-    display: inline !important;
-    opacity: 1 !important;
-    visibility: visible !important;
-    white-space: nowrap !important;
   }
 
   /* Prevenir que los links se queden enganchados */
