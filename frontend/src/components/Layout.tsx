@@ -155,10 +155,18 @@ export default function Layout({ children, organizationId }: LayoutProps) {
   // Función helper para cerrar el sidebar en móvil
   const closeMobileMenu = useCallback(() => {
     setSidebarOpen(false);
+    // Restaurar la posición del scroll
+    const scrollY = document.body.style.top;
     document.body.classList.remove('sidebar-open');
     document.body.style.overflow = '';
     document.body.style.position = '';
     document.body.style.width = '';
+    document.body.style.top = '';
+    document.body.style.left = '';
+    
+    if (scrollY) {
+      window.scrollTo(0, parseInt(scrollY || '0') * -1);
+    }
   }, []);
 
   if (!isAuthed()) {
@@ -167,35 +175,63 @@ export default function Layout({ children, organizationId }: LayoutProps) {
 
   // Prevenir scroll del body cuando el sidebar está abierto en móvil
   React.useEffect(() => {
-    const handleResize = () => {
-      if (window.innerWidth <= 768) {
-        if (sidebarOpen) {
-          document.body.classList.add("sidebar-open");
-          document.body.style.overflow = "hidden";
-          document.body.style.position = "fixed";
-          document.body.style.width = "100%";
-        } else {
-          document.body.classList.remove("sidebar-open");
-          document.body.style.overflow = "";
-          document.body.style.position = "";
-          document.body.style.width = "";
-        }
-      } else {
-        document.body.classList.remove("sidebar-open");
-        document.body.style.overflow = "";
-        document.body.style.position = "";
-        document.body.style.width = "";
-      }
-    };
-
-    handleResize();
-    window.addEventListener("resize", handleResize);
-
-    return () => {
+    const isMobile = window.innerWidth <= 768;
+    
+    if (isMobile && sidebarOpen) {
+      // Guardar la posición del scroll antes de fijar el body
+      const scrollY = window.scrollY;
+      document.body.classList.add("sidebar-open");
+      document.body.style.overflow = "hidden";
+      document.body.style.position = "fixed";
+      document.body.style.width = "100%";
+      document.body.style.top = `-${scrollY}px`;
+      document.body.style.left = "0";
+    } else {
+      // Restaurar la posición del scroll
+      const scrollY = document.body.style.top;
       document.body.classList.remove("sidebar-open");
       document.body.style.overflow = "";
       document.body.style.position = "";
       document.body.style.width = "";
+      document.body.style.top = "";
+      document.body.style.left = "";
+      
+      if (scrollY) {
+        window.scrollTo(0, parseInt(scrollY || '0') * -1);
+      }
+    }
+
+    const handleResize = () => {
+      if (window.innerWidth > 768) {
+        const scrollY = document.body.style.top;
+        document.body.classList.remove("sidebar-open");
+        document.body.style.overflow = "";
+        document.body.style.position = "";
+        document.body.style.width = "";
+        document.body.style.top = "";
+        document.body.style.left = "";
+        
+        if (scrollY) {
+          window.scrollTo(0, parseInt(scrollY || '0') * -1);
+        }
+      }
+    };
+
+    window.addEventListener("resize", handleResize);
+
+    return () => {
+      const scrollY = document.body.style.top;
+      document.body.classList.remove("sidebar-open");
+      document.body.style.overflow = "";
+      document.body.style.position = "";
+      document.body.style.width = "";
+      document.body.style.top = "";
+      document.body.style.left = "";
+      
+      if (scrollY) {
+        window.scrollTo(0, parseInt(scrollY || '0') * -1);
+      }
+      
       window.removeEventListener("resize", handleResize);
     };
   }, [sidebarOpen]);
@@ -203,26 +239,14 @@ export default function Layout({ children, organizationId }: LayoutProps) {
   return (
     <div style={{ display: "flex", minHeight: "100vh", backgroundColor: "var(--bg-secondary)", position: "relative" }}>
       {/* Mobile Menu Overlay */}
-      {sidebarOpen && (
-        <div
-          style={{
-            position: "fixed",
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            backgroundColor: "rgba(0, 0, 0, 0.5)",
-            zIndex: 999,
-            display: "none",
-          }}
-          className="mobile-overlay"
-          onClick={closeMobileMenu}
-          onTouchStart={(e) => {
-            e.preventDefault();
-            closeMobileMenu();
-          }}
-        />
-      )}
+      <div
+        className={`mobile-overlay ${sidebarOpen ? 'active' : ''}`}
+        onClick={closeMobileMenu}
+        onTouchStart={(e) => {
+          e.preventDefault();
+          closeMobileMenu();
+        }}
+      />
 
       {/* Mobile Menu Button */}
       <button
@@ -516,7 +540,7 @@ export default function Layout({ children, organizationId }: LayoutProps) {
                   to={`/org/${organizationId}/dashboard`}
                   active={isActive(`/org/${organizationId}/dashboard`)}
                   collapsed={sidebarCollapsed}
-                  onNavigate={() => setSidebarOpen(false)}
+                  onNavigate={closeMobileMenu}
                 />
                 <NavItem
                   icon="📁"
@@ -524,7 +548,7 @@ export default function Layout({ children, organizationId }: LayoutProps) {
                   to={`/org/${organizationId}/projects`}
                   active={isActive(`/org/${organizationId}/projects`)}
                   collapsed={sidebarCollapsed}
-                  onNavigate={() => setSidebarOpen(false)}
+                  onNavigate={closeMobileMenu}
                 />
                 <NavItem
                   icon="🔔"
@@ -532,7 +556,7 @@ export default function Layout({ children, organizationId }: LayoutProps) {
                   to={`/org/${organizationId}/notifications`}
                   active={isActive(`/org/${organizationId}/notifications`)}
                   collapsed={sidebarCollapsed}
-                  onNavigate={() => setSidebarOpen(false)}
+                  onNavigate={closeMobileMenu}
                 />
                 <NavItem
                   icon="📊"
@@ -540,7 +564,7 @@ export default function Layout({ children, organizationId }: LayoutProps) {
                   to={`/org/${organizationId}/analytics`}
                   active={isActive(`/org/${organizationId}/analytics`)}
                   collapsed={sidebarCollapsed}
-                  onNavigate={() => setSidebarOpen(false)}
+                  onNavigate={closeMobileMenu}
                 />
                 <NavItem
                   icon="📅"
@@ -548,7 +572,7 @@ export default function Layout({ children, organizationId }: LayoutProps) {
                   to={`/org/${organizationId}/timeline`}
                   active={isActive(`/org/${organizationId}/timeline`) || isActive(`/org/${organizationId}/project/`) && location.pathname.includes("timeline")}
                   collapsed={sidebarCollapsed}
-                  onNavigate={() => setSidebarOpen(false)}
+                  onNavigate={closeMobileMenu}
                 />
               </div>
 
@@ -824,19 +848,6 @@ type NavItemProps = {
 
 function NavItem({ icon, label, to, active, collapsed, indent, onClick, onNavigate }: NavItemProps) {
   const handleClick = (e: React.MouseEvent) => {
-    // En móvil, cerrar el sidebar al navegar
-    if (window.innerWidth <= 768) {
-      // Cerrar sidebar inmediatamente
-      const sidebar = document.querySelector('.sidebar');
-      if (sidebar) {
-        sidebar.classList.remove('open');
-      }
-      document.body.classList.remove('sidebar-open');
-      document.body.style.overflow = '';
-      document.body.style.position = '';
-      document.body.style.width = '';
-    }
-    
     // Llamar al callback de navegación primero para cerrar el menú
     if (onNavigate) {
       onNavigate();
