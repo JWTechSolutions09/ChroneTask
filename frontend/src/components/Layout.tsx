@@ -42,14 +42,19 @@ export default function Layout({ children, organizationId }: LayoutProps) {
 
   // Detectar si estamos en móvil y manejar resize
   useEffect(() => {
+    let wasMobile = window.innerWidth <= 768;
+    
     const checkMobile = () => {
       const mobile = window.innerWidth <= 768;
       setIsMobile(mobile);
-      // Solo cerrar el sidebar si cambiamos de móvil a desktop
-      if (!mobile && sidebarOpen) {
+      // Solo cerrar el sidebar si REALMENTE cambiamos de móvil a desktop
+      // (no solo si estamos en desktop, sino si cambió de móvil a desktop)
+      if (!mobile && wasMobile && sidebarOpen) {
         setSidebarOpen(false);
       }
+      wasMobile = mobile;
     };
+    
     checkMobile();
     window.addEventListener('resize', checkMobile);
     return () => window.removeEventListener('resize', checkMobile);
@@ -67,16 +72,9 @@ export default function Layout({ children, organizationId }: LayoutProps) {
     return sidebarCollapsed;
   }, [isMobile, sidebarOpen, sidebarCollapsed]);
 
-  // Cerrar sidebar al cambiar de ruta en móvil (pero no inmediatamente para evitar parpadeo)
-  useEffect(() => {
-    if (isMobile && sidebarOpen) {
-      // Usar un delay más largo para evitar parpadeo
-      const timer = setTimeout(() => {
-        setSidebarOpen(false);
-      }, 300);
-      return () => clearTimeout(timer);
-    }
-  }, [location.pathname, isMobile, sidebarOpen]);
+  // NO cerrar automáticamente el sidebar al cambiar de ruta
+  // El sidebar se cerrará solo cuando el usuario haga clic en un NavItem
+  // Esto evita que se cierre solo sin interacción del usuario
 
   // Memoizar funciones para evitar recrearlas en cada render
   const loadOrgs = useCallback(async () => {
@@ -251,8 +249,9 @@ export default function Layout({ children, organizationId }: LayoutProps) {
       <div
         className={`mobile-overlay ${sidebarOpen ? 'active' : ''}`}
         onClick={closeMobileMenu}
-        onTouchStart={(e) => {
-          e.preventDefault();
+        onTouchEnd={(e) => {
+          // Solo cerrar en touchEnd, no en touchStart, para evitar cierres accidentales
+          e.stopPropagation();
           closeMobileMenu();
         }}
       />
@@ -317,7 +316,7 @@ export default function Layout({ children, organizationId }: LayoutProps) {
           // Prevenir que el clic en el sidebar cierre el menú
           e.stopPropagation();
         }}
-        onTouchStart={(e) => {
+        onTouchEnd={(e) => {
           // Prevenir que el touch en el sidebar cierre el menú
           e.stopPropagation();
         }}
