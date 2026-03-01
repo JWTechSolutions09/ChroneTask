@@ -69,6 +69,13 @@ export default function Landing() {
     <div className="landing-page dark" data-theme="dark">
       {/* Navigation Bar */}
       <nav className="landing-nav">
+        {/* Mobile Menu Overlay */}
+        {mobileMenuOpen && (
+          <div
+            className="landing-mobile-overlay"
+            onClick={() => setMobileMenuOpen(false)}
+          />
+        )}
         <div className="nav-container">
           <div className="nav-logo">
             <img src="/logolanding.png" alt="ChroneTask" />
@@ -83,12 +90,40 @@ export default function Landing() {
             <span className={mobileMenuOpen ? "open" : ""}></span>
             <span className={mobileMenuOpen ? "open" : ""}></span>
           </button>
-          <div className={`nav-links ${mobileMenuOpen ? "mobile-open" : ""}`}>
-            <button onClick={() => { scrollToSection(heroRef); setMobileMenuOpen(false); }}>Inicio</button>
-            <button onClick={() => { scrollToSection(featuresRef); setMobileMenuOpen(false); }}>Características</button>
-            <button onClick={() => { scrollToSection(techRef); setMobileMenuOpen(false); }}>Tecnologías</button>
-            <button onClick={() => { scrollToSection(benefitsRef); setMobileMenuOpen(false); }}>Ventajas</button>
-            <button className="btn-login" onClick={() => navigate("/login")}>
+          <div
+            className={`nav-links ${mobileMenuOpen ? "mobile-open" : ""}`}
+            onClick={(e) => {
+              // Prevenir que el clic en el contenedor cierre el menú
+              e.stopPropagation();
+            }}
+          >
+            <button onClick={(e) => {
+              e.stopPropagation();
+              scrollToSection(heroRef);
+              setMobileMenuOpen(false);
+            }}>Inicio</button>
+            <button onClick={(e) => {
+              e.stopPropagation();
+              scrollToSection(featuresRef);
+              setMobileMenuOpen(false);
+            }}>Características</button>
+            <button onClick={(e) => {
+              e.stopPropagation();
+              scrollToSection(techRef);
+              setMobileMenuOpen(false);
+            }}>Tecnologías</button>
+            <button onClick={(e) => {
+              e.stopPropagation();
+              scrollToSection(benefitsRef);
+              setMobileMenuOpen(false);
+            }}>Ventajas</button>
+            <button
+              className="btn-login"
+              onClick={(e) => {
+                e.stopPropagation();
+                navigate("/login");
+              }}
+            >
               <i className="fas fa-sign-in-alt"></i> Iniciar Sesión
             </button>
           </div>
