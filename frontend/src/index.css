@@ -1122,8 +1122,6 @@ input, textarea, select {
     -webkit-overflow-scrolling: touch !important;
     scrollbar-width: thin !important;
   }
-    grid-template-columns: 1fr !important;
-  }
 
   /* Ajustar tablas y listas */
   table {
