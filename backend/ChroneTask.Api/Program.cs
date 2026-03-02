@@ -26,8 +26,14 @@ builder.Services.AddCors(options =>
     });
 });
 
-// ✅ Controllers
-builder.Services.AddControllers();
+// ✅ Controllers con configuración JSON
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        // Configurar JSON para usar camelCase (compatible con frontend)
+        options.JsonSerializerOptions.PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase;
+        options.JsonSerializerOptions.PropertyNameCaseInsensitive = true;
+    });
 
 // ✅ Swagger
 builder.Services.AddEndpointsApiExplorer();

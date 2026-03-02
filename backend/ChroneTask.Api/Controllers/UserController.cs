@@ -5,6 +5,7 @@ using ChroneTask.Api.Helpers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Linq;
 
 namespace ChroneTask.Api.Controllers;
 
@@ -54,6 +55,7 @@ public class UserController : ControllerBase
                 FullName = user.FullName,
                 Email = user.Email,
                 ProfilePictureUrl = user.ProfilePictureUrl,
+                UsageType = user.UsageType,
                 CreatedAt = user.CreatedAt,
                 Organizations = organizations
             });
@@ -88,6 +90,17 @@ public class UserController : ControllerBase
             if (!string.IsNullOrWhiteSpace(request.ProfilePictureUrl))
                 user.ProfilePictureUrl = request.ProfilePictureUrl.Trim();
 
+            // Permitir actualizar UsageType desde UpdateProfile
+            if (!string.IsNullOrWhiteSpace(request.UsageType))
+            {
+                var validUsageTypes = new[] { "personal", "team", "business" };
+                var usageTypeValue = request.UsageType.Trim().ToLowerInvariant();
+                if (validUsageTypes.Contains(usageTypeValue))
+                {
+                    user.UsageType = usageTypeValue;
+                }
+            }
+
             await _db.SaveChangesAsync();
 
             // Obtener organizaciones del usuario
@@ -110,6 +123,7 @@ public class UserController : ControllerBase
                 FullName = user.FullName,
                 Email = user.Email,
                 ProfilePictureUrl = user.ProfilePictureUrl,
+                UsageType = user.UsageType,
                 CreatedAt = user.CreatedAt,
                 Organizations = organizations
             });
@@ -117,6 +131,72 @@ public class UserController : ControllerBase
         catch (Exception ex)
         {
             Console.WriteLine($"❌ Error en UpdateProfile: {ex.Message}");
+            return StatusCode(500, new { 
+                error = "Internal Server Error", 
+                message = ex.Message
+            });
+        }
+    }
+
+    // PATCH: api/users/me/usage-type
+    [HttpPatch("me/usage-type")]
+    public async Task<ActionResult<UserProfileResponse>> UpdateUsageType([FromBody] UpdateUsageTypeRequest request)
+    {
+        try
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var userId = UserContext.GetUserId(User);
+
+            var user = await _db.Users
+                .FirstOrDefaultAsync(u => u.Id == userId);
+
+            if (user is null)
+                return NotFound();
+
+            // Validar que el tipo de uso sea válido
+            var validUsageTypes = new[] { "personal", "team", "business" };
+            var usageTypeValue = request.UsageType?.Trim().ToLowerInvariant() ?? "";
+            
+            if (string.IsNullOrWhiteSpace(usageTypeValue))
+                return BadRequest(new { message = "UsageType is required" });
+                
+            if (!validUsageTypes.Contains(usageTypeValue))
+                return BadRequest(new { message = "Invalid usage type. Must be 'personal', 'team', or 'business'" });
+
+            // Actualizar el tipo de uso
+            user.UsageType = usageTypeValue;
+            await _db.SaveChangesAsync();
+
+            // Obtener organizaciones del usuario
+            var organizations = await _db.OrganizationMembers
+                .Where(m => m.UserId == userId)
+                .Include(m => m.Organization)
+                .Where(m => m.Organization != null)
+                .Select(m => new UserOrganizationResponse
+                {
+                    OrganizationId = m.OrganizationId,
+                    OrganizationName = m.Organization != null ? m.Organization.Name : "Unknown",
+                    Role = m.Role,
+                    JoinedAt = m.JoinedAt
+                })
+                .ToListAsync();
+
+            return Ok(new UserProfileResponse
+            {
+                Id = user.Id,
+                FullName = user.FullName,
+                Email = user.Email,
+                ProfilePictureUrl = user.ProfilePictureUrl,
+                UsageType = user.UsageType,
+                CreatedAt = user.CreatedAt,
+                Organizations = organizations
+            });
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"❌ Error en UpdateUsageType: {ex.Message}");
             return StatusCode(500, new { 
                 error = "Internal Server Error", 
                 message = ex.Message

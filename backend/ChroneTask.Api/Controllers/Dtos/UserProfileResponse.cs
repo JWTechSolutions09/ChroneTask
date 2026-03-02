@@ -6,6 +6,7 @@ public class UserProfileResponse
     public string FullName { get; set; } = string.Empty;
     public string Email { get; set; } = string.Empty;
     public string? ProfilePictureUrl { get; set; }
+    public string? UsageType { get; set; } // "personal", "team", "business"
     public DateTime CreatedAt { get; set; }
     public List<UserOrganizationResponse> Organizations { get; set; } = new();
 }

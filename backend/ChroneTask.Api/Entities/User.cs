@@ -20,5 +20,8 @@ public class User
     [MaxLength(500)]
     public string? ProfilePictureUrl { get; set; }
 
+    [MaxLength(20)]
+    public string? UsageType { get; set; } // "personal", "team", "business"
+
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 }
