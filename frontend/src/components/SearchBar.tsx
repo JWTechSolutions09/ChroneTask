@@ -47,6 +47,8 @@ export default function SearchBar({
             left: "12px",
             fontSize: "18px",
             color: "#6c757d",
+            zIndex: 1,
+            pointerEvents: "none",
           }}
         >
           🔍
@@ -58,9 +60,10 @@ export default function SearchBar({
           onChange={(e) => setLocalValue(e.target.value)}
           className="input"
           style={{
-            paddingLeft: "40px",
+            paddingLeft: "44px",
             paddingRight: localValue ? "40px" : "12px",
             fontSize: "14px",
+            width: "100%",
           }}
         />
         {localValue && (

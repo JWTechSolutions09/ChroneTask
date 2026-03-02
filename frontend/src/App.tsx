@@ -2,6 +2,7 @@ import React from "react";
 import { Routes, Route, Navigate, useNavigate } from "react-router-dom";
 import Landing from "./pages/Landing";
 import Auth from "./pages/Auth";
+import Onboarding from "./pages/Onboarding";
 import Orgs from "./pages/Orgs";
 import OrgSelect from "./pages/OrgSelect";
 import Dashboard from "./pages/Dashboard";
@@ -109,10 +110,34 @@ function AppContent() {
                 }
             />
             <Route
+                path="/onboarding"
+                element={
+                    <PrivateRoute>
+                        <Onboarding />
+                    </PrivateRoute>
+                }
+            />
+            <Route
                 path="/orgs"
                 element={
                     <PrivateRoute>
                         <Orgs />
+                    </PrivateRoute>
+                }
+            />
+            <Route
+                path="/teams"
+                element={
+                    <PrivateRoute>
+                        <Orgs />
+                    </PrivateRoute>
+                }
+            />
+            <Route
+                path="/personal/projects"
+                element={
+                    <PrivateRoute>
+                        <Projects />
                     </PrivateRoute>
                 }
             />

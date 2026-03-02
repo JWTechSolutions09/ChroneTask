@@ -3,10 +3,12 @@ import { useNavigate, useLocation, Link, useParams } from "react-router-dom";
 import { clearToken, isAuthed } from "../auth/token";
 import { http } from "../api/http";
 import { useTheme } from "../contexts/ThemeContext";
+import { useUserUsageType, UsageType } from "../hooks/useUserUsageType";
 
 type LayoutProps = {
   children: React.ReactNode;
   organizationId?: string;
+  usageType?: UsageType;
 };
 
 type Org = {
@@ -20,11 +22,13 @@ type Project = {
   name: string;
 };
 
-export default function Layout({ children, organizationId }: LayoutProps) {
+export default function Layout({ children, organizationId, usageType: propUsageType }: LayoutProps) {
   const navigate = useNavigate();
   const location = useLocation();
   const params = useParams();
   const { theme, toggleTheme } = useTheme();
+  const { usageType: hookUsageType, loading: loadingUsageType } = useUserUsageType();
+  const usageType = propUsageType || hookUsageType;
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(() => {
@@ -39,6 +43,12 @@ export default function Layout({ children, organizationId }: LayoutProps) {
   const [currentOrg, setCurrentOrg] = useState<Org | null>(null);
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(false);
+
+  // Determinar si mostrar secciones de organización/equipo
+  const showOrgSections = usageType === "business" || usageType === "team";
+  const isPersonalMode = usageType === "personal";
+  const isTeamMode = usageType === "team";
+  const orgLabel = isTeamMode ? "Equipo" : "Organización";
 
   // Detectar si estamos en móvil y manejar resize
   useEffect(() => {
@@ -354,7 +364,7 @@ export default function Layout({ children, organizationId }: LayoutProps) {
                 }}
               >
                 <img 
-                  src="/logosidebar.png" 
+                  src="/logolanding.png" 
                   alt="ChroneTask Logo" 
                   style={{
                     width: "100%",
@@ -480,9 +490,9 @@ export default function Layout({ children, organizationId }: LayoutProps) {
           }}
           className={isMobile && sidebarOpen ? "mobile-nav-open" : ""}
         >
-          {organizationId ? (
+          {showOrgSections && organizationId ? (
             <>
-              {/* Organization Info */}
+              {/* Organization/Team Info */}
               {currentOrg && (
                 <div
                   style={{
@@ -496,7 +506,7 @@ export default function Layout({ children, organizationId }: LayoutProps) {
                   }}
                 >
                   <div style={{ fontSize: "11px", color: "var(--text-secondary)", marginBottom: "6px", textTransform: "uppercase", letterSpacing: "0.5px", fontWeight: 600 }}>
-                    Organización
+                    {orgLabel}
                   </div>
                   <div style={{ fontWeight: 700, color: "var(--text-primary)", fontSize: "15px" }}>
                     {currentOrg.name}
@@ -644,14 +654,42 @@ export default function Layout({ children, organizationId }: LayoutProps) {
                 </div>
               )}
             </>
+          ) : isPersonalMode ? (
+            <>
+              {/* Modo Personal - Solo proyectos */}
+              <NavItem
+                icon="📁"
+                label="Mis Proyectos"
+                to="/personal/projects"
+                active={isActive("/personal/projects")}
+                collapsed={effectiveCollapsed}
+                forceShowLabel={isMobile && sidebarOpen}
+                onNavigate={closeMobileMenu}
+              />
+            </>
+          ) : isTeamMode ? (
+            <>
+              {/* Modo Equipo */}
+              <NavItem
+                icon="👥"
+                label="Equipos"
+                to="/teams"
+                active={isActive("/teams")}
+                collapsed={effectiveCollapsed}
+                forceShowLabel={isMobile && sidebarOpen}
+                onNavigate={closeMobileMenu}
+              />
+            </>
           ) : (
             <>
+              {/* Modo Empresarial - Organizaciones */}
               <NavItem
                 icon="🏢"
                 label="Organizaciones"
                 to="/orgs"
                 active={isActive("/orgs")}
                 collapsed={effectiveCollapsed}
+                forceShowLabel={isMobile && sidebarOpen}
                 onNavigate={closeMobileMenu}
               />
               <NavItem
@@ -660,6 +698,7 @@ export default function Layout({ children, organizationId }: LayoutProps) {
                 to="/org-select"
                 active={isActive("/org-select")}
                 collapsed={effectiveCollapsed}
+                forceShowLabel={isMobile && sidebarOpen}
                 onNavigate={closeMobileMenu}
               />
             </>

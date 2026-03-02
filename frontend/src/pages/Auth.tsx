@@ -140,7 +140,8 @@ export default function Auth() {
       if (loginRes.data?.token) {
         setToken(loginRes.data.token);
         showToast("Registro exitoso. ¡Bienvenido!", "success");
-        navigate("/org-select", { replace: true });
+        // Redirigir a onboarding para nuevos usuarios
+        navigate("/onboarding", { replace: true });
       } else {
         setErr("Token no recibido del servidor");
         showToast("Registro exitoso, pero no se pudo iniciar sesión automáticamente", "warning");
