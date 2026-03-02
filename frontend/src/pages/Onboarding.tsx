@@ -22,23 +22,34 @@ export default function Onboarding() {
     try {
       // Intentar guardar el tipo de uso del usuario
       // Primero intentar con el endpoint específico, si falla usar el endpoint general
+      // El backend está configurado para camelCase, así que enviamos usageType
+      let saved = false;
       try {
         await http.patch("/api/users/me/usage-type", {
-          UsageType: selectedType,
+          usageType: selectedType, // camelCase para coincidir con la configuración del backend
         });
+        saved = true;
       } catch (usageTypeError: any) {
         // Si el endpoint específico no existe (404), usar el endpoint general
         if (usageTypeError?.response?.status === 404) {
-          console.log("Endpoint /api/users/me/usage-type no disponible, usando /api/users/me");
-          await http.patch("/api/users/me", {
-            UsageType: selectedType,
-          });
+          console.log("Endpoint /api/users/me/usage-type no disponible, usando /api/users/me como fallback");
+          try {
+            await http.patch("/api/users/me", {
+              usageType: selectedType, // camelCase para coincidir con la configuración del backend
+            });
+            saved = true;
+          } catch (fallbackError: any) {
+            console.error("Error en fallback:", fallbackError);
+            throw fallbackError; // Re-lanzar el error del fallback
+          }
         } else {
           throw usageTypeError; // Re-lanzar si es otro error
         }
       }
 
-      showToast("Configuración guardada exitosamente", "success");
+      if (saved) {
+        showToast("Configuración guardada exitosamente", "success");
+      }
 
       // Redirigir según el tipo seleccionado
       switch (selectedType) {
