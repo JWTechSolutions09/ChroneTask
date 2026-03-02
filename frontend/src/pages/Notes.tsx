@@ -36,8 +36,19 @@ export default function Notes() {
   const [isCreating, setIsCreating] = useState(false);
   const [draggedNote, setDraggedNote] = useState<{ id: string; offsetX: number; offsetY: number } | null>(null);
   const [resizingNote, setResizingNote] = useState<{ id: string; startX: number; startY: number; startWidth: number; startHeight: number } | null>(null);
+  const [isMobile, setIsMobile] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const { showToast } = useToast();
+
+  // Detectar si estamos en móvil
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   const loadNotes = useCallback(async () => {
     if (!organizationId || !projectId) return;
@@ -114,6 +125,8 @@ export default function Notes() {
   };
 
   const handleMouseDown = (e: React.MouseEvent, note: ProjectNote) => {
+    // En móvil, no permitir arrastrar
+    if (isMobile) return;
     if ((e.target as HTMLElement).classList.contains("resize-handle")) return;
     
     const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
@@ -220,11 +233,15 @@ export default function Notes() {
           style={{
             position: "relative",
             minHeight: "calc(100vh - 200px)",
-            padding: "24px",
+            padding: isMobile ? "12px" : "24px",
             backgroundColor: "#f5f5f5",
-            backgroundImage: "radial-gradient(circle, #ddd 1px, transparent 1px)",
+            backgroundImage: isMobile ? "none" : "radial-gradient(circle, #ddd 1px, transparent 1px)",
             backgroundSize: "20px 20px",
+            display: isMobile ? "flex" : "block",
+            flexDirection: isMobile ? "column" : "initial",
+            gap: isMobile ? "12px" : "0",
           }}
+          className={isMobile ? "notes-mobile-container" : ""}
         >
           {loading ? (
             <div className="loading">Cargando notas...</div>
@@ -234,20 +251,23 @@ export default function Notes() {
                 <Card
                   key={note.id}
                   style={{
-                    position: "absolute",
-                    left: note.positionX || 0,
-                    top: note.positionY || 0,
-                    width: note.width || 200,
-                    height: note.height || 150,
+                    position: isMobile ? "relative" : "absolute",
+                    left: isMobile ? "auto" : note.positionX || 0,
+                    top: isMobile ? "auto" : note.positionY || 0,
+                    width: isMobile ? "100%" : note.width || 200,
+                    height: isMobile ? "auto" : note.height || 150,
+                    minHeight: isMobile ? "120px" : "150px",
                     backgroundColor: note.color || "#FFE5E5",
-                    padding: "12px",
-                    cursor: draggedNote?.id === note.id ? "grabbing" : "grab",
+                    padding: isMobile ? "12px" : "12px",
+                    cursor: isMobile ? "default" : (draggedNote?.id === note.id ? "grabbing" : "grab"),
                     boxShadow: "0 4px 12px rgba(0, 0, 0, 0.15)",
                     display: "flex",
                     flexDirection: "column",
+                    marginBottom: isMobile ? "12px" : "0",
                   }}
                   onMouseDown={(e) => handleMouseDown(e, note)}
                   onClick={() => setSelectedNote(note)}
+                  className={isMobile ? "note-mobile-card" : ""}
                 >
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "start", marginBottom: "8px" }}>
                     <input
@@ -326,29 +346,31 @@ export default function Notes() {
                       fontFamily: "inherit",
                     }}
                   />
-                  <div
-                    className="resize-handle"
-                    onMouseDown={(e) => {
-                      e.stopPropagation();
-                      setResizingNote({
-                        id: note.id,
-                        startX: e.clientX,
-                        startY: e.clientY,
-                        startWidth: note.width || 200,
-                        startHeight: note.height || 150,
-                      });
-                    }}
-                    style={{
-                      position: "absolute",
-                      bottom: 0,
-                      right: 0,
-                      width: "20px",
-                      height: "20px",
-                      cursor: "nwse-resize",
-                      backgroundColor: "rgba(0, 0, 0, 0.1)",
-                      borderTopLeftRadius: "4px",
-                    }}
-                  />
+                  {!isMobile && (
+                    <div
+                      className="resize-handle"
+                      onMouseDown={(e) => {
+                        e.stopPropagation();
+                        setResizingNote({
+                          id: note.id,
+                          startX: e.clientX,
+                          startY: e.clientY,
+                          startWidth: note.width || 200,
+                          startHeight: note.height || 150,
+                        });
+                      }}
+                      style={{
+                        position: "absolute",
+                        bottom: 0,
+                        right: 0,
+                        width: "20px",
+                        height: "20px",
+                        cursor: "nwse-resize",
+                        backgroundColor: "rgba(0, 0, 0, 0.1)",
+                        borderTopLeftRadius: "4px",
+                      }}
+                    />
+                  )}
                 </Card>
               ))}
             </>

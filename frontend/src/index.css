@@ -962,6 +962,169 @@ input, textarea, select {
     grid-template-columns: 1fr !important;
   }
 
+  /* ===== ESTILOS RESPONSIVE PARA PÁGINAS ESPECÍFICAS ===== */
+  
+  /* Página de Notas - Canvas interactivo */
+  [style*="position: relative"][style*="min-height: calc(100vh - 200px)"] {
+    min-height: calc(100vh - 150px) !important;
+    padding: clamp(0.75rem, 2vw, 1rem) !important;
+    overflow-x: auto !important;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+  }
+
+  /* Notas posicionadas absolutamente - ajustar para móvil */
+  [style*="position: absolute"][style*="left:"] {
+    position: relative !important;
+    left: auto !important;
+    top: auto !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    margin-bottom: clamp(0.75rem, 2vw, 1rem) !important;
+  }
+
+  /* Contenedor de notas en móvil - cambiar a columna */
+  [style*="position: relative"][style*="min-height"] > div[style*="position: absolute"] {
+    position: relative !important;
+    left: auto !important;
+    top: auto !important;
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+
+  /* Ajustar tamaño de notas en móvil */
+  [style*="position: absolute"][style*="width:"] {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: auto !important;
+    height: auto !important;
+    min-height: clamp(120px, 30vw, 200px) !important;
+  }
+
+  /* Grids y tablas responsive */
+  [style*="display: grid"] {
+    grid-template-columns: 1fr !important;
+    gap: clamp(0.75rem, 2vw, 1rem) !important;
+  }
+
+  [style*="grid-template-columns: repeat(2"] {
+    grid-template-columns: 1fr !important;
+  }
+
+  [style*="grid-template-columns: repeat(3"] {
+    grid-template-columns: 1fr !important;
+  }
+
+  [style*="grid-template-columns: repeat(4"] {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+
+  /* Tablas responsive */
+  table {
+    display: block !important;
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    width: 100% !important;
+  }
+
+  /* Formularios responsive */
+  form {
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+
+  form > div {
+    width: 100% !important;
+    margin-bottom: clamp(0.75rem, 2vw, 1rem) !important;
+  }
+
+  /* Inputs y textareas en formularios */
+  form input,
+  form textarea,
+  form select {
+    width: 100% !important;
+    max-width: 100% !important;
+    font-size: clamp(0.875rem, 2vw, 1rem) !important;
+    padding: clamp(0.5rem, 1.5vw, 0.75rem) !important;
+  }
+
+  /* Modales y diálogos responsive */
+  [role="dialog"],
+  [class*="modal"],
+  [class*="Modal"] {
+    width: 95vw !important;
+    max-width: 95vw !important;
+    margin: clamp(0.5rem, 2vw, 1rem) !important;
+    padding: clamp(0.75rem, 2vw, 1rem) !important;
+  }
+
+  /* Cards de estadísticas en Dashboard/Analytics */
+  [style*="display: flex"][style*="flex-wrap"] {
+    flex-direction: column !important;
+  }
+
+  /* Listas de notificaciones */
+  [style*="display: flex"][style*="flex-direction: column"] > div {
+    width: 100% !important;
+    margin-bottom: clamp(0.5rem, 1.5vw, 0.75rem) !important;
+  }
+
+  /* Botones de acción en PageHeader */
+  .page-header-actions button,
+  .page-header-actions .btn {
+    width: 100% !important;
+    margin-bottom: clamp(0.5rem, 1.5vw, 0.75rem) !important;
+  }
+
+  /* Tabs responsive */
+  [role="tablist"],
+  [class*="tabs"] {
+    flex-wrap: wrap !important;
+    gap: clamp(0.25rem, 1vw, 0.5rem) !important;
+  }
+
+  [role="tab"],
+  [class*="tab"] {
+    flex: 1 1 auto !important;
+    min-width: 0 !important;
+    font-size: clamp(0.75rem, 2vw, 0.875rem) !important;
+    padding: clamp(0.5rem, 1.5vw, 0.75rem) clamp(0.75rem, 2vw, 1rem) !important;
+  }
+
+  /* Filtros y búsquedas */
+  [style*="display: flex"][style*="gap"] {
+    flex-wrap: wrap !important;
+    gap: clamp(0.5rem, 1.5vw, 0.75rem) !important;
+  }
+
+  /* Selectores de fecha */
+  input[type="date"],
+  input[type="datetime-local"] {
+    width: 100% !important;
+    font-size: clamp(0.875rem, 2vw, 1rem) !important;
+  }
+
+  /* Imágenes responsive */
+  img {
+    max-width: 100% !important;
+    height: auto !important;
+  }
+
+  /* Avatares y fotos de perfil */
+  [style*="width"][style*="height"][style*="border-radius"] {
+    width: clamp(40px, 10vw, 60px) !important;
+    height: clamp(40px, 10vw, 60px) !important;
+  }
+
+  /* Contenedores con scroll horizontal */
+  [style*="overflow-x: auto"],
+  [style*="overflow-x: scroll"] {
+    -webkit-overflow-scrolling: touch !important;
+    scrollbar-width: thin !important;
+  }
+    grid-template-columns: 1fr !important;
+  }
+
   /* Ajustar tablas y listas */
   table {
     display: block !important;
@@ -1109,5 +1272,129 @@ input, textarea, select {
   div[style*="padding"] {
     max-width: 100% !important;
     box-sizing: border-box !important;
+  }
+
+  /* Página de Notas - Estilos específicos para móvil */
+  .notes-mobile-container {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 12px !important;
+    padding: 12px !important;
+  }
+
+  .note-mobile-card {
+    position: relative !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    left: auto !important;
+    top: auto !important;
+    margin-bottom: 12px !important;
+  }
+
+  /* Analytics - Grids de estadísticas */
+  [style*="display: grid"][style*="grid-template-columns: repeat(2"] {
+    grid-template-columns: 1fr !important;
+  }
+
+  [style*="display: grid"][style*="grid-template-columns: repeat(3"] {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* Notifications - Lista de notificaciones */
+  [style*="display: flex"][style*="flex-direction: column"] > div[style*="padding"] {
+    padding: 12px !important;
+    margin-bottom: 8px !important;
+  }
+
+  /* Settings - Tabs y formularios */
+  [style*="display: flex"][style*="gap"][style*="marginBottom"] {
+    flex-direction: column !important;
+    gap: 12px !important;
+  }
+
+  /* Dashboard - Grid de proyectos */
+  [style*="display: grid"][style*="grid-template-columns: repeat(auto-fill"] {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* Cards de estadísticas en Dashboard */
+  [style*="display: grid"][style*="grid-template-columns: repeat(4"] {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 8px !important;
+  }
+
+  /* Inputs y selects en formularios */
+  input[type="text"],
+  input[type="email"],
+  input[type="password"],
+  input[type="date"],
+  textarea,
+  select {
+    font-size: 16px !important; /* Evitar zoom en iOS */
+    padding: 10px !important;
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+
+  /* Botones en grupos */
+  [style*="display: flex"][style*="gap"] button {
+    flex: 1 1 auto !important;
+    min-width: 0 !important;
+  }
+
+  /* Modales y diálogos */
+  [style*="position: fixed"][style*="z-index: 1000"] {
+    padding: 16px !important;
+    max-width: 95vw !important;
+    width: 95vw !important;
+  }
+
+  /* Tablas responsive */
+  table {
+    font-size: 12px !important;
+  }
+
+  table th,
+  table td {
+    padding: 8px 4px !important;
+    font-size: 12px !important;
+  }
+
+  /* Imágenes en cards */
+  [style*="backgroundImage"] {
+    background-size: cover !important;
+    background-position: center !important;
+  }
+
+  /* Contenedores con scroll */
+  [style*="overflow-y: auto"],
+  [style*="overflow-x: auto"] {
+    -webkit-overflow-scrolling: touch !important;
+  }
+
+  /* Asegurar que los textos no se desborden */
+  h1, h2, h3, h4, h5, h6, p, span, div, label {
+    word-wrap: break-word !important;
+    overflow-wrap: break-word !important;
+    hyphens: auto !important;
+  }
+
+  /* Breadcrumbs responsive */
+  nav[aria-label="breadcrumb"] a {
+    font-size: 12px !important;
+    white-space: nowrap !important;
+  }
+
+  /* Avatares y fotos de perfil */
+  [style*="width: 40px"][style*="height: 40px"],
+  [style*="width: 48px"][style*="height: 48px"] {
+    width: clamp(32px, 8vw, 48px) !important;
+    height: clamp(32px, 8vw, 48px) !important;
+  }
+
+  /* Iconos en botones */
+  button span[style*="fontSize: 18px"],
+  button span[style*="fontSize: 20px"] {
+    font-size: clamp(16px, 4vw, 20px) !important;
   }
 }
