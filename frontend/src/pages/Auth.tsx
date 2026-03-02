@@ -141,7 +141,10 @@ export default function Auth() {
         setToken(loginRes.data.token);
         showToast("Registro exitoso. ¡Bienvenido!", "success");
         // Redirigir a onboarding para nuevos usuarios
-        navigate("/onboarding", { replace: true });
+        // Pequeño delay para asegurar que el token se guarde
+        setTimeout(() => {
+          navigate("/onboarding", { replace: true });
+        }, 100);
       } else {
         setErr("Token no recibido del servidor");
         showToast("Registro exitoso, pero no se pudo iniciar sesión automáticamente", "warning");

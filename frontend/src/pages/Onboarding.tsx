@@ -21,8 +21,9 @@ export default function Onboarding() {
     setLoading(true);
     try {
       // Guardar el tipo de uso del usuario
+      // El backend espera UsageType (PascalCase) debido a la configuración JSON
       await http.patch("/api/users/me/usage-type", {
-        usageType: selectedType,
+        UsageType: selectedType,
       });
 
       showToast("Configuración guardada exitosamente", "success");
@@ -40,9 +41,25 @@ export default function Onboarding() {
           break;
       }
     } catch (ex: any) {
-      const errorMsg =
-        ex?.response?.data?.message ?? ex.message ?? "Error guardando configuración";
+      console.error("Error en onboarding:", ex);
+      let errorMsg = "Error guardando configuración";
+      
+      if (ex?.response?.status === 404) {
+        errorMsg = "El endpoint no está disponible. Por favor, verifica que el backend esté actualizado.";
+      } else if (ex?.response?.data?.message) {
+        errorMsg = ex.response.data.message;
+      } else if (ex?.message) {
+        errorMsg = ex.message;
+      }
+      
       showToast(errorMsg, "error");
+      
+      // Si el endpoint no existe, redirigir a org-select como fallback
+      if (ex?.response?.status === 404) {
+        setTimeout(() => {
+          navigate("/org-select", { replace: true });
+        }, 2000);
+      }
     } finally {
       setLoading(false);
     }
