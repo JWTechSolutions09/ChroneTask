@@ -20,11 +20,23 @@ export default function Onboarding() {
 
     setLoading(true);
     try {
-      // Guardar el tipo de uso del usuario
-      // El backend espera UsageType (PascalCase) debido a la configuración JSON
-      await http.patch("/api/users/me/usage-type", {
-        UsageType: selectedType,
-      });
+      // Intentar guardar el tipo de uso del usuario
+      // Primero intentar con el endpoint específico, si falla usar el endpoint general
+      try {
+        await http.patch("/api/users/me/usage-type", {
+          UsageType: selectedType,
+        });
+      } catch (usageTypeError: any) {
+        // Si el endpoint específico no existe (404), usar el endpoint general
+        if (usageTypeError?.response?.status === 404) {
+          console.log("Endpoint /api/users/me/usage-type no disponible, usando /api/users/me");
+          await http.patch("/api/users/me", {
+            UsageType: selectedType,
+          });
+        } else {
+          throw usageTypeError; // Re-lanzar si es otro error
+        }
+      }
 
       showToast("Configuración guardada exitosamente", "success");
 
