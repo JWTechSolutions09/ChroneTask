@@ -677,4 +677,252 @@ public class UserController : ControllerBase
             });
         }
     }
+
+    // GET: api/users/me/projects/{id}/notes
+    [HttpGet("me/projects/{id:guid}/notes")]
+    public async Task<ActionResult<List<ProjectNoteResponse>>> GetPersonalProjectNotes(Guid id)
+    {
+        try
+        {
+            var userId = UserContext.GetUserId(User);
+
+            // Verificar que el proyecto es personal y pertenece al usuario
+            var project = await _db.Projects
+                .FirstOrDefaultAsync(p => p.Id == id && p.UserId == userId && p.OrganizationId == null);
+
+            if (project is null)
+                return NotFound();
+
+            // Verificar que el usuario es miembro del proyecto
+            var isMember = await _db.ProjectMembers
+                .AnyAsync(m => m.ProjectId == id && m.UserId == userId);
+
+            if (!isMember)
+                return StatusCode(403, new { message = "You are not a member of this project" });
+
+            var notes = await _db.ProjectNotes
+                .Where(n => n.ProjectId == id)
+                .Include(n => n.User)
+                .OrderBy(n => n.CreatedAt)
+                .Select(n => new ProjectNoteResponse
+                {
+                    Id = n.Id,
+                    ProjectId = n.ProjectId,
+                    UserId = n.UserId,
+                    UserName = n.User.FullName,
+                    UserAvatar = n.User.ProfilePictureUrl,
+                    Title = n.Title,
+                    Content = n.Content,
+                    Color = n.Color,
+                    PositionX = n.PositionX,
+                    PositionY = n.PositionY,
+                    Width = n.Width,
+                    Height = n.Height,
+                    CanvasData = n.CanvasData,
+                    ImageUrl = n.ImageUrl,
+                    CreatedAt = n.CreatedAt,
+                    UpdatedAt = n.UpdatedAt
+                })
+                .ToListAsync();
+
+            return Ok(notes);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"❌ Error en GetPersonalProjectNotes: {ex.Message}");
+            return StatusCode(500, new
+            {
+                error = "Internal Server Error",
+                message = ex.Message
+            });
+        }
+    }
+
+    // POST: api/users/me/projects/{id}/notes
+    [HttpPost("me/projects/{id:guid}/notes")]
+    public async Task<ActionResult<ProjectNoteResponse>> CreatePersonalProjectNote(Guid id, [FromBody] ProjectNoteCreateRequest request)
+    {
+        try
+        {
+            var userId = UserContext.GetUserId(User);
+
+            // Verificar que el proyecto es personal y pertenece al usuario
+            var project = await _db.Projects
+                .FirstOrDefaultAsync(p => p.Id == id && p.UserId == userId && p.OrganizationId == null);
+
+            if (project is null)
+                return NotFound();
+
+            // Verificar que el usuario es miembro del proyecto
+            var isMember = await _db.ProjectMembers
+                .AnyAsync(m => m.ProjectId == id && m.UserId == userId);
+
+            if (!isMember)
+                return StatusCode(403, new { message = "You are not a member of this project" });
+
+            var note = new ProjectNote
+            {
+                ProjectId = id,
+                UserId = userId,
+                Title = string.IsNullOrWhiteSpace(request.Title) ? null : request.Title.Trim(),
+                Content = string.IsNullOrWhiteSpace(request.Content) ? null : request.Content.Trim(),
+                Color = string.IsNullOrWhiteSpace(request.Color) ? null : request.Color.Trim(),
+                PositionX = request.PositionX,
+                PositionY = request.PositionY,
+                Width = request.Width,
+                Height = request.Height,
+                CanvasData = string.IsNullOrWhiteSpace(request.CanvasData) ? null : request.CanvasData.Trim(),
+                ImageUrl = string.IsNullOrWhiteSpace(request.ImageUrl) ? null : request.ImageUrl.Trim()
+            };
+
+            _db.ProjectNotes.Add(note);
+            await _db.SaveChangesAsync();
+
+            await _db.Entry(note).Reference(n => n.User).LoadAsync();
+
+            return Ok(new ProjectNoteResponse
+            {
+                Id = note.Id,
+                ProjectId = note.ProjectId,
+                UserId = note.UserId,
+                UserName = note.User.FullName,
+                UserAvatar = note.User.ProfilePictureUrl,
+                Title = note.Title,
+                Content = note.Content,
+                Color = note.Color,
+                PositionX = note.PositionX,
+                PositionY = note.PositionY,
+                Width = note.Width,
+                Height = note.Height,
+                CanvasData = note.CanvasData,
+                ImageUrl = note.ImageUrl,
+                CreatedAt = note.CreatedAt,
+                UpdatedAt = note.UpdatedAt
+            });
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"❌ Error en CreatePersonalProjectNote: {ex.Message}");
+            return StatusCode(500, new
+            {
+                error = "Internal Server Error",
+                message = ex.Message
+            });
+        }
+    }
+
+    // PATCH: api/users/me/projects/{id}/notes/{noteId}
+    [HttpPatch("me/projects/{id:guid}/notes/{noteId:guid}")]
+    public async Task<ActionResult<ProjectNoteResponse>> UpdatePersonalProjectNote(Guid id, Guid noteId, [FromBody] ProjectNoteCreateRequest request)
+    {
+        try
+        {
+            var userId = UserContext.GetUserId(User);
+
+            // Verificar que el proyecto es personal y pertenece al usuario
+            var project = await _db.Projects
+                .FirstOrDefaultAsync(p => p.Id == id && p.UserId == userId && p.OrganizationId == null);
+
+            if (project is null)
+                return NotFound();
+
+            var note = await _db.ProjectNotes
+                .Include(n => n.User)
+                .FirstOrDefaultAsync(n => n.Id == noteId && n.ProjectId == id);
+
+            if (note is null)
+                return NotFound();
+
+            // Solo el autor puede editar
+            if (note.UserId != userId)
+                return StatusCode(403, new { message = "You can only edit your own notes" });
+
+            note.Title = string.IsNullOrWhiteSpace(request.Title) ? null : request.Title.Trim();
+            note.Content = string.IsNullOrWhiteSpace(request.Content) ? null : request.Content.Trim();
+            note.Color = string.IsNullOrWhiteSpace(request.Color) ? null : request.Color.Trim();
+            note.PositionX = request.PositionX;
+            note.PositionY = request.PositionY;
+            note.Width = request.Width;
+            note.Height = request.Height;
+            note.CanvasData = string.IsNullOrWhiteSpace(request.CanvasData) ? null : request.CanvasData.Trim();
+            note.ImageUrl = string.IsNullOrWhiteSpace(request.ImageUrl) ? null : request.ImageUrl.Trim();
+            note.UpdatedAt = DateTime.UtcNow;
+
+            await _db.SaveChangesAsync();
+
+            return Ok(new ProjectNoteResponse
+            {
+                Id = note.Id,
+                ProjectId = note.ProjectId,
+                UserId = note.UserId,
+                UserName = note.User.FullName,
+                UserAvatar = note.User.ProfilePictureUrl,
+                Title = note.Title,
+                Content = note.Content,
+                Color = note.Color,
+                PositionX = note.PositionX,
+                PositionY = note.PositionY,
+                Width = note.Width,
+                Height = note.Height,
+                CanvasData = note.CanvasData,
+                ImageUrl = note.ImageUrl,
+                CreatedAt = note.CreatedAt,
+                UpdatedAt = note.UpdatedAt
+            });
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"❌ Error en UpdatePersonalProjectNote: {ex.Message}");
+            return StatusCode(500, new
+            {
+                error = "Internal Server Error",
+                message = ex.Message
+            });
+        }
+    }
+
+    // DELETE: api/users/me/projects/{id}/notes/{noteId}
+    [HttpDelete("me/projects/{id:guid}/notes/{noteId:guid}")]
+    public async Task<IActionResult> DeletePersonalProjectNote(Guid id, Guid noteId)
+    {
+        try
+        {
+            var userId = UserContext.GetUserId(User);
+
+            // Verificar que el proyecto es personal y pertenece al usuario
+            var project = await _db.Projects
+                .FirstOrDefaultAsync(p => p.Id == id && p.UserId == userId && p.OrganizationId == null);
+
+            if (project is null)
+                return NotFound();
+
+            var note = await _db.ProjectNotes
+                .FirstOrDefaultAsync(n => n.Id == noteId && n.ProjectId == id);
+
+            if (note is null)
+                return NotFound();
+
+            // Solo el autor o PM puede eliminar
+            var isAuthor = note.UserId == userId;
+            var isPM = await _db.ProjectMembers
+                .AnyAsync(m => m.ProjectId == id && m.UserId == userId && m.Role == "pm");
+
+            if (!isAuthor && !isPM)
+                return StatusCode(403, new { message = "You don't have permission to delete this note" });
+
+            _db.ProjectNotes.Remove(note);
+            await _db.SaveChangesAsync();
+
+            return NoContent();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"❌ Error en DeletePersonalProjectNote: {ex.Message}");
+            return StatusCode(500, new
+            {
+                error = "Internal Server Error",
+                message = ex.Message
+            });
+        }
+    }
 }

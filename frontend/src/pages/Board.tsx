@@ -218,12 +218,14 @@ export default function Board() {
     return tasks.filter((t) => t.status === status);
   }, [tasks]);
 
-  if (!organizationId || !projectId) {
+  // En modo personal, solo requerimos projectId
+  // En modo organizacional, requerimos ambos
+  if (!projectId || (!isPersonalMode && !isPersonalRoute && !organizationId)) {
     return (
-      <Layout organizationId={organizationId}>
+      <Layout organizationId={isPersonalMode || isPersonalRoute ? undefined : organizationId}>
         <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center" }}>
           <div className="alert alert-error">
-            Error: Faltan parámetros requeridos {!organizationId && "(Organization ID)"} {!projectId && "(Project ID)"}
+            Error: Faltan parámetros requeridos {!projectId && "(Project ID)"} {!isPersonalMode && !isPersonalRoute && !organizationId && "(Organization ID)"}
           </div>
         </div>
       </Layout>

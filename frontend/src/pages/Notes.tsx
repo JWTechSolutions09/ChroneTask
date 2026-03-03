@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback, useRef } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useLocation } from "react-router-dom";
 import { http } from "../api/http";
 import Layout from "../components/Layout";
 import PageHeader from "../components/PageHeader";
@@ -7,6 +7,7 @@ import Card from "../components/Card";
 import Button from "../components/Button";
 import { useToast } from "../contexts/ToastContext";
 import { useTerminology } from "../hooks/useTerminology";
+import { useUserUsageType } from "../hooks/useUserUsageType";
 
 type ProjectNote = {
   id: string;
@@ -30,7 +31,11 @@ type ProjectNote = {
 const NOTE_COLORS = ["#FFE5E5", "#E5F3FF", "#E5FFE5", "#FFF5E5", "#F0E5FF", "#E5FFFF", "#FFE5F0"];
 
 export default function Notes() {
-  const { organizationId, projectId } = useParams<{ organizationId: string; projectId: string }>();
+  const { organizationId, projectId } = useParams<{ organizationId?: string; projectId: string }>();
+  const location = useLocation();
+  const { usageType } = useUserUsageType();
+  const isPersonalMode = usageType === "personal";
+  const isPersonalRoute = location.pathname.startsWith("/personal");
   const [notes, setNotes] = useState<ProjectNote[]>([]);
   const [loading, setLoading] = useState(false);
   const [selectedNote, setSelectedNote] = useState<ProjectNote | null>(null);
@@ -53,10 +58,13 @@ export default function Notes() {
   }, []);
 
   const loadNotes = useCallback(async () => {
-    if (!organizationId || !projectId) return;
+    if (!projectId) return;
     setLoading(true);
     try {
-      const res = await http.get(`/api/orgs/${organizationId}/projects/${projectId}/notes`);
+      const endpoint = isPersonalMode || isPersonalRoute
+        ? `/api/users/me/projects/${projectId}/notes`
+        : `/api/orgs/${organizationId}/projects/${projectId}/notes`;
+      const res = await http.get(endpoint);
       setNotes(res.data || []);
     } catch (ex: any) {
       const errorMsg = ex?.response?.data?.message ?? ex.message ?? "Error cargando notas";
@@ -64,16 +72,19 @@ export default function Notes() {
     } finally {
       setLoading(false);
     }
-  }, [organizationId, projectId, showToast]);
+  }, [organizationId, projectId, showToast, isPersonalMode, isPersonalRoute]);
 
   useEffect(() => {
     loadNotes();
   }, [loadNotes]);
 
   const createNote = async () => {
-    if (!organizationId || !projectId) return;
+    if (!projectId) return;
     try {
-      const res = await http.post(`/api/orgs/${organizationId}/projects/${projectId}/notes`, {
+      const endpoint = isPersonalMode || isPersonalRoute
+        ? `/api/users/me/projects/${projectId}/notes`
+        : `/api/orgs/${organizationId}/projects/${projectId}/notes`;
+      const res = await http.post(endpoint, {
         title: "Nueva Nota",
         content: "",
         color: NOTE_COLORS[Math.floor(Math.random() * NOTE_COLORS.length)],
@@ -93,9 +104,12 @@ export default function Notes() {
   };
 
   const updateNote = async (note: ProjectNote) => {
-    if (!organizationId || !projectId) return;
+    if (!projectId) return;
     try {
-      await http.patch(`/api/orgs/${organizationId}/projects/${projectId}/notes/${note.id}`, {
+      const endpoint = isPersonalMode || isPersonalRoute
+        ? `/api/users/me/projects/${projectId}/notes/${note.id}`
+        : `/api/orgs/${organizationId}/projects/${projectId}/notes/${note.id}`;
+      await http.patch(endpoint, {
         title: note.title,
         content: note.content,
         color: note.color,
@@ -201,28 +215,39 @@ export default function Notes() {
     }
   }, [draggedNote, resizingNote, notes]);
 
-  if (!organizationId || !projectId) {
+  // En modo personal, solo requerimos projectId
+  // En modo organizacional, requerimos ambos
+  if (!projectId || (!isPersonalMode && !isPersonalRoute && !organizationId)) {
     return (
-      <Layout>
+      <Layout organizationId={isPersonalMode || isPersonalRoute ? undefined : organizationId}>
         <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center" }}>
-          <div className="alert alert-error">Error: Faltan parámetros requeridos</div>
+          <div className="alert alert-error">
+            Error: Faltan parámetros requeridos {!projectId && "(Project ID)"} {!isPersonalMode && !isPersonalRoute && !organizationId && "(Organization ID)"}
+          </div>
         </div>
       </Layout>
     );
   }
 
   return (
-    <Layout organizationId={organizationId}>
+    <Layout organizationId={isPersonalMode || isPersonalRoute ? undefined : organizationId}>
       <div style={{ flex: 1, overflowY: "auto", backgroundColor: "var(--bg-secondary)" }}>
         <PageHeader
           title="Notas Interactivas"
           subtitle={`${notes.length} notas`}
-          breadcrumbs={[
-            { label: t.organizations, to: "/org-select" },
-            { label: "Dashboard", to: `/org/${organizationId}/dashboard` },
-            { label: "Proyectos", to: `/org/${organizationId}/projects` },
-            { label: "Notas" },
-          ]}
+          breadcrumbs={
+            isPersonalMode || isPersonalRoute
+              ? [
+                  { label: "Mis Proyectos", to: "/personal/projects" },
+                  { label: "Notas" },
+                ]
+              : [
+                  { label: t.organizations, to: "/org-select" },
+                  { label: "Dashboard", to: `/org/${organizationId}/dashboard` },
+                  { label: "Proyectos", to: `/org/${organizationId}/projects` },
+                  { label: "Notas" },
+                ]
+          }
           actions={
             <Button variant="primary" onClick={createNote}>
               + Nueva Nota
