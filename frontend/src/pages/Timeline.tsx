@@ -28,7 +28,7 @@ export default function Timeline() {
   const location = useLocation();
   const { usageType } = useUserUsageType();
   const isPersonalMode = usageType === "personal";
-  const isPersonalRoute = location.pathname.startsWith("/personal");
+  const isPersonalRoute = location?.pathname?.startsWith("/personal") ?? false;
   const [tasks, setTasks] = useState<Task[]>([]);
   const t = useTerminology();
   const [projects, setProjects] = useState<any[]>([]);

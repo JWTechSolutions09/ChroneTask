@@ -24,11 +24,11 @@ type Project = {
 };
 
 export default function Projects() {
-  const { organizationId } = useParams<{ organizationId: string }>();
+  const { organizationId } = useParams<{ organizationId?: string }>();
   const location = useLocation();
   const { usageType } = useUserUsageType();
   const isPersonalMode = usageType === "personal";
-  const isPersonalRoute = location.pathname.startsWith("/personal");
+  const isPersonalRoute = location?.pathname?.startsWith("/personal") ?? false;
   const [projects, setProjects] = useState<Project[]>([]);
   const t = useTerminology();
   const [filteredProjects, setFilteredProjects] = useState<Project[]>([]);

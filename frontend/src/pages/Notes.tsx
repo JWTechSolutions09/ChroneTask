@@ -31,11 +31,11 @@ type ProjectNote = {
 const NOTE_COLORS = ["#FFE5E5", "#E5F3FF", "#E5FFE5", "#FFF5E5", "#F0E5FF", "#E5FFFF", "#FFE5F0"];
 
 export default function Notes() {
-  const { organizationId, projectId } = useParams<{ organizationId?: string; projectId: string }>();
+  const { organizationId, projectId } = useParams<{ organizationId?: string; projectId?: string }>();
   const location = useLocation();
   const { usageType } = useUserUsageType();
   const isPersonalMode = usageType === "personal";
-  const isPersonalRoute = location.pathname.startsWith("/personal");
+  const isPersonalRoute = location?.pathname?.startsWith("/personal") ?? false;
   const [notes, setNotes] = useState<ProjectNote[]>([]);
   const [loading, setLoading] = useState(false);
   const [selectedNote, setSelectedNote] = useState<ProjectNote | null>(null);
@@ -125,11 +125,23 @@ export default function Notes() {
   };
 
   const updateNote = async (note: ProjectNote) => {
-    if (!projectId) return;
+    // En modo personal, usar el projectId de la nota si no hay uno en la URL
+    const targetProjectId = projectId || note.projectId;
+    
+    if (!targetProjectId) {
+      showToast("No se puede actualizar la nota: falta projectId", "error");
+      return;
+    }
+    
+    if (!isPersonalMode && !isPersonalRoute && !organizationId) {
+      showToast("Se requiere una organización", "error");
+      return;
+    }
+    
     try {
       const endpoint = isPersonalMode || isPersonalRoute
-        ? `/api/users/me/projects/${projectId}/notes/${note.id}`
-        : `/api/orgs/${organizationId}/projects/${projectId}/notes/${note.id}`;
+        ? `/api/users/me/projects/${targetProjectId}/notes/${note.id}`
+        : `/api/orgs/${organizationId}/projects/${targetProjectId}/notes/${note.id}`;
       await http.patch(endpoint, {
         title: note.title,
         content: note.content,
@@ -148,7 +160,39 @@ export default function Notes() {
   };
 
   const deleteNote = async (id: string) => {
-    if (!organizationId || !projectId) return;
+    // Encontrar la nota para obtener su projectId
+    const note = notes.find((n) => n.id === id);
+    if (!note) {
+      showToast("Nota no encontrada", "error");
+      return;
+    }
+    
+    // En modo personal, usar el projectId de la nota
+    if (isPersonalMode || isPersonalRoute) {
+      const targetProjectId = projectId || note.projectId;
+      if (!targetProjectId) {
+        showToast("No se puede eliminar la nota: falta projectId", "error");
+        return;
+      }
+      try {
+        await http.delete(`/api/users/me/projects/${targetProjectId}/notes/${id}`);
+        await loadNotes();
+        if (selectedNote?.id === id) {
+          setSelectedNote(null);
+        }
+        showToast("Nota eliminada exitosamente", "success");
+      } catch (ex: any) {
+        showToast("Error eliminando nota", "error");
+      }
+      return;
+    }
+    
+    // Modo organizacional
+    if (!organizationId || !projectId) {
+      showToast("Se requieren organización y proyecto", "error");
+      return;
+    }
+    
     try {
       await http.delete(`/api/orgs/${organizationId}/projects/${projectId}/notes/${id}`);
       await loadNotes();

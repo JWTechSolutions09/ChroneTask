@@ -48,11 +48,11 @@ const STATUS_COLORS: Record<string, string> = {
 };
 
 export default function Board() {
-  const { organizationId, projectId } = useParams<{ organizationId?: string; projectId: string }>();
+  const { organizationId, projectId } = useParams<{ organizationId?: string; projectId?: string }>();
   const location = useLocation();
   const { usageType } = useUserUsageType();
   const isPersonalMode = usageType === "personal";
-  const isPersonalRoute = location.pathname.startsWith("/personal");
+  const isPersonalRoute = location?.pathname?.startsWith("/personal") ?? false;
   const [tasks, setTasks] = useState<Task[]>([]);
   const [projectName, setProjectName] = useState<string>("");
   const [projectMembers, setProjectMembers] = useState<ProjectMember[]>([]);
@@ -218,14 +218,26 @@ export default function Board() {
     return tasks.filter((t) => t.status === status);
   }, [tasks]);
 
-  // En modo personal, solo requerimos projectId
-  // En modo organizacional, requerimos ambos
-  if (!projectId || (!isPersonalMode && !isPersonalRoute && !organizationId)) {
+  // En modo personal, requerimos projectId
+  // En modo organizacional, requerimos ambos organizationId y projectId
+  if (!projectId) {
     return (
       <Layout organizationId={isPersonalMode || isPersonalRoute ? undefined : organizationId}>
         <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center" }}>
           <div className="alert alert-error">
-            Error: Faltan parámetros requeridos {!projectId && "(Project ID)"} {!isPersonalMode && !isPersonalRoute && !organizationId && "(Organization ID)"}
+            Error: Faltan parámetros requeridos (Project ID)
+          </div>
+        </div>
+      </Layout>
+    );
+  }
+  
+  if (!isPersonalMode && !isPersonalRoute && !organizationId) {
+    return (
+      <Layout organizationId={organizationId}>
+        <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center" }}>
+          <div className="alert alert-error">
+            Error: Faltan parámetros requeridos (Organization ID)
           </div>
         </div>
       </Layout>

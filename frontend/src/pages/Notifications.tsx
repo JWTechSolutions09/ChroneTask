@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useLocation } from "react-router-dom";
 import { http } from "../api/http";
 import Layout from "../components/Layout";
 import PageHeader from "../components/PageHeader";
@@ -7,6 +7,7 @@ import Card from "../components/Card";
 import Button from "../components/Button";
 import { useToast } from "../contexts/ToastContext";
 import { useTerminology } from "../hooks/useTerminology";
+import { useUserUsageType } from "../hooks/useUserUsageType";
 
 type Notification = {
   id: string;
@@ -47,7 +48,7 @@ export default function Notifications() {
   const location = useLocation();
   const { usageType } = useUserUsageType();
   const isPersonalMode = usageType === "personal";
-  const isPersonalRoute = location.pathname.startsWith("/personal");
+  const isPersonalRoute = location?.pathname?.startsWith("/personal") ?? false;
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const [loading, setLoading] = useState(false);

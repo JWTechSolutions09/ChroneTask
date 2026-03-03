@@ -53,7 +53,7 @@ type MemberInactivity = {
 };
 
 export default function Analytics() {
-  const { organizationId } = useParams<{ organizationId: string }>();
+  const { organizationId } = useParams<{ organizationId?: string }>();
   const [analytics, setAnalytics] = useState<Analytics | null>(null);
   const [loading, setLoading] = useState(false);
   const [selectedProjectId, setSelectedProjectId] = useState<string>("");
