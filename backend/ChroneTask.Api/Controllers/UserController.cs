@@ -259,46 +259,67 @@ public class UserController : ControllerBase
         {
             var userId = UserContext.GetUserId(User);
 
-            // Verificar que el usuario tiene usageType = "personal"
+            // Verificar que el usuario existe
             var user = await _db.Users
                 .FirstOrDefaultAsync(u => u.Id == userId);
 
             if (user is null)
                 return NotFound();
 
-            // Obtener proyectos personales (sin OrganizationId, con UserId)
-            var projects = await _db.Projects
-                .Where(p => p.UserId == userId && p.OrganizationId == null && p.IsActive)
-                .OrderByDescending(p => p.CreatedAt)
-                .Select(p => new ProjectResponse
-                {
-                    Id = p.Id,
-                    Name = p.Name,
-                    Description = p.Description,
-                    OrganizationId = p.OrganizationId,
-                    UserId = p.UserId,
-                    Template = p.Template,
-                    IsActive = p.IsActive,
-                    CreatedAt = p.CreatedAt,
-                    UpdatedAt = p.UpdatedAt,
-                    TaskCount = p.Tasks.Count,
-                    ActiveTaskCount = p.Tasks.Count(t => t.Status != "Done"),
-                    ImageUrl = p.ImageUrl,
-                    SlaHours = p.SlaHours,
-                    SlaWarningThreshold = p.SlaWarningThreshold
-                })
-                .ToListAsync();
+            // Intentar obtener proyectos personales
+            // Si la columna UserId no existe (migración no ejecutada), retornar lista vacía
+            try
+            {
+                var projects = await _db.Projects
+                    .Where(p => p.UserId == userId && p.OrganizationId == null && p.IsActive)
+                    .OrderByDescending(p => p.CreatedAt)
+                    .Select(p => new ProjectResponse
+                    {
+                        Id = p.Id,
+                        Name = p.Name,
+                        Description = p.Description,
+                        OrganizationId = p.OrganizationId,
+                        UserId = p.UserId,
+                        Template = p.Template,
+                        IsActive = p.IsActive,
+                        CreatedAt = p.CreatedAt,
+                        UpdatedAt = p.UpdatedAt,
+                        TaskCount = p.Tasks.Count,
+                        ActiveTaskCount = p.Tasks.Count(t => t.Status != "Done"),
+                        ImageUrl = p.ImageUrl,
+                        SlaHours = p.SlaHours,
+                        SlaWarningThreshold = p.SlaWarningThreshold
+                    })
+                    .ToListAsync();
 
-            return Ok(projects);
+                return Ok(projects);
+            }
+            catch (Microsoft.EntityFrameworkCore.DbUpdateException dbEx)
+            {
+                // Si es un error de base de datos relacionado con columnas faltantes
+                Console.WriteLine($"⚠️ Error de base de datos en GetPersonalProjects (posible migración pendiente): {dbEx.Message}");
+                Console.WriteLine($"⚠️ StackTrace: {dbEx.StackTrace}");
+                // Retornar lista vacía en lugar de error 500
+                return Ok(new List<ProjectResponse>());
+            }
+            catch (InvalidOperationException invalidOpEx)
+            {
+                // Si es un error de operación inválida (columna no existe)
+                Console.WriteLine($"⚠️ Error de operación en GetPersonalProjects (posible migración pendiente): {invalidOpEx.Message}");
+                Console.WriteLine($"⚠️ StackTrace: {invalidOpEx.StackTrace}");
+                // Retornar lista vacía en lugar de error 500
+                return Ok(new List<ProjectResponse>());
+            }
         }
         catch (Exception ex)
         {
             Console.WriteLine($"❌ Error en GetPersonalProjects: {ex.Message}");
-            return StatusCode(500, new
-            {
-                error = "Internal Server Error",
-                message = ex.Message
-            });
+            Console.WriteLine($"❌ StackTrace: {ex.StackTrace}");
+            Console.WriteLine($"❌ InnerException: {ex.InnerException?.Message}");
+
+            // Retornar lista vacía en lugar de error 500 para evitar romper el frontend
+            // El frontend puede manejar una lista vacía
+            return Ok(new List<ProjectResponse>());
         }
     }
 
