@@ -159,7 +159,7 @@ namespace ChroneTask.Api.Migrations
                         .HasMaxLength(120)
                         .HasColumnType("character varying(120)");
 
-                    b.Property<Guid>("OrganizationId")
+                    b.Property<Guid?>("OrganizationId")
                         .HasColumnType("uuid");
 
                     b.Property<string>("Template")
@@ -169,9 +169,14 @@ namespace ChroneTask.Api.Migrations
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<Guid?>("UserId")
+                        .HasColumnType("uuid");
+
                     b.HasKey("Id");
 
                     b.HasIndex("OrganizationId");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("Projects", (string)null);
                 });
@@ -393,10 +398,16 @@ namespace ChroneTask.Api.Migrations
                     b.HasOne("ChroneTask.Api.Entities.Organization", "Organization")
                         .WithMany()
                         .HasForeignKey("OrganizationId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("ChroneTask.Api.Entities.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.Navigation("Organization");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("ChroneTask.Api.Entities.ProjectMember", b =>
