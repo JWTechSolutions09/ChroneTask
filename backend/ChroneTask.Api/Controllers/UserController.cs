@@ -415,10 +415,23 @@ public class UserController : ControllerBase
         catch (Exception ex)
         {
             Console.WriteLine($"❌ Error en CreatePersonalProject: {ex.Message}");
+            Console.WriteLine($"❌ Tipo: {ex.GetType().Name}");
+            Console.WriteLine($"❌ StackTrace: {ex.StackTrace}");
+            if (ex.InnerException != null)
+            {
+                Console.WriteLine($"❌ InnerException: {ex.InnerException.Message}");
+                Console.WriteLine($"❌ InnerException Tipo: {ex.InnerException.GetType().Name}");
+                if (ex.InnerException.InnerException != null)
+                {
+                    Console.WriteLine($"❌ InnerException.InnerException: {ex.InnerException.InnerException.Message}");
+                }
+            }
+
             return StatusCode(500, new
             {
                 error = "Internal Server Error",
-                message = ex.Message
+                message = ex.Message,
+                innerException = ex.InnerException?.Message
             });
         }
     }
