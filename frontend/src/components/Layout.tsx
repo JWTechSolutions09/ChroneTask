@@ -4,6 +4,7 @@ import { clearToken, isAuthed } from "../auth/token";
 import { http } from "../api/http";
 import { useTheme } from "../contexts/ThemeContext";
 import { useUserUsageType, UsageType } from "../hooks/useUserUsageType";
+import { useTerminology } from "../hooks/useTerminology";
 
 type LayoutProps = {
   children: React.ReactNode;
@@ -29,6 +30,7 @@ export default function Layout({ children, organizationId, usageType: propUsageT
   const { theme, toggleTheme } = useTheme();
   const { usageType: hookUsageType, loading: loadingUsageType } = useUserUsageType();
   const usageType = propUsageType || hookUsageType;
+  const t = useTerminology();
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(() => {
@@ -87,31 +89,33 @@ export default function Layout({ children, organizationId, usageType: propUsageT
   // Esto evita que se cierre solo sin interacción del usuario
 
   // Memoizar funciones para evitar recrearlas en cada render
+  // NO cargar organizaciones en modo personal
   const loadOrgs = useCallback(async () => {
+    if (isPersonalMode) return; // No cargar en modo personal
     try {
       const res = await http.get("/api/orgs");
       setOrgs(res.data || []);
     } catch (err: any) {
-      console.error("Error cargando organizaciones:", err);
+      console.error(`Error cargando ${isTeamMode ? "equipos" : "organizaciones"}:`, err);
       // No mostrar error en el sidebar para no interrumpir la UX
     }
-  }, []);
+  }, [isPersonalMode, isTeamMode]);
 
   const loadOrgInfo = useCallback(async () => {
-    if (!organizationId) return;
+    if (!organizationId || isPersonalMode) return; // No cargar en modo personal
     try {
       const res = await http.get("/api/orgs");
       const orgs = res.data || [];
       const org = orgs.find((o: Org) => o.id === organizationId);
       setCurrentOrg(org || null);
     } catch (err: any) {
-      console.error("Error cargando información de organización:", err);
+      console.error(`Error cargando información de ${isTeamMode ? "equipo" : "organización"}:`, err);
       // No mostrar error en el sidebar para no interrumpir la UX
     }
-  }, [organizationId]);
+  }, [organizationId, isPersonalMode, isTeamMode]);
 
   const loadProjects = useCallback(async () => {
-    if (!organizationId) return;
+    if (!organizationId || isPersonalMode) return; // No cargar en modo personal
     setLoading(true);
     try {
       const res = await http.get(`/api/orgs/${organizationId}/projects`);
@@ -122,10 +126,13 @@ export default function Layout({ children, organizationId, usageType: propUsageT
     } finally {
       setLoading(false);
     }
-  }, [organizationId]);
+  }, [organizationId, isPersonalMode]);
 
-  // Solo cargar datos cuando cambie organizationId
+  // Solo cargar datos cuando cambie organizationId (NO en modo personal)
   useEffect(() => {
+    // No cargar nada en modo personal
+    if (isPersonalMode) return;
+    
     let isMounted = true;
     let timeoutId: NodeJS.Timeout | null = null;
     
@@ -157,7 +164,7 @@ export default function Layout({ children, organizationId, usageType: propUsageT
         clearTimeout(timeoutId);
       }
     };
-  }, [organizationId]); // Solo dependemos de organizationId
+  }, [organizationId, isPersonalMode, loadOrgInfo, loadProjects, loadOrgs]); // Dependemos de organizationId y modo personal
 
 
   const handleLogout = () => {
@@ -548,7 +555,7 @@ export default function Layout({ children, organizationId, usageType: propUsageT
                   onClick={() => {
                     navigate(`/org/${organizationId}/dashboard`);
                     setTimeout(() => {
-                      const inviteBtn = document.querySelector('[title="Invitar miembros a la organización"]');
+                      const inviteBtn = document.querySelector(`[title="${t.inviteMembersToOrganization}"]`);
                       if (inviteBtn) (inviteBtn as HTMLElement).click();
                     }, 300);
                   }}
@@ -564,7 +571,7 @@ export default function Layout({ children, organizationId, usageType: propUsageT
                   onClick={() => {
                     navigate(`/org/${organizationId}/dashboard`);
                     setTimeout(() => {
-                      const membersBtn = document.querySelector('[title="Ver miembros de la organización"]');
+                      const membersBtn = document.querySelector(`[title="${t.viewOrganizationMembers}"]`);
                       if (membersBtn) (membersBtn as HTMLElement).click();
                     }, 300);
                   }}
@@ -685,7 +692,7 @@ export default function Layout({ children, organizationId, usageType: propUsageT
               {/* Modo Empresarial - Organizaciones */}
               <NavItem
                 icon="🏢"
-                label="Organizaciones"
+                label={t.organizations}
                 to="/orgs"
                 active={isActive("/orgs")}
                 collapsed={effectiveCollapsed}

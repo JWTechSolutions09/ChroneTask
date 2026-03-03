@@ -129,11 +129,11 @@ export default function Register() {
             ChroneTask
           </h1>
           <p style={{ color: "#6c757d", fontSize: "16px" }}>
-            {invitationToken ? "Únete a la organización" : "Crea una cuenta para comenzar"}
+            {invitationToken ? "Únete al equipo" : "Crea una cuenta para comenzar"}
           </p>
           {invitationToken && (
             <div className="alert alert-info" style={{ marginTop: "12px", fontSize: "14px" }}>
-              Has sido invitado a unirte a una organización. Al registrarte, serás agregado automáticamente.
+              Has sido invitado a unirte a un equipo. Al registrarte, serás agregado automáticamente.
             </div>
           )}
         </div>

@@ -15,6 +15,7 @@ import Timeline from "./pages/Timeline";
 import Notes from "./pages/Notes";
 import { isAuthed } from "./auth/token";
 import { setNavigateFunction } from "./api/http";
+import { useUserUsageType } from "./hooks/useUserUsageType";
 import type { ReactElement } from "react";
 
 function PrivateRoute({ children }: { children: ReactElement }) {
@@ -51,6 +52,7 @@ function PrivateRoute({ children }: { children: ReactElement }) {
 function PublicRoute({ children }: { children: ReactElement }) {
     const [isChecking, setIsChecking] = React.useState(true);
     const [isAuthenticated, setIsAuthenticated] = React.useState(false);
+    const { usageType, loading: loadingUsageType } = useUserUsageType();
 
     React.useEffect(() => {
         // Verificar autenticación de forma asíncrona para evitar problemas de render
@@ -62,7 +64,7 @@ function PublicRoute({ children }: { children: ReactElement }) {
         checkAuth();
     }, []);
 
-    if (isChecking) {
+    if (isChecking || loadingUsageType) {
         return (
             <div style={{ 
                 display: "flex", 
@@ -76,7 +78,54 @@ function PublicRoute({ children }: { children: ReactElement }) {
         );
     }
 
-    return !isAuthenticated ? children : <Navigate to="/org-select" replace />;
+    if (!isAuthenticated) {
+        return children;
+    }
+
+    // Redirigir según el tipo de uso
+    switch (usageType) {
+        case "personal":
+            return <Navigate to="/personal/projects" replace />;
+        case "team":
+            return <Navigate to="/teams" replace />;
+        case "business":
+        default:
+            return <Navigate to="/org-select" replace />;
+    }
+}
+
+function DefaultRedirect() {
+    const { usageType, loading } = useUserUsageType();
+    const authenticated = isAuthed();
+
+    if (loading) {
+        return (
+            <div style={{ 
+                display: "flex", 
+                justifyContent: "center", 
+                alignItems: "center", 
+                minHeight: "100vh",
+                backgroundColor: "#f8f9fa"
+            }}>
+                <div className="loading">Cargando...</div>
+            </div>
+        );
+    }
+
+    if (!authenticated) {
+        return <Navigate to="/login" replace />;
+    }
+
+    // Redirigir según el tipo de uso
+    switch (usageType) {
+        case "personal":
+            return <Navigate to="/personal/projects" replace />;
+        case "team":
+            return <Navigate to="/teams" replace />;
+        case "business":
+        default:
+            return <Navigate to="/org-select" replace />;
+    }
 }
 
 function AppContent() {
@@ -223,9 +272,7 @@ function AppContent() {
             />
             <Route
                 path="*"
-                element={
-                    <Navigate to={isAuthed() ? "/org-select" : "/login"} replace />
-                }
+                element={<DefaultRedirect />}
             />
         </Routes>
     );

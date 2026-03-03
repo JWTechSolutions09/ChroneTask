@@ -12,6 +12,7 @@ import TaskDetailModal from "../components/TaskDetailModal";
 import KeyboardShortcuts from "../components/KeyboardShortcuts";
 import Button from "../components/Button";
 import { useToast } from "../contexts/ToastContext";
+import { useTerminology } from "../hooks/useTerminology";
 
 type Task = {
   id: string;
@@ -59,6 +60,7 @@ export default function Board() {
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const [assigningTaskId, setAssigningTaskId] = useState<string | null>(null);
   const { showToast } = useToast();
+  const t = useTerminology();
 
   const loadProjectInfo = useCallback(async () => {
     if (!projectId || !organizationId) return;
@@ -229,7 +231,7 @@ export default function Board() {
           title={projectName || "Board Kanban"}
           subtitle={`${tasks.length} tareas`}
           breadcrumbs={[
-            { label: "Organizaciones", to: "/org-select" },
+            { label: t.organizations, to: "/org-select" },
             { label: "Dashboard", to: `/org/${organizationId}/dashboard` },
             { label: "Proyectos", to: `/org/${organizationId}/projects` },
             { label: projectName || "Board" },

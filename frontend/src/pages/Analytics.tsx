@@ -6,6 +6,7 @@ import PageHeader from "../components/PageHeader";
 import Card from "../components/Card";
 import Button from "../components/Button";
 import { useToast } from "../contexts/ToastContext";
+import { useTerminology } from "../hooks/useTerminology";
 
 type Analytics = {
   totalTasks: number;
@@ -61,6 +62,7 @@ export default function Analytics() {
   const [endDate, setEndDate] = useState<string>("");
   const [projects, setProjects] = useState<any[]>([]);
   const { showToast } = useToast();
+  const t = useTerminology();
 
   const loadAnalytics = useCallback(async () => {
     if (!organizationId) return;
@@ -152,7 +154,7 @@ export default function Analytics() {
           title="Resumen y Analíticas"
           subtitle="Estadísticas organizacionales y métricas de rendimiento"
           breadcrumbs={[
-            { label: "Organizaciones", to: "/org-select" },
+            { label: t.organizations, to: "/org-select" },
             { label: "Dashboard", to: `/org/${organizationId}/dashboard` },
             { label: "Resumen" },
           ]}

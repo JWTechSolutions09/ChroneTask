@@ -6,6 +6,7 @@ import Card from "../components/Card";
 import Button from "../components/Button";
 import ImageUpload from "../components/ImageUpload";
 import { useToast } from "../contexts/ToastContext";
+import { useTerminology } from "../hooks/useTerminology";
 
 type UserProfile = {
   id: string;
@@ -27,6 +28,7 @@ export default function Settings() {
   const [saving, setSaving] = useState(false);
   const [changingPassword, setChangingPassword] = useState(false);
   const [activeTab, setActiveTab] = useState<"profile" | "password" | "organizations">("profile");
+  const t = useTerminology();
   
   // Form states
   const [fullName, setFullName] = useState("");
@@ -132,7 +134,7 @@ export default function Settings() {
           title="Configuración"
           subtitle="Gestiona tu perfil y preferencias"
           breadcrumbs={[
-            { label: "Organizaciones", to: "/org-select" },
+            { label: t.organizations, to: "/org-select" },
             { label: "Configuración" },
           ]}
         />
@@ -186,7 +188,7 @@ export default function Settings() {
                 transition: "all 0.2s",
               }}
             >
-              🏢 Organizaciones
+              🏢 {t.organizations}
             </button>
           </div>
 
@@ -335,7 +337,7 @@ export default function Settings() {
           {activeTab === "organizations" && (
             <Card>
               <h2 style={{ fontSize: "20px", fontWeight: 600, marginBottom: "24px", color: "var(--text-primary)" }}>
-                Mis Organizaciones
+                {t.myOrganizations}
               </h2>
               {profile?.organizations && profile.organizations.length > 0 ? (
                 <div style={{ display: "grid", gap: "12px" }}>
@@ -401,7 +403,7 @@ export default function Settings() {
                 </div>
               ) : (
                 <div className="empty-state">
-                  <p>No perteneces a ninguna organización todavía.</p>
+                  <p>No perteneces a ningún {t.organizationLower} todavía.</p>
                 </div>
               )}
             </Card>

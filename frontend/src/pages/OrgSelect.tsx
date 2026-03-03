@@ -5,6 +5,8 @@ import Layout from "../components/Layout";
 import PageHeader from "../components/PageHeader";
 import Card from "../components/Card";
 import { useToast } from "../contexts/ToastContext";
+import { useTerminology } from "../hooks/useTerminology";
+import { useUserUsageType } from "../hooks/useUserUsageType";
 
 type Org = {
   id: string;
@@ -15,37 +17,52 @@ type Org = {
 
 export default function OrgSelect() {
   const nav = useNavigate();
+  const { usageType } = useUserUsageType();
+  const isPersonalMode = usageType === "personal";
   const [orgs, setOrgs] = useState<Org[]>([]);
   const [loading, setLoading] = useState(false);
   const [err, setErr] = useState<string | null>(null);
   const { showToast } = useToast();
+  const t = useTerminology();
+
+  // Redirigir si es modo personal
+  useEffect(() => {
+    if (isPersonalMode) {
+      nav("/personal/projects", { replace: true });
+    }
+  }, [isPersonalMode, nav]);
 
   const loadOrgs = useCallback(async () => {
+    // No cargar en modo personal
+    if (isPersonalMode) return;
+    
     setLoading(true);
     setErr(null);
     try {
       const res = await http.get("/api/orgs");
       setOrgs(res.data || []);
     } catch (ex: any) {
-      const errorMsg = ex?.response?.data?.message ?? ex.message ?? "Error cargando organizaciones";
+      const errorMsg = ex?.response?.data?.message ?? ex.message ?? t.errorLoadingOrganizations;
       setErr(errorMsg);
-      console.error("Error cargando organizaciones:", ex);
+      console.error(`Error cargando ${t.organizationsLower}:`, ex);
       // No mostrar toast aquí para evitar spam, pero sí loguear el error
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [isPersonalMode, t]);
 
   useEffect(() => {
-    loadOrgs();
+    if (!isPersonalMode) {
+      loadOrgs();
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []); // Solo ejecutar una vez al montar
+  }, [isPersonalMode]); // Solo ejecutar si no es modo personal
 
   const selectOrg = (orgId: string) => {
     const selectedOrg = orgs.find((o) => o.id === orgId);
     localStorage.setItem("currentOrgId", orgId);
     if (selectedOrg) {
-      showToast(`Organización "${selectedOrg.name}" seleccionada`, "success");
+      showToast(`${t.organizationSelected} "${selectedOrg.name}" seleccionada`, "success");
     }
     nav(`/org/${orgId}/dashboard`);
   };
@@ -54,7 +71,7 @@ export default function OrgSelect() {
     return (
       <Layout>
         <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", minHeight: "400px" }}>
-          <div className="loading">Cargando organizaciones...</div>
+          <div className="loading">{t.loadingOrganizations}</div>
         </div>
       </Layout>
     );
@@ -64,13 +81,13 @@ export default function OrgSelect() {
     <Layout>
       <div style={{ flex: 1, overflowY: "auto", backgroundColor: "#f8f9fa" }}>
         <PageHeader
-          title="Selecciona una organización"
+          title={t.selectAnOrganization}
           subtitle={
             orgs.length > 0
-              ? `${orgs.length} ${orgs.length === 1 ? "organización disponible" : "organizaciones disponibles"}`
-              : "No tienes organizaciones"
+              ? `${orgs.length} ${orgs.length === 1 ? t.organizationAvailable : t.organizationsAvailable}`
+              : t.noOrganizations
           }
-          breadcrumbs={[{ label: "Organizaciones" }]}
+          breadcrumbs={[{ label: t.organizations }]}
         />
 
         <div style={{ padding: "24px" }}>
@@ -82,10 +99,10 @@ export default function OrgSelect() {
                 🏢
               </div>
               <h3 style={{ fontSize: "24px", fontWeight: 700, color: "#212529", marginBottom: "12px" }}>
-                No tienes organizaciones
+                {t.noOrganizations}
               </h3>
               <p style={{ fontSize: "16px", color: "#6c757d", marginBottom: "24px" }}>
-                Crea tu primera organización para comenzar a gestionar proyectos y tareas
+                {t.noOrganizationsMessage}
               </p>
               <a
                 href="/orgs"
@@ -111,7 +128,7 @@ export default function OrgSelect() {
                   e.currentTarget.style.boxShadow = "none";
                 }}
               >
-                Crear Organización
+                {t.createFirstOrganization}
               </a>
             </Card>
           ) : (

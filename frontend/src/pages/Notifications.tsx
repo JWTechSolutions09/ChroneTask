@@ -6,6 +6,7 @@ import PageHeader from "../components/PageHeader";
 import Card from "../components/Card";
 import Button from "../components/Button";
 import { useToast } from "../contexts/ToastContext";
+import { useTerminology } from "../hooks/useTerminology";
 
 type Notification = {
   id: string;
@@ -48,6 +49,7 @@ export default function Notifications() {
   const [loading, setLoading] = useState(false);
   const [filter, setFilter] = useState<"all" | "unread">("all");
   const { showToast } = useToast();
+  const t = useTerminology();
 
   const loadNotifications = useCallback(async () => {
     if (!organizationId) return;
@@ -161,7 +163,7 @@ export default function Notifications() {
           title="Notificaciones"
           subtitle={`${notifications.length} notificaciones${unreadNotifications.length > 0 ? ` • ${unreadNotifications.length} sin leer` : ""}`}
           breadcrumbs={[
-            { label: "Organizaciones", to: "/org-select" },
+            { label: t.organizations, to: "/org-select" },
             { label: "Dashboard", to: `/org/${organizationId}/dashboard` },
             { label: "Notificaciones" },
           ]}

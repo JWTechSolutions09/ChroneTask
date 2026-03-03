@@ -3,6 +3,7 @@ import { http } from "../api/http";
 import { useToast } from "../contexts/ToastContext";
 import Card from "./Card";
 import Button from "./Button";
+import { useTerminology } from "../hooks/useTerminology";
 
 type OrganizationMember = {
   userId: string;
@@ -43,6 +44,7 @@ export default function AddProjectMemberModal({
   const [selectedUserId, setSelectedUserId] = useState<string>("");
   const [selectedRole, setSelectedRole] = useState<string>("member");
   const { showToast } = useToast();
+  const t = useTerminology();
 
   const loadData = useCallback(async () => {
     if (!isOpen) return;
@@ -191,7 +193,7 @@ export default function AddProjectMemberModal({
               <form onSubmit={handleAddMember} style={{ display: "grid", gap: "12px" }}>
                 <div>
                   <label style={{ display: "block", marginBottom: "6px", fontSize: "14px", fontWeight: 500, color: "#495057" }}>
-                    Miembro de la Organización
+                    Miembro del {t.organization}
                   </label>
                   <select
                     value={selectedUserId}
@@ -209,7 +211,7 @@ export default function AddProjectMemberModal({
                   </select>
                   {availableMembers.length === 0 && (
                     <p style={{ fontSize: "12px", color: "#6c757d", marginTop: "4px" }}>
-                      Todos los miembros de la organización ya están en el proyecto
+                      Todos los miembros del {t.organizationLower} ya están en el proyecto
                     </p>
                   )}
                 </div>

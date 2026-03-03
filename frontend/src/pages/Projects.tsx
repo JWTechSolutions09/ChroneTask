@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useLocation } from "react-router-dom";
 import { http } from "../api/http";
 import Layout from "../components/Layout";
 import PageHeader from "../components/PageHeader";
@@ -9,6 +9,8 @@ import SearchBar from "../components/SearchBar";
 import AddProjectMemberModal from "../components/AddProjectMemberModal";
 import ImageUpload from "../components/ImageUpload";
 import { useToast } from "../contexts/ToastContext";
+import { useTerminology } from "../hooks/useTerminology";
+import { useUserUsageType } from "../hooks/useUserUsageType";
 
 type Project = {
   id: string;
@@ -23,7 +25,12 @@ type Project = {
 
 export default function Projects() {
   const { organizationId } = useParams<{ organizationId: string }>();
+  const location = useLocation();
+  const { usageType } = useUserUsageType();
+  const isPersonalMode = usageType === "personal";
+  const isPersonalRoute = location.pathname.startsWith("/personal");
   const [projects, setProjects] = useState<Project[]>([]);
+  const t = useTerminology();
   const [filteredProjects, setFilteredProjects] = useState<Project[]>([]);
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
@@ -40,6 +47,27 @@ export default function Projects() {
   const { showToast } = useToast();
 
   const loadProjects = useCallback(async () => {
+    // En modo personal, usar endpoint diferente (si existe) o no cargar
+    if (isPersonalMode || isPersonalRoute) {
+      setLoading(true);
+      setErr(null);
+      try {
+        // TODO: Crear endpoint /api/users/me/projects para proyectos personales
+        // Por ahora, usar un array vacío o endpoint alternativo
+        const res = await http.get("/api/users/me/projects").catch(() => ({ data: [] }));
+        const projectsData = res.data || [];
+        setProjects(projectsData);
+        setFilteredProjects(projectsData);
+      } catch (ex: any) {
+        // Si el endpoint no existe, simplemente usar array vacío
+        setProjects([]);
+        setFilteredProjects([]);
+      } finally {
+        setLoading(false);
+      }
+      return;
+    }
+
     if (!organizationId) return;
 
     setLoading(true);
@@ -59,14 +87,15 @@ export default function Projects() {
     } finally {
       setLoading(false);
     }
-  }, [organizationId, showToast]);
+  }, [organizationId, isPersonalMode, isPersonalRoute, showToast]);
 
   useEffect(() => {
-    if (organizationId) {
+    // Cargar proyectos si hay organizationId o si estamos en modo personal
+    if (organizationId || isPersonalMode || isPersonalRoute) {
       loadProjects();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [organizationId]); // Solo dependemos de organizationId para evitar loops
+  }, [organizationId, isPersonalMode, isPersonalRoute]); // Dependemos de organizationId o modo personal
 
   useEffect(() => {
     let filtered = [...projects];
@@ -90,8 +119,20 @@ export default function Projects() {
   const createProject = useCallback(async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
 
-    if (!organizationId || !name.trim()) {
+    if (!name.trim()) {
       setErr("El nombre es requerido");
+      return;
+    }
+
+    // En modo personal, usar endpoint diferente
+    if (isPersonalMode || isPersonalRoute) {
+      setErr("Los proyectos personales aún no están implementados en el backend");
+      setCreating(false);
+      return;
+    }
+
+    if (!organizationId) {
+      setErr(`Se requiere ID de ${t.organizationLower}`);
       return;
     }
 
@@ -126,36 +167,43 @@ export default function Projects() {
     } finally {
       setCreating(false);
     }
-  }, [organizationId, name, description, template, loadProjects, showToast]);
+  }, [organizationId, name, description, template, loadProjects, showToast, isPersonalMode, isPersonalRoute, t]);
 
-  if (!organizationId) {
+  // En modo personal, no requerir organizationId
+  if (!isPersonalMode && !isPersonalRoute && !organizationId) {
     return (
       <Layout>
         <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center" }}>
-          <div className="alert alert-error">Error: No se proporcionó ID de organización</div>
+          <div className="alert alert-error">Error: No se proporcionó ID de {t.organizationLower}</div>
         </div>
       </Layout>
     );
   }
 
   return (
-    <Layout organizationId={organizationId}>
+    <Layout organizationId={isPersonalMode || isPersonalRoute ? undefined : organizationId}>
       <div style={{ flex: 1, overflowY: "auto", backgroundColor: "#f8f9fa" }}>
         <PageHeader
           title="Proyectos"
           subtitle={`${projects.length} ${projects.length === 1 ? "proyecto" : "proyectos"} en total`}
-          breadcrumbs={[
-            { label: "Organizaciones", to: "/org-select" },
-            { label: "Dashboard", to: `/org/${organizationId}/dashboard` },
-            { label: "Proyectos" },
-          ]}
+          breadcrumbs={
+            isPersonalMode || isPersonalRoute
+              ? [{ label: "Mis Proyectos" }]
+              : [
+                { label: t.organizations, to: "/org-select" },
+                { label: "Dashboard", to: `/org/${organizationId}/dashboard` },
+                { label: "Proyectos" },
+              ]
+          }
           actions={
-            <Link to={`/org/${organizationId}/dashboard`}>
-              <Button variant="secondary" style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-                <span>←</span>
-                <span>Dashboard</span>
-              </Button>
-            </Link>
+            !isPersonalMode && !isPersonalRoute && organizationId ? (
+              <Link to={`/org/${organizationId}/dashboard`}>
+                <Button variant="secondary" style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                  <span>←</span>
+                  <span>Dashboard</span>
+                </Button>
+              </Link>
+            ) : null
           }
         />
 

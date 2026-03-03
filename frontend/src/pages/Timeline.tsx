@@ -6,6 +6,7 @@ import PageHeader from "../components/PageHeader";
 import Card from "../components/Card";
 import Button from "../components/Button";
 import { useToast } from "../contexts/ToastContext";
+import { useTerminology } from "../hooks/useTerminology";
 
 type Task = {
   id: string;
@@ -24,6 +25,7 @@ type TimelineView = "week" | "month";
 export default function Timeline() {
   const { organizationId, projectId } = useParams<{ organizationId: string; projectId?: string }>();
   const [tasks, setTasks] = useState<Task[]>([]);
+  const t = useTerminology();
   const [projects, setProjects] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [view, setView] = useState<TimelineView>("week");
@@ -172,7 +174,7 @@ export default function Timeline() {
           title="Cronograma"
           subtitle={viewTitle}
           breadcrumbs={[
-            { label: "Organizaciones", to: "/org-select" },
+            { label: t.organizations, to: "/org-select" },
             { label: "Dashboard", to: `/org/${organizationId}/dashboard` },
             { label: "Cronograma" },
           ]}

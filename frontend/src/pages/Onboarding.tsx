@@ -106,7 +106,7 @@ export default function Onboarding() {
     {
       type: "business" as UsageType,
       title: "Empresarial",
-      description: "Gestiona organizaciones y múltiples equipos",
+      description: "Gestiona múltiples organizaciones y equipos",
       icon: "🏢",
       color: "#8b5cf6",
     },

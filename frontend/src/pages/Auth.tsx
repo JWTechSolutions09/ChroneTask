@@ -4,6 +4,7 @@ import { http } from "../api/http";
 import { setToken, isAuthed } from "../auth/token";
 import { useToast } from "../contexts/ToastContext";
 import { useTheme } from "../contexts/ThemeContext";
+import { useUserUsageType } from "../hooks/useUserUsageType";
 import "../styles/auth.css";
 
 export default function Auth() {
@@ -23,12 +24,25 @@ export default function Auth() {
   const [invitationToken, setInvitationToken] = useState<string | null>(null);
   const { theme } = useTheme();
 
-  // Si ya está autenticado, redirigir
+  const { usageType, loading: loadingUsageType } = useUserUsageType();
+  
+  // Si ya está autenticado, redirigir según el tipo de uso
   useEffect(() => {
-    if (isAuthed()) {
-      navigate("/org-select", { replace: true });
+    if (isAuthed() && !loadingUsageType) {
+      switch (usageType) {
+        case "personal":
+          navigate("/personal/projects", { replace: true });
+          break;
+        case "team":
+          navigate("/teams", { replace: true });
+          break;
+        case "business":
+        default:
+          navigate("/org-select", { replace: true });
+          break;
+      }
     }
-  }, [navigate]);
+  }, [navigate, usageType, loadingUsageType]);
 
   // Obtener token de invitación de la URL
   useEffect(() => {
@@ -73,7 +87,13 @@ export default function Auth() {
       if (res.data?.token) {
         setToken(res.data.token);
         showToast("Inicio de sesión exitoso", "success");
-        navigate("/org-select", { replace: true });
+        // Redirigir según el tipo de uso (se cargará después del login)
+        // Por ahora redirigir a onboarding si no tiene tipo, o según el tipo
+        setTimeout(() => {
+          // El hook useUserUsageType se actualizará después del login
+          // Por ahora redirigir a org-select como default
+          navigate("/org-select", { replace: true });
+        }, 100);
       } else {
         setErr("Token no recibido del servidor");
       }
@@ -150,10 +170,26 @@ export default function Auth() {
         showToast("Registro exitoso, pero no se pudo iniciar sesión automáticamente", "warning");
       }
     } catch (ex: any) {
-      const errorMsg =
-        ex?.response?.data?.message ?? ex.message ?? "Error al registrarse";
-      setErr(errorMsg);
-      showToast(errorMsg, "error");
+      let errorMsg = "Error al registrarse";
+      
+      // Manejar error 409 (Conflict) - Email ya registrado
+      if (ex?.response?.status === 409) {
+        errorMsg = "Este email ya está registrado. Por favor, inicia sesión o usa otro email.";
+        setErr(errorMsg);
+        showToast(errorMsg, "error");
+        // Sugerir cambiar a modo login
+        setTimeout(() => {
+          if (window.confirm("¿Deseas iniciar sesión en su lugar?")) {
+            setIsRegisterMode(false);
+            setEmail(email.trim().toLowerCase());
+          }
+        }, 1000);
+      } else {
+        // Otros errores
+        errorMsg = ex?.response?.data?.message ?? ex.message ?? "Error al registrarse";
+        setErr(errorMsg);
+        showToast(errorMsg, "error");
+      }
     } finally {
       setLoading(false);
     }

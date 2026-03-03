@@ -7,6 +7,7 @@ import Card from "../components/Card";
 import Button from "../components/Button";
 import InvitationsModal from "../components/InvitationsModal";
 import { useToast } from "../contexts/ToastContext";
+import { useTerminology } from "../hooks/useTerminology";
 
 type Org = {
   id: string;
@@ -27,6 +28,7 @@ export default function Orgs() {
   const [confirmDelete, setConfirmDelete] = useState<string | null>(null);
   const [invitationsModalOrg, setInvitationsModalOrg] = useState<{ id: string; name: string } | null>(null);
   const { showToast } = useToast();
+  const t = useTerminology();
 
   const load = useCallback(async () => {
     setErr(null);
@@ -35,7 +37,7 @@ export default function Orgs() {
       const res = await http.get("/api/orgs");
       setItems(res.data || []);
     } catch (ex: any) {
-      let errorMessage = "Error cargando organizaciones";
+      let errorMessage = t.errorLoadingOrganizations;
       if (ex.response) {
         errorMessage = ex.response.data?.message || errorMessage;
       } else if (ex.request) {
@@ -65,11 +67,11 @@ export default function Orgs() {
       setName("");
       setSlug("");
       await load();
-      showToast("Organización creada exitosamente", "success");
-      // Redirigir a selección de organización después de crear
+      showToast(t.organizationCreated, "success");
+      // Redirigir a selección después de crear
       nav("/org-select");
     } catch (ex: any) {
-      let errorMessage = "Error creando organización";
+      let errorMessage = t.errorCreatingOrganization;
       if (ex.response) {
         errorMessage = ex.response.data?.message || errorMessage;
       } else if (ex.request) {
@@ -95,17 +97,17 @@ export default function Orgs() {
     setErr(null);
     try {
       await http.delete(`/api/orgs/${confirmDelete}`);
-      showToast("Organización eliminada exitosamente", "success");
+      showToast(t.organizationDeleted, "success");
       await load();
       
-      // Si era la organización actual, redirigir a selección
+      // Si era la actual, redirigir a selección
       const currentOrgId = localStorage.getItem("currentOrgId");
       if (currentOrgId === confirmDelete) {
         localStorage.removeItem("currentOrgId");
         nav("/org-select", { replace: true });
       }
     } catch (ex: any) {
-      let errorMessage = "Error eliminando organización";
+      let errorMessage = t.errorDeletingOrganization;
       if (ex.response) {
         errorMessage = ex.response.data?.message || errorMessage;
       } else if (ex.request) {
@@ -134,16 +136,16 @@ export default function Orgs() {
     <Layout>
       <div style={{ flex: 1, overflowY: "auto", backgroundColor: "var(--bg-secondary)" }}>
         <PageHeader
-          title="Organizaciones"
-          subtitle="Gestiona tus organizaciones"
-          breadcrumbs={[{ label: "Organizaciones" }]}
+          title={t.organizations}
+          subtitle={t.manageOrganizations}
+          breadcrumbs={[{ label: t.organizations }]}
         />
 
         <div style={{ padding: "24px" }}>
           {/* Create Org Form */}
           <Card style={{ marginBottom: "24px" }}>
             <h2 style={{ fontSize: "18px", fontWeight: 600, marginBottom: "16px", color: "var(--text-primary)" }}>
-              Crear Nueva Organización
+              {t.createOrganization}
             </h2>
             <form onSubmit={createOrg} style={{ display: "grid", gap: "12px" }}>
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px" }}>
@@ -195,7 +197,7 @@ export default function Orgs() {
                 disabled={!name.trim() || creating}
                 loading={creating}
               >
-                Crear Organización
+                {t.createFirstOrganization}
               </Button>
             </form>
           </Card>
@@ -203,11 +205,11 @@ export default function Orgs() {
           {err && <div className="alert alert-error">{err}</div>}
 
           {loading ? (
-            <div className="loading">Cargando organizaciones...</div>
+            <div className="loading">{t.loadingOrganizations}</div>
           ) : items.length === 0 ? (
             <div className="empty-state">
               <div className="empty-state-icon">🏢</div>
-              <p>No hay organizaciones todavía. Crea una para comenzar.</p>
+              <p>No hay {t.organizationsLower} todavía. Crea una para comenzar.</p>
             </div>
           ) : (
             <div
@@ -309,7 +311,7 @@ export default function Orgs() {
                         e.currentTarget.style.backgroundColor = "transparent";
                         e.currentTarget.style.transform = "scale(1)";
                       }}
-                      title="Eliminar organización"
+                      title={t.deleteOrganization}
                     >
                       {deletingId === o.id ? "⏳" : "🗑️"}
                     </button>
@@ -347,7 +349,7 @@ export default function Orgs() {
                             marginBottom: "8px",
                           }}
                         >
-                          ¿Eliminar organización?
+                          {t.deleteOrganizationConfirm}
                         </h4>
                         <p style={{ fontSize: "14px", color: "#6c757d", margin: 0 }}>
                           Esta acción no se puede deshacer. Se eliminarán todos los proyectos y tareas asociados.

@@ -3,6 +3,7 @@ import { http } from "../api/http";
 import { useToast } from "../contexts/ToastContext";
 import Card from "./Card";
 import Button from "./Button";
+import { useTerminology } from "../hooks/useTerminology";
 
 type OrganizationMember = {
   userId: string;
@@ -28,6 +29,7 @@ export default function OrganizationMembersModal({
 }: OrganizationMembersModalProps) {
   const [members, setMembers] = useState<OrganizationMember[]>([]);
   const [loading, setLoading] = useState(false);
+  const t = useTerminology();
   const { showToast } = useToast();
 
   const loadMembers = useCallback(async () => {
@@ -101,7 +103,7 @@ export default function OrganizationMembersModal({
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "24px" }}>
           <div>
             <h2 style={{ fontSize: "24px", fontWeight: 700, margin: 0, color: "#212529" }}>
-              Miembros de la Organización
+              {t.organizationMembers}
             </h2>
             <p style={{ fontSize: "14px", color: "#6c757d", margin: "4px 0 0 0" }}>
               {organizationName} • {members.length} {members.length === 1 ? "miembro" : "miembros"}
@@ -136,7 +138,7 @@ export default function OrganizationMembersModal({
           <div className="loading">Cargando miembros...</div>
         ) : members.length === 0 ? (
           <div className="empty-state">
-            <p>No hay miembros en esta organización.</p>
+            <p>No hay miembros en este {t.organizationLower}.</p>
           </div>
         ) : (
           <div style={{ display: "grid", gap: "12px" }}>

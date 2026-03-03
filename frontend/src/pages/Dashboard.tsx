@@ -11,6 +11,7 @@ import MiniChart from "../components/MiniChart";
 import InvitationsModal from "../components/InvitationsModal";
 import OrganizationMembersModal from "../components/OrganizationMembersModal";
 import { useToast } from "../contexts/ToastContext";
+import { useTerminology } from "../hooks/useTerminology";
 
 type Project = {
   id: string;
@@ -28,6 +29,7 @@ export default function Dashboard() {
   const [projects, setProjects] = useState<Project[]>([]);
   const [filteredProjects, setFilteredProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(false);
+  const t = useTerminology();
   const [err, setErr] = useState<string | null>(null);
   const [viewMode, setViewMode] = useState<"grid" | "table">("grid");
   const [searchQuery, setSearchQuery] = useState("");
@@ -46,7 +48,7 @@ export default function Dashboard() {
         setOrganizationName(org.name || "");
       }
     } catch (ex: any) {
-      console.error("Error cargando información de organización:", ex);
+      console.error(`Error cargando información de ${t.organizationLower}:`, ex);
     }
   }, [organizationId]);
 
@@ -99,7 +101,7 @@ export default function Dashboard() {
     return (
       <Layout>
         <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center" }}>
-          <div className="alert alert-error">Error: No se proporcionó ID de organización</div>
+          <div className="alert alert-error">Error: No se proporcionó ID de {t.organizationLower}</div>
         </div>
       </Layout>
     );
@@ -135,7 +137,7 @@ export default function Dashboard() {
               : `${projects.length} ${projects.length === 1 ? "proyecto activo" : "proyectos activos"}`
           }
           breadcrumbs={[
-            { label: "Organizaciones", to: "/org-select" },
+            { label: t.organizations, to: "/org-select" },
             { label: "Dashboard" },
           ]}
           actions={
@@ -162,7 +164,7 @@ export default function Dashboard() {
                 onMouseLeave={(e) => {
                   e.currentTarget.style.backgroundColor = "white";
                 }}
-                title="Ver miembros de la organización"
+                title={t.viewOrganizationMembers}
               >
                 👥 Miembros
               </button>
@@ -188,7 +190,7 @@ export default function Dashboard() {
                 onMouseLeave={(e) => {
                   e.currentTarget.style.backgroundColor = "white";
                 }}
-                title="Invitar miembros a la organización"
+                title={t.inviteMembersToOrganization}
               >
                 ✉️ Invitar
               </button>

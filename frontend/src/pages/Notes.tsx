@@ -6,6 +6,7 @@ import PageHeader from "../components/PageHeader";
 import Card from "../components/Card";
 import Button from "../components/Button";
 import { useToast } from "../contexts/ToastContext";
+import { useTerminology } from "../hooks/useTerminology";
 
 type ProjectNote = {
   id: string;
@@ -33,6 +34,7 @@ export default function Notes() {
   const [notes, setNotes] = useState<ProjectNote[]>([]);
   const [loading, setLoading] = useState(false);
   const [selectedNote, setSelectedNote] = useState<ProjectNote | null>(null);
+  const t = useTerminology();
   const [isCreating, setIsCreating] = useState(false);
   const [draggedNote, setDraggedNote] = useState<{ id: string; offsetX: number; offsetY: number } | null>(null);
   const [resizingNote, setResizingNote] = useState<{ id: string; startX: number; startY: number; startWidth: number; startHeight: number } | null>(null);
@@ -216,7 +218,7 @@ export default function Notes() {
           title="Notas Interactivas"
           subtitle={`${notes.length} notas`}
           breadcrumbs={[
-            { label: "Organizaciones", to: "/org-select" },
+            { label: t.organizations, to: "/org-select" },
             { label: "Dashboard", to: `/org/${organizationId}/dashboard` },
             { label: "Proyectos", to: `/org/${organizationId}/projects` },
             { label: "Notas" },
