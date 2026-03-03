@@ -628,6 +628,15 @@ export default function Layout({ children, organizationId, usageType: propUsageT
                   forceShowLabel={isMobile && sidebarOpen}
                   onNavigate={closeMobileMenu}
                 />
+                <NavItem
+                  icon="📝"
+                  label="Notas"
+                  to={`/org/${organizationId}/notes`}
+                  active={isActive(`/org/${organizationId}/notes`) || isActive(`/org/${organizationId}/project/`) && location.pathname.includes("notes")}
+                  collapsed={effectiveCollapsed}
+                  forceShowLabel={isMobile && sidebarOpen}
+                  onNavigate={closeMobileMenu}
+                />
               </div>
 
               {/* Projects List */}
@@ -663,12 +672,63 @@ export default function Layout({ children, organizationId, usageType: propUsageT
             </>
           ) : isPersonalMode ? (
             <>
-              {/* Modo Personal - Solo proyectos */}
+              {/* Modo Personal - Dashboard completo */}
+              {!effectiveCollapsed && (
+                <div
+                  style={{
+                    fontSize: "11px",
+                    fontWeight: 600,
+                    color: "var(--text-secondary)",
+                    textTransform: "uppercase",
+                    letterSpacing: "0.5px",
+                    padding: "8px 12px",
+                    marginBottom: "4px",
+                  }}
+                >
+                  Navegación Principal
+                </div>
+              )}
+              <NavItem
+                icon="📊"
+                label="Dashboard"
+                to="/personal/dashboard"
+                active={isActive("/personal/dashboard")}
+                collapsed={effectiveCollapsed}
+                forceShowLabel={isMobile && sidebarOpen}
+                onNavigate={closeMobileMenu}
+              />
               <NavItem
                 icon="📁"
                 label="Mis Proyectos"
                 to="/personal/projects"
                 active={isActive("/personal/projects")}
+                collapsed={effectiveCollapsed}
+                forceShowLabel={isMobile && sidebarOpen}
+                onNavigate={closeMobileMenu}
+              />
+              <NavItem
+                icon="🔔"
+                label="Notificaciones"
+                to="/personal/notifications"
+                active={isActive("/personal/notifications")}
+                collapsed={effectiveCollapsed}
+                forceShowLabel={isMobile && sidebarOpen}
+                onNavigate={closeMobileMenu}
+              />
+              <NavItem
+                icon="📅"
+                label="Cronograma"
+                to="/personal/timeline"
+                active={isActive("/personal/timeline")}
+                collapsed={effectiveCollapsed}
+                forceShowLabel={isMobile && sidebarOpen}
+                onNavigate={closeMobileMenu}
+              />
+              <NavItem
+                icon="📝"
+                label="Notas"
+                to="/personal/notes"
+                active={isActive("/personal/notes")}
                 collapsed={effectiveCollapsed}
                 forceShowLabel={isMobile && sidebarOpen}
                 onNavigate={closeMobileMenu}

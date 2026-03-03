@@ -89,6 +89,27 @@ body {
   max-width: 100vw;
 }
 
+/* Mejorar transiciones de tema para todos los elementos */
+* {
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
+
+/* Excluir elementos que no necesitan transición */
+*:not([data-no-transition]) {
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
+
+/* Asegurar que los elementos principales tengan transiciones suaves */
+.sidebar,
+.main-content,
+.card,
+.button,
+input,
+textarea,
+select {
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease !important;
+}
+
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;

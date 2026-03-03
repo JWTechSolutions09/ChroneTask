@@ -24,9 +24,16 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   });
 
   useEffect(() => {
-    // Aplicar tema al documento
-    document.documentElement.setAttribute("data-theme", theme);
+    // Aplicar tema al documento con transición suave
+    const root = document.documentElement;
+    root.style.transition = "background-color 0.3s ease, color 0.3s ease";
+    root.setAttribute("data-theme", theme);
     localStorage.setItem("theme", theme);
+    
+    // Forzar repaint para asegurar que la transición se aplique
+    requestAnimationFrame(() => {
+      root.style.transition = "";
+    });
   }, [theme]);
 
   const toggleTheme = () => {

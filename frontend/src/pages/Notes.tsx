@@ -58,14 +58,35 @@ export default function Notes() {
   }, []);
 
   const loadNotes = useCallback(async () => {
-    if (!projectId) return;
     setLoading(true);
     try {
-      const endpoint = isPersonalMode || isPersonalRoute
-        ? `/api/users/me/projects/${projectId}/notes`
-        : `/api/orgs/${organizationId}/projects/${projectId}/notes`;
-      const res = await http.get(endpoint);
-      setNotes(res.data || []);
+      if (isPersonalMode || isPersonalRoute) {
+        // Si hay projectId, cargar notas de ese proyecto
+        // Si no, cargar todas las notas de todos los proyectos personales
+        if (projectId) {
+          const res = await http.get(`/api/users/me/projects/${projectId}/notes`);
+          setNotes(res.data || []);
+        } else {
+          // Cargar todas las notas de todos los proyectos personales
+          const projectsRes = await http.get("/api/users/me/projects");
+          const projects = projectsRes.data || [];
+          let allNotes: ProjectNote[] = [];
+          for (const project of projects) {
+            try {
+              const notesRes = await http.get(`/api/users/me/projects/${project.id}/notes`);
+              allNotes = [...allNotes, ...(notesRes.data || [])];
+            } catch (ex: any) {
+              // Silently fail for individual projects
+            }
+          }
+          setNotes(allNotes);
+        }
+      } else {
+        // Modo organizacional: requiere projectId
+        if (!projectId || !organizationId) return;
+        const res = await http.get(`/api/orgs/${organizationId}/projects/${projectId}/notes`);
+        setNotes(res.data || []);
+      }
     } catch (ex: any) {
       const errorMsg = ex?.response?.data?.message ?? ex.message ?? "Error cargando notas";
       showToast(errorMsg, "error");
@@ -215,14 +236,14 @@ export default function Notes() {
     }
   }, [draggedNote, resizingNote, notes]);
 
-  // En modo personal, solo requerimos projectId
-  // En modo organizacional, requerimos ambos
-  if (!projectId || (!isPersonalMode && !isPersonalRoute && !organizationId)) {
+  // En modo personal sin projectId, permitimos mostrar todas las notas
+  // En modo organizacional, requerimos ambos organizationId y projectId
+  if (!isPersonalMode && !isPersonalRoute && (!organizationId || !projectId)) {
     return (
-      <Layout organizationId={isPersonalMode || isPersonalRoute ? undefined : organizationId}>
+      <Layout organizationId={organizationId}>
         <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center" }}>
           <div className="alert alert-error">
-            Error: Faltan parámetros requeridos {!projectId && "(Project ID)"} {!isPersonalMode && !isPersonalRoute && !organizationId && "(Organization ID)"}
+            Error: Faltan parámetros requeridos {!projectId && "(Project ID)"} {!organizationId && "(Organization ID)"}
           </div>
         </div>
       </Layout>
@@ -238,13 +259,17 @@ export default function Notes() {
           breadcrumbs={
             isPersonalMode || isPersonalRoute
               ? [
-                  { label: "Mis Proyectos", to: "/personal/projects" },
+                  { label: "Notas" },
+                ]
+              : projectId
+              ? [
+                  { label: t.organizations, to: "/org-select" },
+                  { label: "Dashboard", to: `/org/${organizationId}/dashboard` },
+                  { label: "Proyectos", to: `/org/${organizationId}/projects` },
                   { label: "Notas" },
                 ]
               : [
                   { label: t.organizations, to: "/org-select" },
-                  { label: "Dashboard", to: `/org/${organizationId}/dashboard` },
-                  { label: "Proyectos", to: `/org/${organizationId}/projects` },
                   { label: "Notas" },
                 ]
           }

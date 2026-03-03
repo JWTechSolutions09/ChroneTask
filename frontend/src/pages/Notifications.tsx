@@ -43,7 +43,11 @@ const NOTIFICATION_COLORS: Record<string, string> = {
 };
 
 export default function Notifications() {
-  const { organizationId } = useParams<{ organizationId: string }>();
+  const { organizationId } = useParams<{ organizationId?: string }>();
+  const location = useLocation();
+  const { usageType } = useUserUsageType();
+  const isPersonalMode = usageType === "personal";
+  const isPersonalRoute = location.pathname.startsWith("/personal");
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const [loading, setLoading] = useState(false);
@@ -52,7 +56,6 @@ export default function Notifications() {
   const t = useTerminology();
 
   const loadNotifications = useCallback(async () => {
-    if (!organizationId) return;
     setLoading(true);
     try {
       const res = await http.get(`/api/notifications?unreadOnly=${filter === "unread"}`);
@@ -63,7 +66,7 @@ export default function Notifications() {
     } finally {
       setLoading(false);
     }
-  }, [organizationId, filter, showToast]);
+  }, [filter, showToast]);
 
   const loadUnreadCount = useCallback(async () => {
     try {
@@ -135,6 +138,15 @@ export default function Notifications() {
   };
 
   const getNotificationLink = (notification: Notification) => {
+    if (isPersonalMode || isPersonalRoute) {
+      if (notification.taskId && notification.projectId) {
+        return `/personal/project/${notification.projectId}/board`;
+      }
+      if (notification.projectId) {
+        return `/personal/projects`;
+      }
+      return `/personal/dashboard`;
+    }
     if (notification.taskId && notification.projectId) {
       return `/org/${organizationId}/project/${notification.projectId}/board`;
     }
@@ -144,7 +156,8 @@ export default function Notifications() {
     return `/org/${organizationId}/dashboard`;
   };
 
-  if (!organizationId) {
+  // En modo personal, no requerimos organizationId
+  if (!isPersonalMode && !isPersonalRoute && !organizationId) {
     return (
       <Layout>
         <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center" }}>
@@ -157,16 +170,20 @@ export default function Notifications() {
   const unreadNotifications = notifications.filter((n) => !n.isRead);
 
   return (
-    <Layout organizationId={organizationId}>
+    <Layout organizationId={isPersonalMode || isPersonalRoute ? undefined : organizationId}>
       <div style={{ flex: 1, overflowY: "auto", backgroundColor: "var(--bg-secondary)" }}>
         <PageHeader
           title="Notificaciones"
           subtitle={`${notifications.length} notificaciones${unreadNotifications.length > 0 ? ` • ${unreadNotifications.length} sin leer` : ""}`}
-          breadcrumbs={[
-            { label: t.organizations, to: "/org-select" },
-            { label: "Dashboard", to: `/org/${organizationId}/dashboard` },
-            { label: "Notificaciones" },
-          ]}
+          breadcrumbs={
+            isPersonalMode || isPersonalRoute
+              ? [{ label: "Notificaciones" }]
+              : [
+                  { label: t.organizations, to: "/org-select" },
+                  { label: "Dashboard", to: `/org/${organizationId}/dashboard` },
+                  { label: "Notificaciones" },
+                ]
+          }
           actions={
             <div style={{ display: "flex", gap: "10px" }}>
               <Button

@@ -183,6 +183,14 @@ function AppContent() {
                 }
             />
             <Route
+                path="/personal/dashboard"
+                element={
+                    <PrivateRoute>
+                        <Dashboard />
+                    </PrivateRoute>
+                }
+            />
+            <Route
                 path="/personal/projects"
                 element={
                     <PrivateRoute>
@@ -195,6 +203,30 @@ function AppContent() {
                 element={
                     <PrivateRoute>
                         <Board />
+                    </PrivateRoute>
+                }
+            />
+            <Route
+                path="/personal/timeline"
+                element={
+                    <PrivateRoute>
+                        <Timeline />
+                    </PrivateRoute>
+                }
+            />
+            <Route
+                path="/personal/notes"
+                element={
+                    <PrivateRoute>
+                        <Notes />
+                    </PrivateRoute>
+                }
+            />
+            <Route
+                path="/personal/notifications"
+                element={
+                    <PrivateRoute>
+                        <Notifications />
                     </PrivateRoute>
                 }
             />
@@ -264,6 +296,14 @@ function AppContent() {
             />
             <Route
                 path="/org/:organizationId/project/:projectId/notes"
+                element={
+                    <PrivateRoute>
+                        <Notes />
+                    </PrivateRoute>
+                }
+            />
+            <Route
+                path="/org/:organizationId/notes"
                 element={
                     <PrivateRoute>
                         <Notes />

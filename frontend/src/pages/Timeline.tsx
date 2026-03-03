@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useLocation } from "react-router-dom";
 import { http } from "../api/http";
 import Layout from "../components/Layout";
 import PageHeader from "../components/PageHeader";
@@ -7,6 +7,7 @@ import Card from "../components/Card";
 import Button from "../components/Button";
 import { useToast } from "../contexts/ToastContext";
 import { useTerminology } from "../hooks/useTerminology";
+import { useUserUsageType } from "../hooks/useUserUsageType";
 
 type Task = {
   id: string;
@@ -23,7 +24,11 @@ type Task = {
 type TimelineView = "week" | "month";
 
 export default function Timeline() {
-  const { organizationId, projectId } = useParams<{ organizationId: string; projectId?: string }>();
+  const { organizationId, projectId } = useParams<{ organizationId?: string; projectId?: string }>();
+  const location = useLocation();
+  const { usageType } = useUserUsageType();
+  const isPersonalMode = usageType === "personal";
+  const isPersonalRoute = location.pathname.startsWith("/personal");
   const [tasks, setTasks] = useState<Task[]>([]);
   const t = useTerminology();
   const [projects, setProjects] = useState<any[]>([]);
@@ -33,6 +38,15 @@ export default function Timeline() {
   const { showToast } = useToast();
 
   const loadProjects = useCallback(async () => {
+    if (isPersonalMode || isPersonalRoute) {
+      try {
+        const res = await http.get("/api/users/me/projects");
+        setProjects(res.data || []);
+      } catch (ex: any) {
+        // Silently fail
+      }
+      return;
+    }
     if (!organizationId) return;
     try {
       const res = await http.get(`/api/orgs/${organizationId}/projects`);
@@ -40,9 +54,38 @@ export default function Timeline() {
     } catch (ex: any) {
       // Silently fail
     }
-  }, [organizationId]);
+  }, [organizationId, isPersonalMode, isPersonalRoute]);
 
   const loadTasks = useCallback(async () => {
+    if (isPersonalMode || isPersonalRoute) {
+      setLoading(true);
+      try {
+        let allTasks: Task[] = [];
+        const res = await http.get("/api/users/me/projects");
+        const personalProjects = res.data || [];
+        
+        for (const project of personalProjects) {
+          try {
+            const tasksRes = await http.get(`/api/projects/${project.id}/tasks`);
+            const projectTasks = (tasksRes.data || []).map((t: any) => ({
+              ...t,
+              projectId: project.id,
+              projectName: project.name,
+            }));
+            allTasks = [...allTasks, ...projectTasks];
+          } catch (ex: any) {
+            // Silently fail for individual projects
+          }
+        }
+        
+        setTasks(allTasks);
+      } catch (ex: any) {
+        showToast("Error cargando tareas", "error");
+      } finally {
+        setLoading(false);
+      }
+      return;
+    }
     if (!organizationId) return;
     setLoading(true);
     try {
@@ -86,7 +129,7 @@ export default function Timeline() {
     } finally {
       setLoading(false);
     }
-  }, [organizationId, projectId, projects, showToast]);
+  }, [organizationId, projectId, projects, showToast, isPersonalMode, isPersonalRoute]);
 
   useEffect(() => {
     loadProjects();
@@ -152,7 +195,8 @@ export default function Timeline() {
     return date.toLocaleDateString("es-ES", { weekday: "short", day: "numeric", month: "short" });
   };
 
-  if (!organizationId) {
+  // En modo personal, no requerimos organizationId
+  if (!isPersonalMode && !isPersonalRoute && !organizationId) {
     return (
       <Layout>
         <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center" }}>

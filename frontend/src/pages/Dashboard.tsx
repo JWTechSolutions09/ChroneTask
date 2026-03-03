@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback, useMemo } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useLocation } from "react-router-dom";
 import { http } from "../api/http";
 import Layout from "../components/Layout";
 import PageHeader from "../components/PageHeader";
@@ -12,6 +12,7 @@ import InvitationsModal from "../components/InvitationsModal";
 import OrganizationMembersModal from "../components/OrganizationMembersModal";
 import { useToast } from "../contexts/ToastContext";
 import { useTerminology } from "../hooks/useTerminology";
+import { useUserUsageType } from "../hooks/useUserUsageType";
 
 type Project = {
   id: string;
@@ -25,7 +26,11 @@ type Project = {
 };
 
 export default function Dashboard() {
-  const { organizationId } = useParams<{ organizationId: string }>();
+  const { organizationId } = useParams<{ organizationId?: string }>();
+  const location = useLocation();
+  const { usageType } = useUserUsageType();
+  const isPersonalMode = usageType === "personal";
+  const isPersonalRoute = location.pathname.startsWith("/personal");
   const [projects, setProjects] = useState<Project[]>([]);
   const [filteredProjects, setFilteredProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(false);
@@ -39,7 +44,7 @@ export default function Dashboard() {
   const { showToast } = useToast();
 
   const loadOrganizationInfo = useCallback(async () => {
-    if (!organizationId) return;
+    if (!organizationId || isPersonalMode || isPersonalRoute) return;
     try {
       const res = await http.get("/api/orgs");
       const orgs = res.data || [];
@@ -50,38 +55,47 @@ export default function Dashboard() {
     } catch (ex: any) {
       console.error(`Error cargando información de ${t.organizationLower}:`, ex);
     }
-  }, [organizationId]);
+  }, [organizationId, isPersonalMode, isPersonalRoute, t]);
 
   const loadProjects = useCallback(async () => {
-    if (!organizationId) return;
-
     setLoading(true);
     setErr(null);
     try {
-      const res = await http.get(`/api/orgs/${organizationId}/projects`);
-      const projectsData = res.data || [];
+      let projectsData: Project[] = [];
+      
+      if (isPersonalMode || isPersonalRoute) {
+        // Cargar proyectos personales
+        const res = await http.get("/api/users/me/projects");
+        projectsData = res.data || [];
+      } else if (organizationId) {
+        // Cargar proyectos organizacionales
+        const res = await http.get(`/api/orgs/${organizationId}/projects`);
+        projectsData = res.data || [];
+      } else {
+        setLoading(false);
+        return;
+      }
+      
       setProjects(projectsData);
       setFilteredProjects(projectsData);
-      // Remover toast automático para evitar spam
     } catch (ex: any) {
       const errorMsg = ex?.response?.data?.message ?? ex.message ?? "Error cargando proyectos";
       setErr(errorMsg);
-      // Solo mostrar toast si es un error real, no si es redirección
       if (ex?.response?.status !== 401) {
         showToast(errorMsg, "error");
       }
     } finally {
       setLoading(false);
     }
-  }, [organizationId, showToast]);
+  }, [organizationId, isPersonalMode, isPersonalRoute, showToast]);
 
   useEffect(() => {
-    if (organizationId) {
+    if (isPersonalMode || isPersonalRoute || organizationId) {
       loadOrganizationInfo();
       loadProjects();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [organizationId]); // Solo dependemos de organizationId para evitar loops
+  }, [organizationId, isPersonalMode, isPersonalRoute]); // Solo dependemos de organizationId para evitar loops
 
   useEffect(() => {
     if (searchQuery.trim()) {
@@ -97,7 +111,8 @@ export default function Dashboard() {
     }
   }, [searchQuery, projects]);
 
-  if (!organizationId) {
+  // En modo personal, no requerimos organizationId
+  if (!isPersonalMode && !isPersonalRoute && !organizationId) {
     return (
       <Layout>
         <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center" }}>
@@ -127,7 +142,7 @@ export default function Dashboard() {
   }, [projects]);
 
   return (
-    <Layout organizationId={organizationId}>
+    <Layout organizationId={isPersonalMode || isPersonalRoute ? undefined : organizationId}>
       <div style={{ flex: 1, overflowY: "auto", backgroundColor: "var(--bg-secondary)" }}>
         <PageHeader
           title="Dashboard"
@@ -136,81 +151,97 @@ export default function Dashboard() {
               ? "Comienza creando tu primer proyecto"
               : `${projects.length} ${projects.length === 1 ? "proyecto activo" : "proyectos activos"}`
           }
-          breadcrumbs={[
-            { label: t.organizations, to: "/org-select" },
-            { label: "Dashboard" },
-          ]}
+          breadcrumbs={
+            isPersonalMode || isPersonalRoute
+              ? [{ label: "Dashboard" }]
+              : [
+                  { label: t.organizations, to: "/org-select" },
+                  { label: "Dashboard" },
+                ]
+          }
           actions={
-            <div style={{ display: "flex", gap: "8px" }}>
-              <button
-                onClick={() => setShowMembersModal(true)}
-                style={{
-                  padding: "8px 12px",
-                  borderRadius: "6px",
-                  border: "1px solid #6c757d",
-                  backgroundColor: "white",
-                  color: "#6c757d",
-                  cursor: "pointer",
-                  fontSize: "14px",
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "6px",
-                  fontWeight: 500,
-                  transition: "all 0.2s",
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor = "#f8f9fa";
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor = "white";
-                }}
-                title={t.viewOrganizationMembers}
-              >
-                👥 Miembros
-              </button>
-              <button
-                onClick={() => setShowInvitationsModal(true)}
-                style={{
-                  padding: "8px 12px",
-                  borderRadius: "6px",
-                  border: "1px solid #007bff",
-                  backgroundColor: "white",
-                  color: "#007bff",
-                  cursor: "pointer",
-                  fontSize: "14px",
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "6px",
-                  fontWeight: 500,
-                  transition: "all 0.2s",
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor = "#e7f3ff";
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor = "white";
-                }}
-                title={t.inviteMembersToOrganization}
-              >
-                ✉️ Invitar
-              </button>
+            <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
+              {!isPersonalMode && !isPersonalRoute && organizationId && (
+                <>
+                  <button
+                    onClick={() => setShowMembersModal(true)}
+                    style={{
+                      padding: "8px 12px",
+                      borderRadius: "6px",
+                      border: "1px solid var(--border-color)",
+                      backgroundColor: "var(--bg-primary)",
+                      color: "var(--text-primary)",
+                      cursor: "pointer",
+                      fontSize: "14px",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "6px",
+                      fontWeight: 500,
+                      transition: "all 0.2s",
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.backgroundColor = "var(--hover-bg)";
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.backgroundColor = "var(--bg-primary)";
+                    }}
+                    title={t.viewOrganizationMembers}
+                  >
+                    👥 Miembros
+                  </button>
+                  <button
+                    onClick={() => setShowInvitationsModal(true)}
+                    style={{
+                      padding: "8px 12px",
+                      borderRadius: "6px",
+                      border: "1px solid var(--primary)",
+                      backgroundColor: "var(--bg-primary)",
+                      color: "var(--primary)",
+                      cursor: "pointer",
+                      fontSize: "14px",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "6px",
+                      fontWeight: 500,
+                      transition: "all 0.2s",
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.backgroundColor = "var(--hover-bg)";
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.backgroundColor = "var(--bg-primary)";
+                    }}
+                    title={t.inviteMembersToOrganization}
+                  >
+                    ✉️ Invitar
+                  </button>
+                </>
+              )}
               <button
                 onClick={() => setViewMode(viewMode === "grid" ? "table" : "grid")}
                 style={{
                   padding: "8px 12px",
                   borderRadius: "6px",
-                  border: "1px solid #dee2e6",
-                  backgroundColor: "white",
+                  border: "1px solid var(--border-color)",
+                  backgroundColor: "var(--bg-primary)",
+                  color: "var(--text-primary)",
                   cursor: "pointer",
                   fontSize: "14px",
                   display: "flex",
                   alignItems: "center",
                   gap: "6px",
+                  transition: "all 0.2s",
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = "var(--hover-bg)";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = "var(--bg-primary)";
                 }}
               >
                 {viewMode === "grid" ? "📋 Tabla" : "🔲 Grid"}
               </button>
-              <Link to={`/org/${organizationId}/projects`}>
+              <Link to={isPersonalMode || isPersonalRoute ? "/personal/projects" : `/org/${organizationId}/projects`}>
                 <Button variant="primary">+ Nuevo Proyecto</Button>
               </Link>
             </div>
@@ -332,7 +363,7 @@ export default function Dashboard() {
                 <p style={{ fontSize: "16px", color: "#6c757d", marginBottom: "24px" }}>
                   Crea tu primer proyecto para comenzar a gestionar tareas y tiempo
                 </p>
-                <Link to={`/org/${organizationId}/projects`}>
+                <Link to={isPersonalMode || isPersonalRoute ? "/personal/projects" : `/org/${organizationId}/projects`}>
                   <Button
                     variant="primary"
                     style={{
@@ -442,7 +473,11 @@ export default function Dashboard() {
                         >
                           <td style={{ padding: "12px" }}>
                             <Link
-                              to={`/org/${organizationId}/project/${project.id}/board`}
+                              to={
+                                isPersonalMode || isPersonalRoute
+                                  ? `/personal/project/${project.id}/board`
+                                  : `/org/${organizationId}/project/${project.id}/board`
+                              }
                               style={{
                                 textDecoration: "none",
                                 color: "var(--text-primary)",
@@ -516,15 +551,26 @@ export default function Dashboard() {
                           </td>
                           <td style={{ padding: "12px", textAlign: "right" }}>
                             <Link
-                              to={`/org/${organizationId}/project/${project.id}/board`}
+                              to={
+                                isPersonalMode || isPersonalRoute
+                                  ? `/personal/project/${project.id}/board`
+                                  : `/org/${organizationId}/project/${project.id}/board`
+                              }
                               style={{
                                 padding: "6px 12px",
                                 borderRadius: "6px",
-                                backgroundColor: "#007bff",
+                                backgroundColor: "var(--primary)",
                                 color: "white",
                                 textDecoration: "none",
                                 fontSize: "12px",
                                 fontWeight: 500,
+                                transition: "all 0.2s",
+                              }}
+                              onMouseEnter={(e) => {
+                                e.currentTarget.style.backgroundColor = "var(--primary-dark)";
+                              }}
+                              onMouseLeave={(e) => {
+                                e.currentTarget.style.backgroundColor = "var(--primary)";
                               }}
                             >
                               Abrir
@@ -554,7 +600,11 @@ export default function Dashboard() {
                   return (
                     <Link
                       key={project.id}
-                      to={`/org/${organizationId}/project/${project.id}/board`}
+                      to={
+                        isPersonalMode || isPersonalRoute
+                          ? `/personal/project/${project.id}/board`
+                          : `/org/${organizationId}/project/${project.id}/board`
+                      }
                       style={{
                         textDecoration: "none",
                         color: "inherit",
