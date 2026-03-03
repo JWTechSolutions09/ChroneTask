@@ -21,10 +21,11 @@ type ProjectMember = {
 };
 
 type AddProjectMemberModalProps = {
-  organizationId: string;
+  organizationId?: string;
   projectId: string;
   projectName: string;
   isOpen: boolean;
+  isPersonalProject?: boolean;
   onClose: () => void;
   onMemberAdded?: () => void;
 };
@@ -34,6 +35,7 @@ export default function AddProjectMemberModal({
   projectId,
   projectName,
   isOpen,
+  isPersonalProject = false,
   onClose,
   onMemberAdded,
 }: AddProjectMemberModalProps) {
@@ -51,20 +53,32 @@ export default function AddProjectMemberModal({
     
     setLoading(true);
     try {
-      // Cargar miembros de la organización
-      const orgRes = await http.get(`/api/orgs/${organizationId}/members`);
-      setOrgMembers(orgRes.data || []);
+      if (isPersonalProject) {
+        // Para proyectos personales, no hay organización
+        // Cargar miembros del proyecto personal
+        const projectRes = await http.get(`/api/users/me/projects/${projectId}/members`);
+        setProjectMembers(projectRes.data || []);
+        // Para proyectos personales, no hay miembros de organización disponibles
+        setOrgMembers([]);
+      } else {
+        if (!organizationId) {
+          throw new Error("OrganizationId is required for non-personal projects");
+        }
+        // Cargar miembros de la organización
+        const orgRes = await http.get(`/api/orgs/${organizationId}/members`);
+        setOrgMembers(orgRes.data || []);
 
-      // Cargar miembros del proyecto
-      const projectRes = await http.get(`/api/orgs/${organizationId}/projects/${projectId}/members`);
-      setProjectMembers(projectRes.data || []);
+        // Cargar miembros del proyecto
+        const projectRes = await http.get(`/api/orgs/${organizationId}/projects/${projectId}/members`);
+        setProjectMembers(projectRes.data || []);
+      }
     } catch (ex: any) {
       const errorMsg = ex?.response?.data?.message ?? ex.message ?? "Error cargando datos";
       showToast(errorMsg, "error");
     } finally {
       setLoading(false);
     }
-  }, [organizationId, projectId, isOpen, showToast]);
+  }, [organizationId, projectId, isOpen, showToast, isPersonalProject]);
 
   useEffect(() => {
     if (isOpen) {
@@ -80,7 +94,11 @@ export default function AddProjectMemberModal({
 
     setAdding(true);
     try {
-      await http.post(`/api/orgs/${organizationId}/projects/${projectId}/members`, {
+      const endpoint = isPersonalProject
+        ? `/api/users/me/projects/${projectId}/members`
+        : `/api/orgs/${organizationId}/projects/${projectId}/members`;
+      
+      await http.post(endpoint, {
         userId: selectedUserId,
         role: selectedRole,
       });
@@ -101,7 +119,11 @@ export default function AddProjectMemberModal({
 
   const handleRemoveMember = async (userId: string) => {
     try {
-      await http.delete(`/api/orgs/${organizationId}/projects/${projectId}/members/${userId}`);
+      const endpoint = isPersonalProject
+        ? `/api/users/me/projects/${projectId}/members/${userId}`
+        : `/api/orgs/${organizationId}/projects/${projectId}/members/${userId}`;
+      
+      await http.delete(endpoint);
       await loadData();
       showToast("Miembro removido del proyecto exitosamente", "success");
       if (onMemberAdded) {
@@ -185,56 +207,65 @@ export default function AddProjectMemberModal({
           <div className="loading">Cargando...</div>
         ) : (
           <>
-            {/* Formulario para agregar miembro */}
-            <Card style={{ marginBottom: "24px", backgroundColor: "#f8f9fa" }}>
-              <h3 style={{ fontSize: "16px", fontWeight: 600, marginBottom: "16px", color: "#212529" }}>
-                Agregar Miembro al Proyecto
-              </h3>
-              <form onSubmit={handleAddMember} style={{ display: "grid", gap: "12px" }}>
-                <div>
-                  <label style={{ display: "block", marginBottom: "6px", fontSize: "14px", fontWeight: 500, color: "#495057" }}>
-                    Miembro del {t.organization}
-                  </label>
-                  <select
-                    value={selectedUserId}
-                    onChange={(e) => setSelectedUserId(e.target.value)}
-                    disabled={adding || availableMembers.length === 0}
-                    className="input"
-                    required
-                  >
-                    <option value="">Selecciona un miembro</option>
-                    {availableMembers.map((member) => (
-                      <option key={member.userId} value={member.userId}>
-                        {member.userName} ({member.userEmail})
-                      </option>
-                    ))}
-                  </select>
-                  {availableMembers.length === 0 && (
-                    <p style={{ fontSize: "12px", color: "#6c757d", marginTop: "4px" }}>
-                      Todos los miembros del {t.organizationLower} ya están en el proyecto
-                    </p>
-                  )}
-                </div>
-                <div>
-                  <label style={{ display: "block", marginBottom: "6px", fontSize: "14px", fontWeight: 500, color: "#495057" }}>
-                    Rol en el Proyecto
-                  </label>
-                  <select
-                    value={selectedRole}
-                    onChange={(e) => setSelectedRole(e.target.value)}
-                    disabled={adding}
-                    className="input"
-                  >
-                    <option value="member">Miembro</option>
-                    <option value="pm">Project Manager</option>
-                    <option value="viewer">Viewer</option>
-                  </select>
-                </div>
-                <Button type="submit" variant="primary" disabled={adding || !selectedUserId || availableMembers.length === 0} loading={adding}>
-                  Agregar al Proyecto
-                </Button>
-              </form>
-            </Card>
+            {/* Formulario para agregar miembro - Solo para proyectos organizacionales */}
+            {!isPersonalProject && (
+              <Card style={{ marginBottom: "24px", backgroundColor: "#f8f9fa" }}>
+                <h3 style={{ fontSize: "16px", fontWeight: 600, marginBottom: "16px", color: "#212529" }}>
+                  Agregar Miembro al Proyecto
+                </h3>
+                <form onSubmit={handleAddMember} style={{ display: "grid", gap: "12px" }}>
+                  <div>
+                    <label style={{ display: "block", marginBottom: "6px", fontSize: "14px", fontWeight: 500, color: "#495057" }}>
+                      Miembro del {t.organization}
+                    </label>
+                    <select
+                      value={selectedUserId}
+                      onChange={(e) => setSelectedUserId(e.target.value)}
+                      disabled={adding || availableMembers.length === 0}
+                      className="input"
+                      required
+                    >
+                      <option value="">Selecciona un miembro</option>
+                      {availableMembers.map((member) => (
+                        <option key={member.userId} value={member.userId}>
+                          {member.userName} ({member.userEmail})
+                        </option>
+                      ))}
+                    </select>
+                    {availableMembers.length === 0 && (
+                      <p style={{ fontSize: "12px", color: "#6c757d", marginTop: "4px" }}>
+                        Todos los miembros del {t.organizationLower} ya están en el proyecto
+                      </p>
+                    )}
+                  </div>
+                  <div>
+                    <label style={{ display: "block", marginBottom: "6px", fontSize: "14px", fontWeight: 500, color: "#495057" }}>
+                      Rol en el Proyecto
+                    </label>
+                    <select
+                      value={selectedRole}
+                      onChange={(e) => setSelectedRole(e.target.value)}
+                      disabled={adding}
+                      className="input"
+                    >
+                      <option value="member">Miembro</option>
+                      <option value="pm">Project Manager</option>
+                      <option value="viewer">Viewer</option>
+                    </select>
+                  </div>
+                  <Button type="submit" variant="primary" disabled={adding || !selectedUserId || availableMembers.length === 0} loading={adding}>
+                    Agregar al Proyecto
+                  </Button>
+                </form>
+              </Card>
+            )}
+            {isPersonalProject && (
+              <Card style={{ marginBottom: "24px", backgroundColor: "#e3f2fd", border: "1px solid #90caf9" }}>
+                <p style={{ fontSize: "14px", color: "#1976d2", margin: 0 }}>
+                  ℹ️ Los proyectos personales solo muestran los miembros actuales. Para agregar miembros, considera crear un equipo u organización.
+                </p>
+              </Card>
+            )}
 
             {/* Lista de miembros del proyecto */}
             <div>

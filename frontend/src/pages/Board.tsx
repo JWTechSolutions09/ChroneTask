@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useLocation } from "react-router-dom";
 import { http } from "../api/http";
 import Layout from "../components/Layout";
 import PageHeader from "../components/PageHeader";
@@ -13,6 +13,7 @@ import KeyboardShortcuts from "../components/KeyboardShortcuts";
 import Button from "../components/Button";
 import { useToast } from "../contexts/ToastContext";
 import { useTerminology } from "../hooks/useTerminology";
+import { useUserUsageType } from "../hooks/useUserUsageType";
 
 type Task = {
   id: string;
@@ -47,7 +48,11 @@ const STATUS_COLORS: Record<string, string> = {
 };
 
 export default function Board() {
-  const { organizationId, projectId } = useParams<{ organizationId: string; projectId: string }>();
+  const { organizationId, projectId } = useParams<{ organizationId?: string; projectId: string }>();
+  const location = useLocation();
+  const { usageType } = useUserUsageType();
+  const isPersonalMode = usageType === "personal";
+  const isPersonalRoute = location.pathname.startsWith("/personal");
   const [tasks, setTasks] = useState<Task[]>([]);
   const [projectName, setProjectName] = useState<string>("");
   const [projectMembers, setProjectMembers] = useState<ProjectMember[]>([]);
@@ -63,26 +68,30 @@ export default function Board() {
   const t = useTerminology();
 
   const loadProjectInfo = useCallback(async () => {
-    if (!projectId || !organizationId) return;
+    if (!projectId) return;
     try {
-      const res = await http.get(`/api/orgs/${organizationId}/projects/${projectId}`);
+      const res = isPersonalMode || isPersonalRoute
+        ? await http.get(`/api/users/me/projects/${projectId}`)
+        : await http.get(`/api/orgs/${organizationId}/projects/${projectId}`);
       setProjectName(res.data?.name || "");
     } catch (err: any) {
       console.error("Error cargando información del proyecto:", err);
       setErr(err?.response?.data?.message ?? "Error cargando información del proyecto");
     }
-  }, [projectId, organizationId]);
+  }, [projectId, organizationId, isPersonalMode, isPersonalRoute]);
 
   const loadProjectMembers = useCallback(async () => {
-    if (!projectId || !organizationId) return;
+    if (!projectId) return;
     try {
-      const res = await http.get(`/api/orgs/${organizationId}/projects/${projectId}/members`);
+      const res = isPersonalMode || isPersonalRoute
+        ? await http.get(`/api/users/me/projects/${projectId}/members`)
+        : await http.get(`/api/orgs/${organizationId}/projects/${projectId}/members`);
       setProjectMembers(res.data || []);
     } catch (err: any) {
       console.error("Error cargando miembros del proyecto:", err);
       // No mostrar error si falla, simplemente no habrá miembros disponibles
     }
-  }, [projectId, organizationId]);
+  }, [projectId, organizationId, isPersonalMode, isPersonalRoute]);
 
   const loadTasks = useCallback(async () => {
     if (!projectId) return;
@@ -100,13 +109,16 @@ export default function Board() {
   }, [projectId]);
 
   useEffect(() => {
-    if (projectId && organizationId) {
-      loadProjectInfo();
-      loadProjectMembers();
-      loadTasks();
+    if (projectId) {
+      // Para proyectos personales, no necesitamos organizationId
+      if (isPersonalMode || isPersonalRoute || organizationId) {
+        loadProjectInfo();
+        loadProjectMembers();
+        loadTasks();
+      }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [projectId, organizationId]); // Solo dependemos de los IDs para evitar loops
+  }, [projectId, organizationId, isPersonalMode, isPersonalRoute]); // Solo dependemos de los IDs para evitar loops
 
   const handleDragStart = useCallback((e: React.DragEvent, task: Task) => {
     setDraggedTask(task);
@@ -219,7 +231,7 @@ export default function Board() {
   }
 
   return (
-    <Layout organizationId={organizationId}>
+    <Layout organizationId={isPersonalMode || isPersonalRoute ? undefined : organizationId}>
       <KeyboardShortcuts
         onNewTask={() => setShowCreateModal(true)}
         onSearch={() => {
@@ -230,12 +242,19 @@ export default function Board() {
         <PageHeader
           title={projectName || "Board Kanban"}
           subtitle={`${tasks.length} tareas`}
-          breadcrumbs={[
-            { label: t.organizations, to: "/org-select" },
-            { label: "Dashboard", to: `/org/${organizationId}/dashboard` },
-            { label: "Proyectos", to: `/org/${organizationId}/projects` },
-            { label: projectName || "Board" },
-          ]}
+          breadcrumbs={
+            isPersonalMode || isPersonalRoute
+              ? [
+                  { label: "Mis Proyectos", to: "/personal/projects" },
+                  { label: projectName || "Board" },
+                ]
+              : [
+                  { label: t.organizations, to: "/org-select" },
+                  { label: "Dashboard", to: `/org/${organizationId}/dashboard` },
+                  { label: "Proyectos", to: `/org/${organizationId}/projects` },
+                  { label: projectName || "Board" },
+                ]
+          }
           actions={
             <div style={{ display: "flex", gap: "8px", flexWrap: "wrap", width: "100%" }}>
               <Button variant="secondary" onClick={() => setShowCommentsPanel(true)}>
@@ -760,12 +779,13 @@ export default function Board() {
             />
           )}
 
-          {showMemberModal && organizationId && projectId && (
+          {showMemberModal && projectId && (
             <AddProjectMemberModal
-              organizationId={organizationId}
+              organizationId={isPersonalMode || isPersonalRoute ? undefined : organizationId}
               projectId={projectId}
               projectName={projectName || "Proyecto"}
               isOpen={showMemberModal}
+              isPersonalProject={isPersonalMode || isPersonalRoute}
               onClose={() => setShowMemberModal(false)}
               onMemberAdded={() => {
                 loadProjectMembers();

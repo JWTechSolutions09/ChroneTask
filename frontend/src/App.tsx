@@ -191,6 +191,14 @@ function AppContent() {
                 }
             />
             <Route
+                path="/personal/project/:projectId/board"
+                element={
+                    <PrivateRoute>
+                        <Board />
+                    </PrivateRoute>
+                }
+            />
+            <Route
                 path="/org-select"
                 element={
                     <PrivateRoute>

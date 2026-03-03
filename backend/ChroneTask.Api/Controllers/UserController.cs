@@ -544,4 +544,137 @@ public class UserController : ControllerBase
             });
         }
     }
+
+    // GET: api/users/me/projects/{id}/members
+    [HttpGet("me/projects/{id:guid}/members")]
+    public async Task<ActionResult<List<ProjectMemberResponse>>> GetPersonalProjectMembers(Guid id)
+    {
+        try
+        {
+            var userId = UserContext.GetUserId(User);
+
+            // Verificar que el proyecto es personal y pertenece al usuario
+            var project = await _db.Projects
+                .FirstOrDefaultAsync(p => p.Id == id && p.UserId == userId && p.OrganizationId == null);
+
+            if (project is null)
+                return NotFound();
+
+            var members = await _db.ProjectMembers
+                .Where(m => m.ProjectId == id)
+                .Include(m => m.User)
+                .Select(m => new ProjectMemberResponse
+                {
+                    UserId = m.UserId,
+                    UserName = m.User.FullName,
+                    UserEmail = m.User.Email,
+                    Role = m.Role
+                })
+                .ToListAsync();
+
+            return Ok(members);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"❌ Error en GetPersonalProjectMembers: {ex.Message}");
+            return StatusCode(500, new
+            {
+                error = "Internal Server Error",
+                message = ex.Message
+            });
+        }
+    }
+
+    // POST: api/users/me/projects/{id}/members
+    [HttpPost("me/projects/{id:guid}/members")]
+    public async Task<ActionResult<ProjectMemberResponse>> AddPersonalProjectMember(Guid id, [FromBody] AddProjectMemberRequest request)
+    {
+        try
+        {
+            var userId = UserContext.GetUserId(User);
+
+            // Verificar que el proyecto es personal y pertenece al usuario
+            var project = await _db.Projects
+                .FirstOrDefaultAsync(p => p.Id == id && p.UserId == userId && p.OrganizationId == null);
+
+            if (project is null)
+                return NotFound();
+
+            // Verificar que el usuario no sea ya miembro del proyecto
+            var existingMember = await _db.ProjectMembers
+                .FirstOrDefaultAsync(m => m.ProjectId == id && m.UserId == request.UserId);
+
+            if (existingMember != null)
+                return Conflict(new { message = "User is already a member of this project" });
+
+            // Agregar miembro al proyecto
+            var projectMember = new ProjectMember
+            {
+                ProjectId = id,
+                UserId = request.UserId,
+                Role = request.Role ?? "member"
+            };
+
+            _db.ProjectMembers.Add(projectMember);
+            await _db.SaveChangesAsync();
+
+            // Cargar información del usuario
+            await _db.Entry(projectMember).Reference(m => m.User).LoadAsync();
+
+            return Ok(new ProjectMemberResponse
+            {
+                UserId = projectMember.UserId,
+                UserName = projectMember.User.FullName,
+                UserEmail = projectMember.User.Email,
+                Role = projectMember.Role
+            });
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"❌ Error en AddPersonalProjectMember: {ex.Message}");
+            return StatusCode(500, new
+            {
+                error = "Internal Server Error",
+                message = ex.Message
+            });
+        }
+    }
+
+    // DELETE: api/users/me/projects/{id}/members/{userId}
+    [HttpDelete("me/projects/{id:guid}/members/{memberUserId:guid}")]
+    public async Task<IActionResult> RemovePersonalProjectMember(Guid id, Guid memberUserId)
+    {
+        try
+        {
+            var userId = UserContext.GetUserId(User);
+
+            // Verificar que el proyecto es personal y pertenece al usuario
+            var project = await _db.Projects
+                .FirstOrDefaultAsync(p => p.Id == id && p.UserId == userId && p.OrganizationId == null);
+
+            if (project is null)
+                return NotFound();
+
+            // Buscar el miembro del proyecto
+            var projectMember = await _db.ProjectMembers
+                .FirstOrDefaultAsync(m => m.ProjectId == id && m.UserId == memberUserId);
+
+            if (projectMember is null)
+                return NotFound();
+
+            _db.ProjectMembers.Remove(projectMember);
+            await _db.SaveChangesAsync();
+
+            return NoContent();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"❌ Error en RemovePersonalProjectMember: {ex.Message}");
+            return StatusCode(500, new
+            {
+                error = "Internal Server Error",
+                message = ex.Message
+            });
+        }
+    }
 }

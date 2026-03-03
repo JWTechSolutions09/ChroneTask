@@ -475,7 +475,11 @@ export default function Projects() {
                       </div>
                     )}
                     <Link
-                      to={`/org/${organizationId}/project/${project.id}/board`}
+                      to={
+                        isPersonalMode || isPersonalRoute
+                          ? `/personal/project/${project.id}/board`
+                          : `/org/${organizationId}/project/${project.id}/board`
+                      }
                       style={{ textDecoration: "none", color: "inherit" }}
                       className="fade-in"
                     >
