@@ -5,7 +5,8 @@ public class ProjectResponse
     public Guid Id { get; set; }
     public string Name { get; set; } = string.Empty;
     public string? Description { get; set; }
-    public Guid OrganizationId { get; set; }
+    public Guid? OrganizationId { get; set; } // Nullable para proyectos personales
+    public Guid? UserId { get; set; } // Para proyectos personales
     public string? Template { get; set; }
     public bool IsActive { get; set; }
     public DateTime CreatedAt { get; set; }

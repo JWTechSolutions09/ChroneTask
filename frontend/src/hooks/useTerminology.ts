@@ -30,6 +30,8 @@ export interface Terminology {
   myOrganizations: string;
   organizationsAvailable: string;
   organizationAvailable: string;
+  changeOrg: string; // "Cambiar Org" o "Cambiar Equipo"
+  selectOrgLabel: string; // "Seleccionar Org" o "Seleccionar Equipo"
 }
 
 export function useTerminology(): Terminology {
@@ -64,6 +66,8 @@ export function useTerminology(): Terminology {
       myOrganizations: "Mis Equipos",
       organizationsAvailable: "equipos disponibles",
       organizationAvailable: "equipo disponible",
+      changeOrg: "Cambiar Equipo",
+      selectOrgLabel: "Seleccionar Equipo",
     };
   }
 
@@ -95,5 +99,7 @@ export function useTerminology(): Terminology {
     myOrganizations: "Mis Organizaciones",
     organizationsAvailable: "organizaciones disponibles",
     organizationAvailable: "organización disponible",
+    changeOrg: "Cambiar Org",
+    selectOrgLabel: "Seleccionar Org",
   };
 }

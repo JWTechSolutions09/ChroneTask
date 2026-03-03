@@ -13,8 +13,13 @@ public class Project
     [MaxLength(500)]
     public string? Description { get; set; }
 
-    public Guid OrganizationId { get; set; }
-    public Organization Organization { get; set; } = null!;
+    // OrganizationId es nullable para permitir proyectos personales
+    public Guid? OrganizationId { get; set; }
+    public Organization? Organization { get; set; }
+    
+    // UserId para proyectos personales (cuando OrganizationId es null)
+    public Guid? UserId { get; set; }
+    public User? User { get; set; }
 
     [MaxLength(50)]
     public string? Template { get; set; } // "Software", "Operaciones", "Soporte"

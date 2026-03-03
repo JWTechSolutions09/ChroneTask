@@ -701,7 +701,7 @@ export default function Layout({ children, organizationId, usageType: propUsageT
               />
               <NavItem
                 icon="🔀"
-                label="Seleccionar Org"
+                label={t.selectOrgLabel}
                 to="/org-select"
                 active={isActive("/org-select")}
                 collapsed={effectiveCollapsed}
@@ -804,7 +804,7 @@ export default function Layout({ children, organizationId, usageType: propUsageT
                 }}
               >
                 <span style={{ fontSize: "18px" }}>🔄</span>
-                <span>Cambiar Org</span>
+                <span>{t.changeOrg}</span>
               </button>
             )}
             

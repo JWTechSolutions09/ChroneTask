@@ -62,10 +62,22 @@ public class ChroneTaskDbContext : DbContext
             entity.Property(x => x.Description).HasMaxLength(500);
             entity.Property(x => x.Template).HasMaxLength(50);
 
+            // Relación opcional con Organization (para proyectos empresariales/de equipo)
             entity.HasOne(p => p.Organization)
                 .WithMany()
                 .HasForeignKey(p => p.OrganizationId)
-                .OnDelete(DeleteBehavior.Cascade);
+                .OnDelete(DeleteBehavior.Cascade)
+                .IsRequired(false);
+
+            // Relación opcional con User (para proyectos personales)
+            entity.HasOne(p => p.User)
+                .WithMany()
+                .HasForeignKey(p => p.UserId)
+                .OnDelete(DeleteBehavior.Cascade)
+                .IsRequired(false);
+
+            // Validación: debe tener OrganizationId O UserId, pero no ambos
+            // Esto se validará en el código de negocio
         });
 
         // ProjectMember configuration

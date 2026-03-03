@@ -124,29 +124,36 @@ export default function Projects() {
       return;
     }
 
-    // En modo personal, usar endpoint diferente
-    if (isPersonalMode || isPersonalRoute) {
-      setErr("Los proyectos personales aún no están implementados en el backend");
-      setCreating(false);
-      return;
-    }
-
-    if (!organizationId) {
-      setErr(`Se requiere ID de ${t.organizationLower}`);
-      return;
-    }
-
     setErr(null);
     setCreating(true);
     try {
-      await http.post(`/api/orgs/${organizationId}/projects`, {
-        name: name.trim(),
-        description: description.trim() || null,
-        template: template.trim() || null,
-        imageUrl: imageUrl.trim() || null,
-        slaHours: slaHours ? parseInt(slaHours) : null,
-        slaWarningThreshold: slaWarningThreshold ? parseInt(slaWarningThreshold) : null,
-      });
+      // En modo personal, usar endpoint diferente
+      if (isPersonalMode || isPersonalRoute) {
+        await http.post("/api/users/me/projects", {
+          name: name.trim(),
+          description: description.trim() || null,
+          template: template.trim() || null,
+          imageUrl: imageUrl.trim() || null,
+          slaHours: slaHours ? parseInt(slaHours) : null,
+          slaWarningThreshold: slaWarningThreshold ? parseInt(slaWarningThreshold) : null,
+        });
+      } else {
+        if (!organizationId) {
+          setErr(`Se requiere ID de ${t.organizationLower}`);
+          setCreating(false);
+          return;
+        }
+
+        await http.post(`/api/orgs/${organizationId}/projects`, {
+          name: name.trim(),
+          description: description.trim() || null,
+          template: template.trim() || null,
+          imageUrl: imageUrl.trim() || null,
+          slaHours: slaHours ? parseInt(slaHours) : null,
+          slaWarningThreshold: slaWarningThreshold ? parseInt(slaWarningThreshold) : null,
+        });
+      }
+
       setName("");
       setDescription("");
       setTemplate("");
@@ -167,7 +174,7 @@ export default function Projects() {
     } finally {
       setCreating(false);
     }
-  }, [organizationId, name, description, template, loadProjects, showToast, isPersonalMode, isPersonalRoute, t]);
+  }, [organizationId, name, description, template, imageUrl, slaHours, slaWarningThreshold, loadProjects, showToast, isPersonalMode, isPersonalRoute, t]);
 
   // En modo personal, no requerir organizationId
   if (!isPersonalMode && !isPersonalRoute && !organizationId) {

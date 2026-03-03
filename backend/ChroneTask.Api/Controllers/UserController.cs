@@ -63,8 +63,9 @@ public class UserController : ControllerBase
         catch (Exception ex)
         {
             Console.WriteLine($"❌ Error en GetCurrentUser: {ex.Message}");
-            return StatusCode(500, new { 
-                error = "Internal Server Error", 
+            return StatusCode(500, new
+            {
+                error = "Internal Server Error",
                 message = ex.Message
             });
         }
@@ -131,8 +132,9 @@ public class UserController : ControllerBase
         catch (Exception ex)
         {
             Console.WriteLine($"❌ Error en UpdateProfile: {ex.Message}");
-            return StatusCode(500, new { 
-                error = "Internal Server Error", 
+            return StatusCode(500, new
+            {
+                error = "Internal Server Error",
                 message = ex.Message
             });
         }
@@ -158,10 +160,10 @@ public class UserController : ControllerBase
             // Validar que el tipo de uso sea válido
             var validUsageTypes = new[] { "personal", "team", "business" };
             var usageTypeValue = request.UsageType?.Trim().ToLowerInvariant() ?? "";
-            
+
             if (string.IsNullOrWhiteSpace(usageTypeValue))
                 return BadRequest(new { message = "UsageType is required" });
-                
+
             if (!validUsageTypes.Contains(usageTypeValue))
                 return BadRequest(new { message = "Invalid usage type. Must be 'personal', 'team', or 'business'" });
 
@@ -197,8 +199,9 @@ public class UserController : ControllerBase
         catch (Exception ex)
         {
             Console.WriteLine($"❌ Error en UpdateUsageType: {ex.Message}");
-            return StatusCode(500, new { 
-                error = "Internal Server Error", 
+            return StatusCode(500, new
+            {
+                error = "Internal Server Error",
                 message = ex.Message
             });
         }
@@ -238,8 +241,268 @@ public class UserController : ControllerBase
         catch (Exception ex)
         {
             Console.WriteLine($"❌ Error en ChangePassword: {ex.Message}");
-            return StatusCode(500, new { 
-                error = "Internal Server Error", 
+            return StatusCode(500, new
+            {
+                error = "Internal Server Error",
+                message = ex.Message
+            });
+        }
+    }
+
+    // ========== PROYECTOS PERSONALES ==========
+
+    // GET: api/users/me/projects
+    [HttpGet("me/projects")]
+    public async Task<ActionResult<List<ProjectResponse>>> GetPersonalProjects()
+    {
+        try
+        {
+            var userId = UserContext.GetUserId(User);
+
+            // Verificar que el usuario tiene usageType = "personal"
+            var user = await _db.Users
+                .FirstOrDefaultAsync(u => u.Id == userId);
+
+            if (user is null)
+                return NotFound();
+
+            // Obtener proyectos personales (sin OrganizationId, con UserId)
+            var projects = await _db.Projects
+                .Where(p => p.UserId == userId && p.OrganizationId == null && p.IsActive)
+                .OrderByDescending(p => p.CreatedAt)
+                .Select(p => new ProjectResponse
+                {
+                    Id = p.Id,
+                    Name = p.Name,
+                    Description = p.Description,
+                    OrganizationId = p.OrganizationId,
+                    UserId = p.UserId,
+                    Template = p.Template,
+                    IsActive = p.IsActive,
+                    CreatedAt = p.CreatedAt,
+                    UpdatedAt = p.UpdatedAt,
+                    TaskCount = p.Tasks.Count,
+                    ActiveTaskCount = p.Tasks.Count(t => t.Status != "Done"),
+                    ImageUrl = p.ImageUrl,
+                    SlaHours = p.SlaHours,
+                    SlaWarningThreshold = p.SlaWarningThreshold
+                })
+                .ToListAsync();
+
+            return Ok(projects);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"❌ Error en GetPersonalProjects: {ex.Message}");
+            return StatusCode(500, new
+            {
+                error = "Internal Server Error",
+                message = ex.Message
+            });
+        }
+    }
+
+    // POST: api/users/me/projects
+    [HttpPost("me/projects")]
+    public async Task<ActionResult<ProjectResponse>> CreatePersonalProject([FromBody] ProjectCreateRequest request)
+    {
+        try
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var userId = UserContext.GetUserId(User);
+
+            // Verificar que el usuario tiene usageType = "personal"
+            var user = await _db.Users
+                .FirstOrDefaultAsync(u => u.Id == userId);
+
+            if (user is null)
+                return NotFound();
+
+            var project = new Project
+            {
+                Name = request.Name.Trim(),
+                Description = string.IsNullOrWhiteSpace(request.Description) ? null : request.Description.Trim(),
+                OrganizationId = null, // Proyecto personal, sin organización
+                UserId = userId, // Asignar al usuario
+                Template = string.IsNullOrWhiteSpace(request.Template) ? null : request.Template.Trim(),
+                ImageUrl = string.IsNullOrWhiteSpace(request.ImageUrl) ? null : request.ImageUrl.Trim(),
+                SlaHours = request.SlaHours,
+                SlaWarningThreshold = request.SlaWarningThreshold
+            };
+
+            _db.Projects.Add(project);
+
+            // Agregar al usuario como miembro del proyecto con rol "owner"
+            _db.ProjectMembers.Add(new ProjectMember
+            {
+                Project = project,
+                UserId = userId,
+                Role = "owner" // Rol especial para proyectos personales
+            });
+
+            await _db.SaveChangesAsync();
+
+            return CreatedAtAction(nameof(GetPersonalProjects), new { }, new ProjectResponse
+            {
+                Id = project.Id,
+                Name = project.Name,
+                Description = project.Description,
+                OrganizationId = project.OrganizationId,
+                UserId = project.UserId,
+                Template = project.Template,
+                IsActive = project.IsActive,
+                CreatedAt = project.CreatedAt,
+                UpdatedAt = project.UpdatedAt,
+                TaskCount = 0,
+                ActiveTaskCount = 0,
+                ImageUrl = project.ImageUrl,
+                SlaHours = project.SlaHours,
+                SlaWarningThreshold = project.SlaWarningThreshold
+            });
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"❌ Error en CreatePersonalProject: {ex.Message}");
+            return StatusCode(500, new
+            {
+                error = "Internal Server Error",
+                message = ex.Message
+            });
+        }
+    }
+
+    // GET: api/users/me/projects/{id}
+    [HttpGet("me/projects/{id:guid}")]
+    public async Task<ActionResult<ProjectResponse>> GetPersonalProject(Guid id)
+    {
+        try
+        {
+            var userId = UserContext.GetUserId(User);
+
+            var project = await _db.Projects
+                .Include(p => p.Tasks)
+                .FirstOrDefaultAsync(p => p.Id == id && p.UserId == userId && p.OrganizationId == null);
+
+            if (project is null)
+                return NotFound();
+
+            return Ok(new ProjectResponse
+            {
+                Id = project.Id,
+                Name = project.Name,
+                Description = project.Description,
+                OrganizationId = project.OrganizationId,
+                UserId = project.UserId,
+                Template = project.Template,
+                IsActive = project.IsActive,
+                CreatedAt = project.CreatedAt,
+                UpdatedAt = project.UpdatedAt,
+                TaskCount = project.Tasks.Count,
+                ActiveTaskCount = project.Tasks.Count(t => t.Status != "Done"),
+                ImageUrl = project.ImageUrl,
+                SlaHours = project.SlaHours,
+                SlaWarningThreshold = project.SlaWarningThreshold
+            });
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"❌ Error en GetPersonalProject: {ex.Message}");
+            return StatusCode(500, new
+            {
+                error = "Internal Server Error",
+                message = ex.Message
+            });
+        }
+    }
+
+    // PATCH: api/users/me/projects/{id}
+    [HttpPatch("me/projects/{id:guid}")]
+    public async Task<ActionResult<ProjectResponse>> UpdatePersonalProject(Guid id, [FromBody] ProjectCreateRequest request)
+    {
+        try
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var userId = UserContext.GetUserId(User);
+
+            var project = await _db.Projects
+                .FirstOrDefaultAsync(p => p.Id == id && p.UserId == userId && p.OrganizationId == null);
+
+            if (project is null)
+                return NotFound();
+
+            project.Name = request.Name.Trim();
+            project.Description = string.IsNullOrWhiteSpace(request.Description) ? null : request.Description.Trim();
+            project.Template = string.IsNullOrWhiteSpace(request.Template) ? null : request.Template.Trim();
+            project.ImageUrl = string.IsNullOrWhiteSpace(request.ImageUrl) ? null : request.ImageUrl.Trim();
+            project.SlaHours = request.SlaHours;
+            project.SlaWarningThreshold = request.SlaWarningThreshold;
+            project.UpdatedAt = DateTime.UtcNow;
+
+            await _db.SaveChangesAsync();
+
+            var taskCount = await _db.Tasks.CountAsync(t => t.ProjectId == id);
+            var activeTaskCount = await _db.Tasks.CountAsync(t => t.ProjectId == id && t.Status != "Done");
+
+            return Ok(new ProjectResponse
+            {
+                Id = project.Id,
+                Name = project.Name,
+                Description = project.Description,
+                OrganizationId = project.OrganizationId,
+                UserId = project.UserId,
+                Template = project.Template,
+                IsActive = project.IsActive,
+                CreatedAt = project.CreatedAt,
+                UpdatedAt = project.UpdatedAt,
+                TaskCount = taskCount,
+                ActiveTaskCount = activeTaskCount,
+                ImageUrl = project.ImageUrl,
+                SlaHours = project.SlaHours,
+                SlaWarningThreshold = project.SlaWarningThreshold
+            });
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"❌ Error en UpdatePersonalProject: {ex.Message}");
+            return StatusCode(500, new
+            {
+                error = "Internal Server Error",
+                message = ex.Message
+            });
+        }
+    }
+
+    // DELETE: api/users/me/projects/{id}
+    [HttpDelete("me/projects/{id:guid}")]
+    public async Task<IActionResult> DeletePersonalProject(Guid id)
+    {
+        try
+        {
+            var userId = UserContext.GetUserId(User);
+
+            var project = await _db.Projects
+                .FirstOrDefaultAsync(p => p.Id == id && p.UserId == userId && p.OrganizationId == null);
+
+            if (project is null)
+                return NotFound();
+
+            // Soft delete
+            project.IsActive = false;
+            project.UpdatedAt = DateTime.UtcNow;
+            await _db.SaveChangesAsync();
+
+            return NoContent();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"❌ Error en DeletePersonalProject: {ex.Message}");
+            return StatusCode(500, new
+            {
+                error = "Internal Server Error",
                 message = ex.Message
             });
         }
