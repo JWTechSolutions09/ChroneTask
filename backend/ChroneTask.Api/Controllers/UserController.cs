@@ -267,58 +267,87 @@ public class UserController : ControllerBase
                 return NotFound();
 
             // Intentar obtener proyectos personales
-            // Si la columna UserId no existe (migración no ejecutada), retornar lista vacía
             try
             {
+                // Primero obtener los proyectos sin las relaciones para evitar problemas
                 var projects = await _db.Projects
                     .Where(p => p.UserId == userId && p.OrganizationId == null && p.IsActive)
                     .OrderByDescending(p => p.CreatedAt)
-                    .Select(p => new ProjectResponse
-                    {
-                        Id = p.Id,
-                        Name = p.Name,
-                        Description = p.Description,
-                        OrganizationId = p.OrganizationId,
-                        UserId = p.UserId,
-                        Template = p.Template,
-                        IsActive = p.IsActive,
-                        CreatedAt = p.CreatedAt,
-                        UpdatedAt = p.UpdatedAt,
-                        TaskCount = p.Tasks.Count,
-                        ActiveTaskCount = p.Tasks.Count(t => t.Status != "Done"),
-                        ImageUrl = p.ImageUrl,
-                        SlaHours = p.SlaHours,
-                        SlaWarningThreshold = p.SlaWarningThreshold
-                    })
                     .ToListAsync();
 
-                return Ok(projects);
+                // Luego construir las respuestas con los conteos de tareas
+                var projectResponses = new List<ProjectResponse>();
+                foreach (var project in projects)
+                {
+                    var taskCount = await _db.Tasks.CountAsync(t => t.ProjectId == project.Id);
+                    var activeTaskCount = await _db.Tasks.CountAsync(t => t.ProjectId == project.Id && t.Status != "Done");
+
+                    projectResponses.Add(new ProjectResponse
+                    {
+                        Id = project.Id,
+                        Name = project.Name,
+                        Description = project.Description,
+                        OrganizationId = project.OrganizationId,
+                        UserId = project.UserId,
+                        Template = project.Template,
+                        IsActive = project.IsActive,
+                        CreatedAt = project.CreatedAt,
+                        UpdatedAt = project.UpdatedAt,
+                        TaskCount = taskCount,
+                        ActiveTaskCount = activeTaskCount,
+                        ImageUrl = project.ImageUrl,
+                        SlaHours = project.SlaHours,
+                        SlaWarningThreshold = project.SlaWarningThreshold
+                    });
+                }
+
+                return Ok(projectResponses);
+            }
+            catch (Exception queryEx) when (
+                queryEx.Message.Contains("column") && queryEx.Message.Contains("UserId") ||
+                queryEx.Message.Contains("does not exist") ||
+                (queryEx.InnerException != null && (
+                    queryEx.InnerException.Message.Contains("column") && queryEx.InnerException.Message.Contains("UserId") ||
+                    queryEx.InnerException.Message.Contains("does not exist")
+                ))
+            )
+            {
+                // Error específico: columna UserId no existe (migración no ejecutada)
+                Console.WriteLine($"⚠️ Columna UserId no existe en Projects. La migración no se ha ejecutado.");
+                Console.WriteLine($"⚠️ Error: {queryEx.Message}");
+                if (queryEx.InnerException != null)
+                {
+                    Console.WriteLine($"⚠️ InnerException: {queryEx.InnerException.Message}");
+                }
+                return Ok(new List<ProjectResponse>());
             }
             catch (Microsoft.EntityFrameworkCore.DbUpdateException dbEx)
             {
-                // Si es un error de base de datos relacionado con columnas faltantes
-                Console.WriteLine($"⚠️ Error de base de datos en GetPersonalProjects (posible migración pendiente): {dbEx.Message}");
-                Console.WriteLine($"⚠️ StackTrace: {dbEx.StackTrace}");
-                // Retornar lista vacía en lugar de error 500
+                Console.WriteLine($"⚠️ Error de base de datos en GetPersonalProjects: {dbEx.Message}");
+                if (dbEx.InnerException != null)
+                {
+                    Console.WriteLine($"⚠️ InnerException: {dbEx.InnerException.Message}");
+                }
                 return Ok(new List<ProjectResponse>());
             }
             catch (InvalidOperationException invalidOpEx)
             {
-                // Si es un error de operación inválida (columna no existe)
-                Console.WriteLine($"⚠️ Error de operación en GetPersonalProjects (posible migración pendiente): {invalidOpEx.Message}");
-                Console.WriteLine($"⚠️ StackTrace: {invalidOpEx.StackTrace}");
-                // Retornar lista vacía en lugar de error 500
+                Console.WriteLine($"⚠️ Error de operación en GetPersonalProjects: {invalidOpEx.Message}");
                 return Ok(new List<ProjectResponse>());
             }
         }
         catch (Exception ex)
         {
             Console.WriteLine($"❌ Error en GetPersonalProjects: {ex.Message}");
+            Console.WriteLine($"❌ Tipo: {ex.GetType().Name}");
             Console.WriteLine($"❌ StackTrace: {ex.StackTrace}");
-            Console.WriteLine($"❌ InnerException: {ex.InnerException?.Message}");
+            if (ex.InnerException != null)
+            {
+                Console.WriteLine($"❌ InnerException: {ex.InnerException.Message}");
+                Console.WriteLine($"❌ InnerException Tipo: {ex.InnerException.GetType().Name}");
+            }
 
             // Retornar lista vacía en lugar de error 500 para evitar romper el frontend
-            // El frontend puede manejar una lista vacía
             return Ok(new List<ProjectResponse>());
         }
     }
