@@ -356,129 +356,58 @@ public class UserController : ControllerBase
     [HttpPost("me/projects")]
     public async Task<ActionResult<ProjectResponse>> CreatePersonalProject([FromBody] ProjectCreateRequest request)
     {
-        try
+        var userId = UserContext.GetUserId(User);
+
+        // Verificar que el usuario existe
+        var user = await _db.Users
+            .FirstOrDefaultAsync(u => u.Id == userId);
+
+        if (user is null)
+            return NotFound();
+
+        // Crear el proyecto - EXACTAMENTE como en ProjectsController
+        var project = new Project
         {
-            // Validación manual más robusta
-            if (request == null)
-            {
-                Console.WriteLine("❌ CreatePersonalProject: Request es null");
-                return BadRequest(new { message = "Request body is required" });
-            }
+            Name = request.Name.Trim(),
+            Description = string.IsNullOrWhiteSpace(request.Description) ? null : request.Description.Trim(),
+            OrganizationId = null, // Proyecto personal, sin organización
+            UserId = userId, // Asignar al usuario
+            Template = string.IsNullOrWhiteSpace(request.Template) ? null : request.Template.Trim(),
+            ImageUrl = string.IsNullOrWhiteSpace(request.ImageUrl) ? null : request.ImageUrl.Trim(),
+            SlaHours = request.SlaHours,
+            SlaWarningThreshold = request.SlaWarningThreshold
+        };
 
-            if (string.IsNullOrWhiteSpace(request.Name))
-            {
-                Console.WriteLine("❌ CreatePersonalProject: Name es requerido");
-                return BadRequest(new { message = "Name is required" });
-            }
+        _db.Projects.Add(project);
 
-            var userId = UserContext.GetUserId(User);
-            Console.WriteLine($"✅ CreatePersonalProject: UserId = {userId}");
-
-            // Verificar que el usuario existe
-            var user = await _db.Users
-                .FirstOrDefaultAsync(u => u.Id == userId);
-
-            if (user is null)
-            {
-                Console.WriteLine($"❌ CreatePersonalProject: Usuario {userId} no encontrado");
-                return NotFound(new { message = "User not found" });
-            }
-
-            Console.WriteLine($"✅ CreatePersonalProject: Usuario encontrado: {user.Email}");
-
-            // Crear el proyecto
-            var project = new Project
-            {
-                Name = request.Name.Trim(),
-                Description = string.IsNullOrWhiteSpace(request.Description) ? null : request.Description.Trim(),
-                OrganizationId = null, // Proyecto personal, sin organización
-                UserId = userId, // Asignar al usuario
-                Template = string.IsNullOrWhiteSpace(request.Template) ? null : request.Template.Trim(),
-                ImageUrl = string.IsNullOrWhiteSpace(request.ImageUrl) ? null : request.ImageUrl.Trim(),
-                SlaHours = request.SlaHours,
-                SlaWarningThreshold = request.SlaWarningThreshold
-            };
-
-            Console.WriteLine($"✅ CreatePersonalProject: Proyecto creado: {project.Name}, UserId = {project.UserId}");
-
-            _db.Projects.Add(project);
-            Console.WriteLine("✅ CreatePersonalProject: Proyecto agregado al contexto");
-
-            // Guardar primero el proyecto para obtener el ID
-            await _db.SaveChangesAsync();
-            Console.WriteLine($"✅ CreatePersonalProject: Proyecto guardado con ID = {project.Id}");
-
-            // Agregar al usuario como miembro del proyecto con rol "owner"
-            var projectMember = new ProjectMember
-            {
-                ProjectId = project.Id, // Usar ProjectId en lugar de Project para evitar problemas
-                UserId = userId,
-                Role = "owner" // Rol especial para proyectos personales
-            };
-
-            _db.ProjectMembers.Add(projectMember);
-            Console.WriteLine($"✅ CreatePersonalProject: ProjectMember agregado: ProjectId = {projectMember.ProjectId}, UserId = {projectMember.UserId}");
-
-            await _db.SaveChangesAsync();
-            Console.WriteLine("✅ CreatePersonalProject: ProjectMember guardado exitosamente");
-
-            var response = new ProjectResponse
-            {
-                Id = project.Id,
-                Name = project.Name,
-                Description = project.Description,
-                OrganizationId = project.OrganizationId,
-                UserId = project.UserId,
-                Template = project.Template,
-                IsActive = project.IsActive,
-                CreatedAt = project.CreatedAt,
-                UpdatedAt = project.UpdatedAt,
-                TaskCount = 0,
-                ActiveTaskCount = 0,
-                ImageUrl = project.ImageUrl,
-                SlaHours = project.SlaHours,
-                SlaWarningThreshold = project.SlaWarningThreshold
-            };
-
-            Console.WriteLine($"✅ CreatePersonalProject: Proyecto creado exitosamente: {response.Id}");
-            return CreatedAtAction(nameof(GetPersonalProjects), new { }, response);
-        }
-        catch (Microsoft.EntityFrameworkCore.DbUpdateException dbEx)
+        // Agregar al usuario como miembro del proyecto - EXACTAMENTE como en ProjectsController
+        _db.ProjectMembers.Add(new ProjectMember
         {
-            Console.WriteLine($"❌ CreatePersonalProject - DbUpdateException: {dbEx.Message}");
-            Console.WriteLine($"❌ InnerException: {dbEx.InnerException?.Message}");
-            Console.WriteLine($"❌ StackTrace: {dbEx.StackTrace}");
+            Project = project, // Usar Project (navegación) como en el código original
+            UserId = userId,
+            Role = "pm" // Usar "pm" como en el código original, no "owner"
+        });
 
-            return StatusCode(500, new
-            {
-                error = "Database Error",
-                message = dbEx.Message,
-                innerException = dbEx.InnerException?.Message
-            });
-        }
-        catch (Exception ex)
+        // Guardar TODO en un solo SaveChangesAsync - EXACTAMENTE como en ProjectsController
+        await _db.SaveChangesAsync();
+
+        return CreatedAtAction(nameof(GetPersonalProjects), new { }, new ProjectResponse
         {
-            Console.WriteLine($"❌ CreatePersonalProject - Exception: {ex.Message}");
-            Console.WriteLine($"❌ Tipo: {ex.GetType().Name}");
-            Console.WriteLine($"❌ StackTrace: {ex.StackTrace}");
-            if (ex.InnerException != null)
-            {
-                Console.WriteLine($"❌ InnerException: {ex.InnerException.Message}");
-                Console.WriteLine($"❌ InnerException Tipo: {ex.InnerException.GetType().Name}");
-                if (ex.InnerException.InnerException != null)
-                {
-                    Console.WriteLine($"❌ InnerException.InnerException: {ex.InnerException.InnerException.Message}");
-                }
-            }
-
-            return StatusCode(500, new
-            {
-                error = "Internal Server Error",
-                message = ex.Message,
-                innerException = ex.InnerException?.Message,
-                type = ex.GetType().Name
-            });
-        }
+            Id = project.Id,
+            Name = project.Name,
+            Description = project.Description,
+            OrganizationId = project.OrganizationId,
+            UserId = project.UserId,
+            Template = project.Template,
+            IsActive = project.IsActive,
+            CreatedAt = project.CreatedAt,
+            UpdatedAt = project.UpdatedAt,
+            TaskCount = 0,
+            ActiveTaskCount = 0,
+            ImageUrl = project.ImageUrl,
+            SlaHours = project.SlaHours,
+            SlaWarningThreshold = project.SlaWarningThreshold
+        });
     }
 
     // GET: api/users/me/projects/{id}
