@@ -358,18 +358,35 @@ public class UserController : ControllerBase
     {
         try
         {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
+            // Validación manual más robusta
+            if (request == null)
+            {
+                Console.WriteLine("❌ CreatePersonalProject: Request es null");
+                return BadRequest(new { message = "Request body is required" });
+            }
+
+            if (string.IsNullOrWhiteSpace(request.Name))
+            {
+                Console.WriteLine("❌ CreatePersonalProject: Name es requerido");
+                return BadRequest(new { message = "Name is required" });
+            }
 
             var userId = UserContext.GetUserId(User);
+            Console.WriteLine($"✅ CreatePersonalProject: UserId = {userId}");
 
-            // Verificar que el usuario tiene usageType = "personal"
+            // Verificar que el usuario existe
             var user = await _db.Users
                 .FirstOrDefaultAsync(u => u.Id == userId);
 
             if (user is null)
-                return NotFound();
+            {
+                Console.WriteLine($"❌ CreatePersonalProject: Usuario {userId} no encontrado");
+                return NotFound(new { message = "User not found" });
+            }
 
+            Console.WriteLine($"✅ CreatePersonalProject: Usuario encontrado: {user.Email}");
+
+            // Crear el proyecto
             var project = new Project
             {
                 Name = request.Name.Trim(),
@@ -382,19 +399,30 @@ public class UserController : ControllerBase
                 SlaWarningThreshold = request.SlaWarningThreshold
             };
 
+            Console.WriteLine($"✅ CreatePersonalProject: Proyecto creado: {project.Name}, UserId = {project.UserId}");
+
             _db.Projects.Add(project);
+            Console.WriteLine("✅ CreatePersonalProject: Proyecto agregado al contexto");
+
+            // Guardar primero el proyecto para obtener el ID
+            await _db.SaveChangesAsync();
+            Console.WriteLine($"✅ CreatePersonalProject: Proyecto guardado con ID = {project.Id}");
 
             // Agregar al usuario como miembro del proyecto con rol "owner"
-            _db.ProjectMembers.Add(new ProjectMember
+            var projectMember = new ProjectMember
             {
-                Project = project,
+                ProjectId = project.Id, // Usar ProjectId en lugar de Project para evitar problemas
                 UserId = userId,
                 Role = "owner" // Rol especial para proyectos personales
-            });
+            };
+
+            _db.ProjectMembers.Add(projectMember);
+            Console.WriteLine($"✅ CreatePersonalProject: ProjectMember agregado: ProjectId = {projectMember.ProjectId}, UserId = {projectMember.UserId}");
 
             await _db.SaveChangesAsync();
+            Console.WriteLine("✅ CreatePersonalProject: ProjectMember guardado exitosamente");
 
-            return CreatedAtAction(nameof(GetPersonalProjects), new { }, new ProjectResponse
+            var response = new ProjectResponse
             {
                 Id = project.Id,
                 Name = project.Name,
@@ -410,11 +438,27 @@ public class UserController : ControllerBase
                 ImageUrl = project.ImageUrl,
                 SlaHours = project.SlaHours,
                 SlaWarningThreshold = project.SlaWarningThreshold
+            };
+
+            Console.WriteLine($"✅ CreatePersonalProject: Proyecto creado exitosamente: {response.Id}");
+            return CreatedAtAction(nameof(GetPersonalProjects), new { }, response);
+        }
+        catch (Microsoft.EntityFrameworkCore.DbUpdateException dbEx)
+        {
+            Console.WriteLine($"❌ CreatePersonalProject - DbUpdateException: {dbEx.Message}");
+            Console.WriteLine($"❌ InnerException: {dbEx.InnerException?.Message}");
+            Console.WriteLine($"❌ StackTrace: {dbEx.StackTrace}");
+
+            return StatusCode(500, new
+            {
+                error = "Database Error",
+                message = dbEx.Message,
+                innerException = dbEx.InnerException?.Message
             });
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"❌ Error en CreatePersonalProject: {ex.Message}");
+            Console.WriteLine($"❌ CreatePersonalProject - Exception: {ex.Message}");
             Console.WriteLine($"❌ Tipo: {ex.GetType().Name}");
             Console.WriteLine($"❌ StackTrace: {ex.StackTrace}");
             if (ex.InnerException != null)
@@ -431,7 +475,8 @@ public class UserController : ControllerBase
             {
                 error = "Internal Server Error",
                 message = ex.Message,
-                innerException = ex.InnerException?.Message
+                innerException = ex.InnerException?.Message,
+                type = ex.GetType().Name
             });
         }
     }
