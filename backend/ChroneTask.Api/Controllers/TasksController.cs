@@ -25,14 +25,24 @@ public class TasksController : ControllerBase
     [HttpGet]
     public async Task<ActionResult<List<TaskResponse>>> GetAll(Guid projectId)
     {
-        var userId = UserContext.GetUserId(User);
+        try
+        {
+            Guid userId;
+            try
+            {
+                userId = UserContext.GetUserId(User);
+            }
+            catch (UnauthorizedAccessException)
+            {
+                return Unauthorized(new { message = "Authentication required" });
+            }
 
-        // Verificar que el usuario es miembro del proyecto
-        var isMember = await _db.ProjectMembers
-            .AnyAsync(m => m.ProjectId == projectId && m.UserId == userId);
+            // Verificar que el usuario es miembro del proyecto
+            var isMember = await _db.ProjectMembers
+                .AnyAsync(m => m.ProjectId == projectId && m.UserId == userId);
 
-        if (!isMember)
-            return StatusCode(403, new { message = "You are not a member of this project" });
+            if (!isMember)
+                return StatusCode(403, new { message = "You are not a member of this project" });
 
         var tasks = await _db.Tasks
             .Where(t => t.ProjectId == projectId)
@@ -59,7 +69,18 @@ public class TasksController : ControllerBase
             })
             .ToListAsync();
 
-        return Ok(tasks);
+            return Ok(tasks);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"❌ Error en GetAll tasks: {ex.Message}");
+            Console.WriteLine($"Stack trace: {ex.StackTrace}");
+            return StatusCode(500, new
+            {
+                error = "Internal Server Error",
+                message = ex.Message
+            });
+        }
     }
 
     // GET: api/projects/{projectId}/tasks/{id}
