@@ -5,6 +5,7 @@ using ChroneTask.Api.Helpers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Text.Json;
 using TaskEntity = ChroneTask.Api.Entities.Task;
 
 namespace ChroneTask.Api.Controllers;
@@ -44,41 +45,66 @@ public class TasksController : ControllerBase
             if (!isMember)
                 return StatusCode(403, new { message = "You are not a member of this project" });
 
-        var tasks = await _db.Tasks
-            .Where(t => t.ProjectId == projectId)
-            .Include(t => t.AssignedTo)
-            .OrderByDescending(t => t.CreatedAt)
-            .Select(t => new TaskResponse
-            {
-                Id = t.Id,
-                Title = t.Title,
-                Description = t.Description,
-                ProjectId = t.ProjectId,
-                Type = t.Type,
-                Status = t.Status,
-                Priority = t.Priority,
-                AssignedToId = t.AssignedToId,
-                AssignedToName = t.AssignedTo != null ? t.AssignedTo.FullName : null,
-                StartDate = t.StartDate,
-                DueDate = t.DueDate,
-                EstimatedMinutes = t.EstimatedMinutes,
-                TotalMinutes = t.TotalMinutes,
-                Tags = t.Tags,
-                CreatedAt = t.CreatedAt,
-                UpdatedAt = t.UpdatedAt
-            })
-            .ToListAsync();
+            // Obtener las tareas con un LEFT JOIN para obtener los usuarios asignados de una vez
+            var tasksQuery = from task in _db.Tasks
+                            where task.ProjectId == projectId
+                            join user in _db.Users on task.AssignedToId equals user.Id into userGroup
+                            from assignedUser in userGroup.DefaultIfEmpty()
+                            orderby task.CreatedAt descending
+                            select new
+                            {
+                                Task = task,
+                                AssignedToName = assignedUser != null ? assignedUser.FullName : null
+                            };
 
-            return Ok(tasks);
+            var tasksWithUsers = await tasksQuery.ToListAsync();
+
+            // Construir las respuestas
+            var taskResponses = tasksWithUsers.Select(t => new TaskResponse
+            {
+                Id = t.Task.Id,
+                Title = t.Task.Title,
+                Description = t.Task.Description,
+                ProjectId = t.Task.ProjectId,
+                Type = t.Task.Type,
+                Status = t.Task.Status,
+                Priority = t.Task.Priority,
+                AssignedToId = t.Task.AssignedToId,
+                AssignedToName = t.AssignedToName,
+                StartDate = t.Task.StartDate,
+                DueDate = t.Task.DueDate,
+                EstimatedMinutes = t.Task.EstimatedMinutes,
+                TotalMinutes = t.Task.TotalMinutes,
+                Tags = t.Task.Tags,
+                CreatedAt = t.Task.CreatedAt,
+                UpdatedAt = t.Task.UpdatedAt
+            }).ToList();
+
+            return Ok(taskResponses);
+        }
+        catch (DbUpdateException dbEx)
+        {
+            Console.WriteLine($"❌ Error de base de datos en GetAll tasks: {dbEx.Message}");
+            Console.WriteLine($"Inner exception: {dbEx.InnerException?.Message}");
+            return StatusCode(500, new
+            {
+                error = "Database error",
+                message = dbEx.InnerException?.Message ?? dbEx.Message
+            });
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"❌ Error en GetAll tasks: {ex.Message}");
+            Console.WriteLine($"❌ Error inesperado en GetAll tasks: {ex.Message}");
             Console.WriteLine($"Stack trace: {ex.StackTrace}");
+            if (ex.InnerException != null)
+            {
+                Console.WriteLine($"Inner exception: {ex.InnerException.Message}");
+            }
             return StatusCode(500, new
             {
                 error = "Internal Server Error",
-                message = ex.Message
+                message = ex.Message,
+                innerException = ex.InnerException?.Message
             });
         }
     }
@@ -128,58 +154,176 @@ public class TasksController : ControllerBase
     [HttpPost]
     public async Task<ActionResult<TaskResponse>> Create(Guid projectId, [FromBody] TaskCreateRequest request)
     {
-        var userId = UserContext.GetUserId(User);
-
-        // Verificar que el usuario es miembro del proyecto
-        var isMember = await _db.ProjectMembers
-            .AnyAsync(m => m.ProjectId == projectId && m.UserId == userId);
-
-        if (!isMember)
-            return StatusCode(403, new { message = "You are not a member of this project" });
-
-        var task = new TaskEntity
+        try
         {
-            Title = request.Title.Trim(),
-            Description = string.IsNullOrWhiteSpace(request.Description) ? null : request.Description.Trim(),
-            ProjectId = projectId,
-            Type = request.Type,
-            Status = "To Do",
-            Priority = string.IsNullOrWhiteSpace(request.Priority) ? null : request.Priority,
-            AssignedToId = request.AssignedToId,
-            StartDate = request.StartDate,
-            DueDate = request.DueDate,
-            EstimatedMinutes = request.EstimatedMinutes,
-            Tags = string.IsNullOrWhiteSpace(request.Tags) ? null : request.Tags.Trim()
-        };
+            Console.WriteLine($"🔵 Create task - ProjectId: {projectId}");
+            Console.WriteLine($"🔵 Request recibido: {JsonSerializer.Serialize(request)}");
 
-        _db.Tasks.Add(task);
-        await _db.SaveChangesAsync();
+            // Validar que el request no sea null
+            if (request == null)
+            {
+                Console.WriteLine("❌ Request es null");
+                return BadRequest(new { message = "Request body is required" });
+            }
 
-        // Cargar el usuario asignado si existe
-        if (task.AssignedToId.HasValue)
-        {
-            await _db.Entry(task).Reference(t => t.AssignedTo).LoadAsync();
+            // Validar modelo
+            if (!ModelState.IsValid)
+            {
+                Console.WriteLine($"❌ ModelState inválido: {string.Join(", ", ModelState.SelectMany(x => x.Value.Errors.Select(e => e.ErrorMessage)))}");
+                return BadRequest(ModelState);
+            }
+
+            Guid userId;
+            try
+            {
+                userId = UserContext.GetUserId(User);
+                Console.WriteLine($"🔵 UserId: {userId}");
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                Console.WriteLine($"❌ UnauthorizedAccessException: {ex.Message}");
+                return Unauthorized(new { message = "Authentication required" });
+            }
+
+            // Verificar que el proyecto existe
+            var projectExists = await _db.Projects
+                .AnyAsync(p => p.Id == projectId && p.IsActive);
+
+            Console.WriteLine($"🔵 Project exists: {projectExists}");
+
+            if (!projectExists)
+            {
+                Console.WriteLine($"❌ Project not found: {projectId}");
+                return NotFound(new { message = "Project not found" });
+            }
+
+            // Verificar que el usuario es miembro del proyecto
+            var isMember = await _db.ProjectMembers
+                .AnyAsync(m => m.ProjectId == projectId && m.UserId == userId);
+
+            Console.WriteLine($"🔵 Is member: {isMember}");
+
+            if (!isMember)
+            {
+                Console.WriteLine($"❌ User {userId} is not a member of project {projectId}");
+                return StatusCode(403, new { message = "You are not a member of this project" });
+            }
+
+            // Validar que el título no esté vacío
+            if (string.IsNullOrWhiteSpace(request?.Title))
+            {
+                Console.WriteLine("❌ Title is empty");
+                return BadRequest(new { message = "Title is required" });
+            }
+
+            // Si se asigna un usuario, verificar que es miembro del proyecto
+            if (request.AssignedToId.HasValue)
+            {
+                var isAssignedUserMember = await _db.ProjectMembers
+                    .AnyAsync(m => m.ProjectId == projectId && m.UserId == request.AssignedToId.Value);
+
+                if (!isAssignedUserMember)
+                    return BadRequest(new { message = "The assigned user must be a member of the project" });
+            }
+
+            Console.WriteLine($"🔵 Creando tarea con Type: {request.Type ?? "Task"}");
+
+            var task = new TaskEntity
+            {
+                Title = request.Title.Trim(),
+                Description = string.IsNullOrWhiteSpace(request.Description) ? null : request.Description.Trim(),
+                ProjectId = projectId,
+                Type = request.Type ?? "Task",
+                Status = "To Do",
+                Priority = string.IsNullOrWhiteSpace(request.Priority) ? null : request.Priority,
+                AssignedToId = request.AssignedToId,
+                StartDate = request.StartDate,
+                DueDate = request.DueDate,
+                EstimatedMinutes = request.EstimatedMinutes,
+                Tags = string.IsNullOrWhiteSpace(request.Tags) ? null : request.Tags.Trim()
+            };
+
+            Console.WriteLine($"🔵 Task entity creada, agregando a DbContext...");
+            _db.Tasks.Add(task);
+            
+            Console.WriteLine($"🔵 Guardando cambios en la base de datos...");
+            await _db.SaveChangesAsync();
+            Console.WriteLine($"✅ Tarea guardada exitosamente con ID: {task.Id}");
+
+            // Cargar el usuario asignado si existe
+            string? assignedToName = null;
+            if (task.AssignedToId.HasValue)
+            {
+                try
+                {
+                    var assignedUser = await _db.Users
+                        .FirstOrDefaultAsync(u => u.Id == task.AssignedToId.Value);
+                    assignedToName = assignedUser?.FullName;
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"⚠️ Error cargando usuario asignado: {ex.Message}");
+                    // Continuar sin el nombre del usuario asignado
+                }
+            }
+
+            Console.WriteLine($"🔵 Construyendo respuesta...");
+            var response = new TaskResponse
+            {
+                Id = task.Id,
+                Title = task.Title,
+                Description = task.Description,
+                ProjectId = task.ProjectId,
+                Type = task.Type,
+                Status = task.Status,
+                Priority = task.Priority,
+                AssignedToId = task.AssignedToId,
+                AssignedToName = assignedToName,
+                StartDate = task.StartDate,
+                DueDate = task.DueDate,
+                EstimatedMinutes = task.EstimatedMinutes,
+                TotalMinutes = task.TotalMinutes,
+                Tags = task.Tags,
+                CreatedAt = task.CreatedAt,
+                UpdatedAt = task.UpdatedAt
+            };
+
+            Console.WriteLine($"✅ Tarea creada exitosamente");
+            return CreatedAtAction(nameof(GetById), new { projectId, id = task.Id }, response);
         }
-
-        return CreatedAtAction(nameof(GetById), new { projectId, id = task.Id }, new TaskResponse
+        catch (DbUpdateException dbEx)
         {
-            Id = task.Id,
-            Title = task.Title,
-            Description = task.Description,
-            ProjectId = task.ProjectId,
-            Type = task.Type,
-            Status = task.Status,
-            Priority = task.Priority,
-            AssignedToId = task.AssignedToId,
-            AssignedToName = task.AssignedTo != null ? task.AssignedTo.FullName : null,
-            StartDate = task.StartDate,
-            DueDate = task.DueDate,
-            EstimatedMinutes = task.EstimatedMinutes,
-            TotalMinutes = task.TotalMinutes,
-            Tags = task.Tags,
-            CreatedAt = task.CreatedAt,
-            UpdatedAt = task.UpdatedAt
-        });
+            Console.WriteLine($"❌ Error de base de datos al crear tarea: {dbEx.Message}");
+            Console.WriteLine($"Inner exception: {dbEx.InnerException?.Message}");
+            Console.WriteLine($"Stack trace: {dbEx.StackTrace}");
+            if (dbEx.InnerException != null)
+            {
+                Console.WriteLine($"Inner stack trace: {dbEx.InnerException.StackTrace}");
+            }
+            return StatusCode(500, new
+            {
+                error = "Database error",
+                message = dbEx.InnerException?.Message ?? dbEx.Message
+            });
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"❌ Error inesperado al crear tarea: {ex.Message}");
+            Console.WriteLine($"Tipo de excepción: {ex.GetType().FullName}");
+            Console.WriteLine($"Stack trace: {ex.StackTrace}");
+            if (ex.InnerException != null)
+            {
+                Console.WriteLine($"Inner exception: {ex.InnerException.Message}");
+                Console.WriteLine($"Inner stack trace: {ex.InnerException.StackTrace}");
+            }
+            return StatusCode(500, new
+            {
+                error = "Internal Server Error",
+                message = ex.Message,
+                type = ex.GetType().Name,
+                innerException = ex.InnerException?.Message
+            });
+        }
     }
 
     // PATCH: api/projects/{projectId}/tasks/{id}
