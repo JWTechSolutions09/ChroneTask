@@ -228,6 +228,45 @@ public class TasksController : ControllerBase
 
             Console.WriteLine($"🔵 Creando tarea con Type: {request.Type ?? "Task"}");
 
+            // Convertir fechas a UTC si no lo están (PostgreSQL requiere UTC)
+            DateTime? startDateUtc = null;
+            if (request.StartDate.HasValue)
+            {
+                var startDate = request.StartDate.Value;
+                if (startDate.Kind == DateTimeKind.Unspecified)
+                {
+                    // Asumir que es UTC si no está especificado
+                    startDateUtc = DateTime.SpecifyKind(startDate, DateTimeKind.Utc);
+                }
+                else if (startDate.Kind == DateTimeKind.Local)
+                {
+                    startDateUtc = startDate.ToUniversalTime();
+                }
+                else
+                {
+                    startDateUtc = startDate;
+                }
+            }
+
+            DateTime? dueDateUtc = null;
+            if (request.DueDate.HasValue)
+            {
+                var dueDate = request.DueDate.Value;
+                if (dueDate.Kind == DateTimeKind.Unspecified)
+                {
+                    // Asumir que es UTC si no está especificado
+                    dueDateUtc = DateTime.SpecifyKind(dueDate, DateTimeKind.Utc);
+                }
+                else if (dueDate.Kind == DateTimeKind.Local)
+                {
+                    dueDateUtc = dueDate.ToUniversalTime();
+                }
+                else
+                {
+                    dueDateUtc = dueDate;
+                }
+            }
+
             var task = new TaskEntity
             {
                 Title = request.Title.Trim(),
@@ -237,8 +276,8 @@ public class TasksController : ControllerBase
                 Status = "To Do",
                 Priority = string.IsNullOrWhiteSpace(request.Priority) ? null : request.Priority,
                 AssignedToId = request.AssignedToId,
-                StartDate = request.StartDate,
-                DueDate = request.DueDate,
+                StartDate = startDateUtc,
+                DueDate = dueDateUtc,
                 EstimatedMinutes = request.EstimatedMinutes,
                 Tags = string.IsNullOrWhiteSpace(request.Tags) ? null : request.Tags.Trim()
             };
@@ -351,8 +390,50 @@ public class TasksController : ControllerBase
         task.Type = request.Type;
         task.Priority = string.IsNullOrWhiteSpace(request.Priority) ? null : request.Priority;
         task.AssignedToId = request.AssignedToId;
-        task.StartDate = request.StartDate;
-        task.DueDate = request.DueDate;
+        
+        // Convertir fechas a UTC si no lo están (PostgreSQL requiere UTC)
+        if (request.StartDate.HasValue)
+        {
+            var startDate = request.StartDate.Value;
+            if (startDate.Kind == DateTimeKind.Unspecified)
+            {
+                task.StartDate = DateTime.SpecifyKind(startDate, DateTimeKind.Utc);
+            }
+            else if (startDate.Kind == DateTimeKind.Local)
+            {
+                task.StartDate = startDate.ToUniversalTime();
+            }
+            else
+            {
+                task.StartDate = startDate;
+            }
+        }
+        else
+        {
+            task.StartDate = null;
+        }
+
+        if (request.DueDate.HasValue)
+        {
+            var dueDate = request.DueDate.Value;
+            if (dueDate.Kind == DateTimeKind.Unspecified)
+            {
+                task.DueDate = DateTime.SpecifyKind(dueDate, DateTimeKind.Utc);
+            }
+            else if (dueDate.Kind == DateTimeKind.Local)
+            {
+                task.DueDate = dueDate.ToUniversalTime();
+            }
+            else
+            {
+                task.DueDate = dueDate;
+            }
+        }
+        else
+        {
+            task.DueDate = null;
+        }
+
         task.EstimatedMinutes = request.EstimatedMinutes;
         task.Tags = string.IsNullOrWhiteSpace(request.Tags) ? null : request.Tags.Trim();
         task.UpdatedAt = DateTime.UtcNow;
@@ -675,12 +756,49 @@ public class TasksController : ControllerBase
         if (!request.DurationMinutes.HasValue || request.DurationMinutes <= 0)
             return BadRequest(new { message = "Duration must be greater than 0" });
 
+        // Convertir fechas a UTC si no lo están
+        DateTime startedAtUtc = DateTime.UtcNow;
+        if (request.StartedAt.HasValue)
+        {
+            var startedAt = request.StartedAt.Value;
+            if (startedAt.Kind == DateTimeKind.Unspecified)
+            {
+                startedAtUtc = DateTime.SpecifyKind(startedAt, DateTimeKind.Utc);
+            }
+            else if (startedAt.Kind == DateTimeKind.Local)
+            {
+                startedAtUtc = startedAt.ToUniversalTime();
+            }
+            else
+            {
+                startedAtUtc = startedAt;
+            }
+        }
+
+        DateTime? endedAtUtc = null;
+        if (request.EndedAt.HasValue)
+        {
+            var endedAt = request.EndedAt.Value;
+            if (endedAt.Kind == DateTimeKind.Unspecified)
+            {
+                endedAtUtc = DateTime.SpecifyKind(endedAt, DateTimeKind.Utc);
+            }
+            else if (endedAt.Kind == DateTimeKind.Local)
+            {
+                endedAtUtc = endedAt.ToUniversalTime();
+            }
+            else
+            {
+                endedAtUtc = endedAt;
+            }
+        }
+
         var timeEntry = new TimeEntry
         {
             TaskId = id,
             UserId = userId,
-            StartedAt = request.StartedAt ?? DateTime.UtcNow,
-            EndedAt = request.EndedAt,
+            StartedAt = startedAtUtc,
+            EndedAt = endedAtUtc,
             DurationMinutes = request.DurationMinutes,
             Description = string.IsNullOrWhiteSpace(request.Description) ? null : request.Description.Trim(),
             IsManual = true
