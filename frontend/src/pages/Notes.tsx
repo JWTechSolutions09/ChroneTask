@@ -82,10 +82,28 @@ export default function Notes() {
           setNotes(allNotes);
         }
       } else {
-        // Modo organizacional: requiere projectId
-        if (!projectId || !organizationId) return;
-        const res = await http.get(`/api/orgs/${organizationId}/projects/${projectId}/notes`);
-        setNotes(res.data || []);
+        // Modo organizacional
+        if (!organizationId) return;
+        
+        if (projectId) {
+          // Si hay projectId, cargar notas de ese proyecto
+          const res = await http.get(`/api/orgs/${organizationId}/projects/${projectId}/notes`);
+          setNotes(res.data || []);
+        } else {
+          // Si no hay projectId, cargar todas las notas de todos los proyectos de la organización
+          const projectsRes = await http.get(`/api/orgs/${organizationId}/projects`);
+          const projects = projectsRes.data || [];
+          let allNotes: ProjectNote[] = [];
+          for (const project of projects) {
+            try {
+              const notesRes = await http.get(`/api/orgs/${organizationId}/projects/${project.id}/notes`);
+              allNotes = [...allNotes, ...(notesRes.data || [])];
+            } catch (ex: any) {
+              // Silently fail for individual projects
+            }
+          }
+          setNotes(allNotes);
+        }
       }
     } catch (ex: any) {
       const errorMsg = ex?.response?.data?.message ?? ex.message ?? "Error cargando notas";
@@ -187,14 +205,20 @@ export default function Notes() {
       return;
     }
     
-    // Modo organizacional
-    if (!organizationId || !projectId) {
-      showToast("Se requieren organización y proyecto", "error");
+    // Modo organizacional: usar el projectId de la nota si no hay uno en la URL
+    if (!organizationId) {
+      showToast("Se requiere una organización", "error");
+      return;
+    }
+    
+    const targetProjectId = projectId || note.projectId;
+    if (!targetProjectId) {
+      showToast("No se puede eliminar la nota: falta projectId", "error");
       return;
     }
     
     try {
-      await http.delete(`/api/orgs/${organizationId}/projects/${projectId}/notes/${id}`);
+      await http.delete(`/api/orgs/${organizationId}/projects/${targetProjectId}/notes/${id}`);
       await loadNotes();
       if (selectedNote?.id === id) {
         setSelectedNote(null);
@@ -280,14 +304,13 @@ export default function Notes() {
     }
   }, [draggedNote, resizingNote, notes]);
 
-  // En modo personal sin projectId, permitimos mostrar todas las notas
-  // En modo organizacional, requerimos ambos organizationId y projectId
-  if (!isPersonalMode && !isPersonalRoute && (!organizationId || !projectId)) {
+  // En modo organizacional, requerimos organizationId
+  if (!isPersonalMode && !isPersonalRoute && !organizationId) {
     return (
       <Layout organizationId={organizationId}>
         <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center" }}>
           <div className="alert alert-error">
-            Error: Faltan parámetros requeridos {!projectId && "(Project ID)"} {!organizationId && "(Organization ID)"}
+            Error: Falta parámetro requerido (Organization ID)
           </div>
         </div>
       </Layout>
@@ -318,9 +341,11 @@ export default function Notes() {
                 ]
           }
           actions={
-            <Button variant="primary" onClick={createNote}>
-              + Nueva Nota
-            </Button>
+            projectId ? (
+              <Button variant="primary" onClick={createNote}>
+                + Nueva Nota
+              </Button>
+            ) : null
           }
         />
 
