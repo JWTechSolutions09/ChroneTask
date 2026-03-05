@@ -18,19 +18,30 @@ public static class NotificationHelper
         Guid? taskId = null,
         Guid? triggeredByUserId = null)
     {
-        var notification = new Notification
+        try
         {
-            UserId = userId,
-            Type = type,
-            Title = title,
-            Message = message,
-            ProjectId = projectId,
-            TaskId = taskId,
-            TriggeredByUserId = triggeredByUserId
-        };
+            var notification = new Notification
+            {
+                UserId = userId,
+                Type = type,
+                Title = title,
+                Message = message,
+                ProjectId = projectId,
+                TaskId = taskId,
+                TriggeredByUserId = triggeredByUserId
+            };
 
-        db.Notifications.Add(notification);
-        await db.SaveChangesAsync();
+            db.Notifications.Add(notification);
+            await db.SaveChangesAsync();
+            
+            Console.WriteLine($"✅ Notificación creada: Tipo={type}, Usuario={userId}, Título={title}");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"❌ Error creando notificación: {ex.Message}");
+            Console.WriteLine($"   Tipo: {type}, Usuario: {userId}, Título: {title}");
+            // No lanzar la excepción para no romper el flujo principal
+        }
     }
 
     public static async SystemTask NotifyTaskStatusChangeAsync(

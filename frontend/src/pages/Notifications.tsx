@@ -32,6 +32,14 @@ const NOTIFICATION_ICONS: Record<string, string> = {
   new_comment: "💬",
   sla_warning: "⏰",
   task_overdue: "⚠️",
+  new_project: "📁",
+  new_task: "📋",
+  calendar_event_created: "📅",
+  new_project_comment: "💬",
+  project_member_added: "👥",
+  task_assigned: "👤",
+  task_unassigned: "👤",
+  calendar_reminder: "⏰",
 };
 
 const NOTIFICATION_COLORS: Record<string, string> = {
@@ -41,6 +49,14 @@ const NOTIFICATION_COLORS: Record<string, string> = {
   new_comment: "#17a2b8",
   sla_warning: "#ffc107",
   task_overdue: "#dc3545",
+  new_project: "#007bff",
+  new_task: "#17a2b8",
+  calendar_event_created: "#6f42c1",
+  new_project_comment: "#17a2b8",
+  project_member_added: "#28a745",
+  task_assigned: "#007bff",
+  task_unassigned: "#6c757d",
+  calendar_reminder: "#ffc107",
 };
 
 export default function Notifications() {
