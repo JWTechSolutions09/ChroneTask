@@ -270,8 +270,9 @@ public class ChroneTaskDbContext : DbContext
             entity.Property(x => x.Title).HasMaxLength(500);
             entity.Property(x => x.Content).HasMaxLength(5000);
             entity.Property(x => x.Color).HasMaxLength(20);
-            entity.Property(x => x.CanvasData).HasMaxLength(1000);
-            entity.Property(x => x.ImageUrl).HasMaxLength(1000);
+            // CanvasData e ImageUrl son TEXT (sin límite) para soportar imágenes base64 grandes
+            entity.Property(x => x.CanvasData).HasColumnType("text");
+            entity.Property(x => x.ImageUrl).HasColumnType("text");
 
             entity.HasOne(n => n.Project)
                 .WithMany(p => p.Notes)
@@ -291,8 +292,9 @@ public class ChroneTaskDbContext : DbContext
             entity.Property(x => x.Title).HasMaxLength(500);
             entity.Property(x => x.Content).HasMaxLength(5000);
             entity.Property(x => x.Color).HasMaxLength(20);
-            entity.Property(x => x.CanvasData).HasMaxLength(10000);
-            entity.Property(x => x.ImageUrl).HasMaxLength(1000);
+            // CanvasData e ImageUrl son TEXT (sin límite) para soportar imágenes base64 grandes
+            entity.Property(x => x.CanvasData).HasColumnType("text");
+            entity.Property(x => x.ImageUrl).HasColumnType("text");
 
             entity.HasOne(n => n.User)
                 .WithMany()

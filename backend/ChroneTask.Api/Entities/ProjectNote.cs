@@ -29,11 +29,9 @@ public class ProjectNote
     public double? Width { get; set; }
     public double? Height { get; set; }
 
-    [MaxLength(1000)]
-    public string? CanvasData { get; set; } // JSON for drawing data
+    public string? CanvasData { get; set; } // JSON for drawing data (base64 image, can be very large)
 
-    [MaxLength(1000)]
-    public string? ImageUrl { get; set; } // Uploaded image URL
+    public string? ImageUrl { get; set; } // Uploaded image URL (base64 image, can be very large)
 
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public DateTime? UpdatedAt { get; set; }

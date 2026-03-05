@@ -12,8 +12,8 @@ CREATE TABLE IF NOT EXISTS "PersonalNotes" (
     "PositionY" DOUBLE PRECISION NULL,
     "Width" DOUBLE PRECISION NULL,
     "Height" DOUBLE PRECISION NULL,
-    "CanvasData" VARCHAR(10000) NULL,
-    "ImageUrl" VARCHAR(1000) NULL,
+    "CanvasData" TEXT NULL,
+    "ImageUrl" TEXT NULL,
     "CreatedAt" TIMESTAMP WITH TIME ZONE NOT NULL,
     "UpdatedAt" TIMESTAMP WITH TIME ZONE NULL,
     CONSTRAINT "PK_PersonalNotes" PRIMARY KEY ("Id")
