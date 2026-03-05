@@ -134,34 +134,80 @@ export default function Calendar() {
     loadTasks();
   }, [loadCalendarEvents, loadTasks]);
 
-  // Obtener eventos para un día específico
-  const getEventsForDay = useCallback((date: Date) => {
-    const dateStr = date.toISOString().split("T")[0];
-    return events.filter((event) => {
+  // Memoizar eventos por día para optimización
+  const eventsByDay = useMemo(() => {
+    const map = new Map<string, CalendarEvent[]>();
+    events.forEach((event) => {
       const eventStart = new Date(event.startDate);
       const eventStartStr = eventStart.toISOString().split("T")[0];
       const eventEndStr = event.endDate
         ? new Date(event.endDate).toISOString().split("T")[0]
         : eventStartStr;
-      return dateStr >= eventStartStr && dateStr <= eventEndStr;
+      
+      // Agregar evento a todos los días en su rango
+      const start = new Date(eventStartStr);
+      const end = new Date(eventEndStr);
+      for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
+        const dayStr = d.toISOString().split("T")[0];
+        if (!map.has(dayStr)) {
+          map.set(dayStr, []);
+        }
+        map.get(dayStr)!.push(event);
+      }
     });
+    return map;
   }, [events]);
 
-  // Obtener tareas para un día específico
+  // Obtener eventos para un día específico - Optimizado
+  const getEventsForDay = useCallback((date: Date) => {
+    const dateStr = date.toISOString().split("T")[0];
+    return eventsByDay.get(dateStr) || [];
+  }, [eventsByDay]);
+
+  // Memoizar tareas por día para optimización
+  const tasksByDay = useMemo(() => {
+    const map = new Map<string, Task[]>();
+    tasks.forEach((task) => {
+      // Priorizar dueDate (fecha límite) sobre startDate
+      let targetDate: string | null = null;
+      if (task.dueDate) {
+        targetDate = new Date(task.dueDate).toISOString().split("T")[0];
+      } else if (task.startDate) {
+        targetDate = new Date(task.startDate).toISOString().split("T")[0];
+      }
+      
+      if (targetDate) {
+        if (!map.has(targetDate)) {
+          map.set(targetDate, []);
+        }
+        map.get(targetDate)!.push(task);
+      }
+    });
+    return map;
+  }, [tasks]);
+
+  // Obtener tareas para un día específico - Optimizado
   const getTasksForDay = useCallback((date: Date) => {
     const dateStr = date.toISOString().split("T")[0];
-    return tasks.filter((task) => {
-      if (task.startDate) {
-        const taskStart = new Date(task.startDate).toISOString().split("T")[0];
-        if (taskStart === dateStr) return true;
-      }
-      if (task.dueDate) {
-        const taskDue = new Date(task.dueDate).toISOString().split("T")[0];
-        if (taskDue === dateStr) return true;
-      }
-      return false;
-    });
-  }, [tasks]);
+    return tasksByDay.get(dateStr) || [];
+  }, [tasksByDay]);
+
+  // Determinar si una tarea está vencida o próxima a vencer
+  const getTaskStatus = useCallback((task: Task) => {
+    if (!task.dueDate) return "normal";
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const dueDate = new Date(task.dueDate);
+    dueDate.setHours(0, 0, 0, 0);
+    const diffTime = dueDate.getTime() - today.getTime();
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    
+    if (task.status === "Done") return "completed";
+    if (diffDays < 0) return "overdue";
+    if (diffDays === 0) return "due-today";
+    if (diffDays <= 2) return "due-soon";
+    return "normal";
+  }, []);
 
   // Navegar meses
   const goToPreviousMonth = () => {
@@ -354,29 +400,33 @@ export default function Calendar() {
             <div className="loading">Cargando calendario...</div>
           ) : (
             <div>
-              {/* Grid del calendario */}
+              {/* Grid del calendario - Mejorado */}
               <div
                 style={{
                   display: "grid",
                   gridTemplateColumns: "repeat(7, 1fr)",
-                  gap: "1px",
+                  gap: "2px",
                   backgroundColor: "var(--border-color)",
-                  border: "1px solid var(--border-color)",
-                  borderRadius: "8px",
+                  border: "2px solid var(--border-color)",
+                  borderRadius: "12px",
                   overflow: "hidden",
+                  boxShadow: "0 4px 12px rgba(0, 0, 0, 0.05)",
                 }}
               >
-                {/* Headers de días */}
+                {/* Headers de días - Mejorados */}
                 {DAYS_OF_WEEK.map((day) => (
                   <div
                     key={day}
                     style={{
-                      padding: "12px",
+                      padding: "14px 12px",
                       backgroundColor: "var(--bg-tertiary)",
                       textAlign: "center",
-                      fontWeight: 600,
+                      fontWeight: 700,
                       fontSize: "14px",
                       color: "var(--text-primary)",
+                      textTransform: "uppercase",
+                      letterSpacing: "0.5px",
+                      borderBottom: "2px solid var(--border-color)",
                     }}
                   >
                     {day}
@@ -397,18 +447,19 @@ export default function Calendar() {
                       key={index}
                       onClick={() => openCreateEventModal(date)}
                       style={{
-                        minHeight: "120px",
-                        padding: "8px",
+                        minHeight: "140px",
+                        padding: "10px",
                         backgroundColor: isCurrentMonthDate
                           ? "var(--bg-primary)"
                           : "var(--bg-secondary)",
                         cursor: "pointer",
                         border: isTodayDate
-                          ? "2px solid var(--primary)"
-                          : "none",
-                        borderRadius: isTodayDate ? "4px" : "0",
-                        transition: "all 0.2s",
+                          ? "3px solid var(--primary)"
+                          : "1px solid var(--border-color)",
+                        borderRadius: isTodayDate ? "6px" : "0",
+                        transition: "all 0.2s ease",
                         position: "relative",
+                        boxShadow: isTodayDate ? "0 2px 8px rgba(0, 123, 255, 0.2)" : "none",
                       }}
                       onMouseEnter={(e) => {
                         e.currentTarget.style.backgroundColor = isCurrentMonthDate
@@ -423,80 +474,185 @@ export default function Calendar() {
                     >
                       <div
                         style={{
-                          fontSize: "14px",
-                          fontWeight: isTodayDate ? 700 : isCurrentMonthDate ? 500 : 400,
+                          fontSize: "15px",
+                          fontWeight: isTodayDate ? 700 : isCurrentMonthDate ? 600 : 400,
                           color: isTodayDate
                             ? "var(--primary)"
                             : isCurrentMonthDate
                             ? "var(--text-primary)"
                             : "var(--text-tertiary)",
-                          marginBottom: "4px",
+                          marginBottom: "6px",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "space-between",
                         }}
                       >
-                        {date.getDate()}
-                      </div>
-
-                      {/* Eventos del calendario */}
-                      <div style={{ display: "flex", flexDirection: "column", gap: "2px" }}>
-                        {dayEvents.slice(0, 3).map((event) => (
-                          <div
-                            key={event.id}
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              openEditEventModal(event);
-                            }}
-                            style={{
-                              fontSize: "11px",
-                              padding: "2px 6px",
-                              borderRadius: "4px",
-                              backgroundColor: event.color || EVENT_COLORS[0],
-                              color: "white",
-                              cursor: "pointer",
-                              overflow: "hidden",
-                              textOverflow: "ellipsis",
-                              whiteSpace: "nowrap",
-                              fontWeight: 500,
-                            }}
-                            title={event.title}
-                          >
-                            {event.allDay ? "📅" : "🕐"} {event.title}
-                          </div>
-                        ))}
-                        {dayEvents.length > 3 && (
-                          <div
+                        <span>{date.getDate()}</span>
+                        {dayTasks.length > 0 && (
+                          <span
                             style={{
                               fontSize: "10px",
-                              color: "var(--text-secondary)",
-                              fontStyle: "italic",
+                              backgroundColor: dayTasks.some(t => getTaskStatus(t) === "overdue") 
+                                ? "#dc3545" 
+                                : dayTasks.some(t => getTaskStatus(t) === "due-today")
+                                ? "#ffc107"
+                                : "#007bff",
+                              color: "white",
+                              borderRadius: "10px",
+                              padding: "2px 6px",
+                              fontWeight: 600,
                             }}
                           >
-                            +{dayEvents.length - 3} más
-                          </div>
+                            {dayTasks.length}
+                          </span>
                         )}
                       </div>
 
-                      {/* Tareas */}
-                      {dayTasks.length > 0 && (
-                        <div style={{ marginTop: "4px", display: "flex", flexDirection: "column", gap: "2px" }}>
-                          {dayTasks.slice(0, 2).map((task) => (
+                      {/* Eventos del calendario - Mejorados */}
+                      {dayEvents.length > 0 && (
+                        <div style={{ display: "flex", flexDirection: "column", gap: "3px", marginBottom: dayTasks.length > 0 ? "4px" : "0" }}>
+                          {dayEvents.slice(0, dayTasks.length > 0 ? 2 : 3).map((event) => (
                             <div
-                              key={task.id}
+                              key={event.id}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                openEditEventModal(event);
+                              }}
                               style={{
-                                fontSize: "10px",
-                                padding: "2px 6px",
-                                borderRadius: "4px",
-                                backgroundColor: "rgba(0, 123, 255, 0.1)",
-                                color: "var(--primary)",
-                                border: "1px solid rgba(0, 123, 255, 0.3)",
+                                fontSize: "11px",
+                                padding: "3px 7px",
+                                borderRadius: "5px",
+                                backgroundColor: event.color || EVENT_COLORS[0],
+                                color: "white",
+                                cursor: "pointer",
                                 overflow: "hidden",
                                 textOverflow: "ellipsis",
                                 whiteSpace: "nowrap",
+                                fontWeight: 500,
+                                transition: "all 0.2s ease",
+                                boxShadow: "0 1px 3px rgba(0, 0, 0, 0.1)",
                               }}
-                              title={`Tarea: ${task.title}`}
+                              onMouseEnter={(e) => {
+                                e.currentTarget.style.transform = "translateX(2px)";
+                                e.currentTarget.style.boxShadow = "0 2px 6px rgba(0, 0, 0, 0.2)";
+                              }}
+                              onMouseLeave={(e) => {
+                                e.currentTarget.style.transform = "translateX(0)";
+                                e.currentTarget.style.boxShadow = "0 1px 3px rgba(0, 0, 0, 0.1)";
+                              }}
+                              title={event.title}
                             >
-                              ✓ {task.title}
+                              <span style={{ marginRight: "4px" }}>{event.allDay ? "📅" : "🕐"}</span>
+                              {event.title}
                             </div>
                           ))}
+                          {dayEvents.length > (dayTasks.length > 0 ? 2 : 3) && (
+                            <div
+                              style={{
+                                fontSize: "10px",
+                                color: "var(--text-secondary)",
+                                fontStyle: "italic",
+                                padding: "2px 6px",
+                              }}
+                            >
+                              +{dayEvents.length - (dayTasks.length > 0 ? 2 : 3)} evento{dayEvents.length - (dayTasks.length > 0 ? 2 : 3) > 1 ? "s" : ""} más
+                            </div>
+                          )}
+                        </div>
+                      )}
+
+                      {/* Tareas - Mejoradas y destacadas */}
+                      {dayTasks.length > 0 && (
+                        <div style={{ marginTop: "6px", display: "flex", flexDirection: "column", gap: "4px" }}>
+                          {dayTasks.slice(0, 3).map((task) => {
+                            const taskStatus = getTaskStatus(task);
+                            const statusStyles = {
+                              overdue: {
+                                backgroundColor: "rgba(220, 53, 69, 0.15)",
+                                color: "#dc3545",
+                                border: "1.5px solid #dc3545",
+                                fontWeight: 700,
+                                boxShadow: "0 2px 4px rgba(220, 53, 69, 0.2)",
+                              },
+                              "due-today": {
+                                backgroundColor: "rgba(255, 193, 7, 0.2)",
+                                color: "#ffc107",
+                                border: "1.5px solid #ffc107",
+                                fontWeight: 700,
+                                boxShadow: "0 2px 4px rgba(255, 193, 7, 0.3)",
+                              },
+                              "due-soon": {
+                                backgroundColor: "rgba(255, 193, 7, 0.12)",
+                                color: "#ff9800",
+                                border: "1px solid #ff9800",
+                                fontWeight: 600,
+                              },
+                              completed: {
+                                backgroundColor: "rgba(40, 167, 69, 0.1)",
+                                color: "#28a745",
+                                border: "1px solid rgba(40, 167, 69, 0.3)",
+                                textDecoration: "line-through",
+                                opacity: 0.7,
+                              },
+                              normal: {
+                                backgroundColor: "rgba(0, 123, 255, 0.12)",
+                                color: "#007bff",
+                                border: "1px solid rgba(0, 123, 255, 0.3)",
+                                fontWeight: 500,
+                              },
+                            };
+                            const style = statusStyles[taskStatus] || statusStyles.normal;
+                            
+                            return (
+                              <div
+                                key={task.id}
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  if (task.projectId) {
+                                    window.location.href = `/personal/project/${task.projectId}/board`;
+                                  }
+                                }}
+                                style={{
+                                  fontSize: "11px",
+                                  padding: "4px 8px",
+                                  borderRadius: "6px",
+                                  overflow: "hidden",
+                                  textOverflow: "ellipsis",
+                                  whiteSpace: "nowrap",
+                                  cursor: "pointer",
+                                  transition: "all 0.2s ease",
+                                  ...style,
+                                }}
+                                onMouseEnter={(e) => {
+                                  e.currentTarget.style.transform = "translateX(2px)";
+                                  e.currentTarget.style.boxShadow = style.boxShadow || "0 2px 6px rgba(0, 0, 0, 0.15)";
+                                }}
+                                onMouseLeave={(e) => {
+                                  e.currentTarget.style.transform = "translateX(0)";
+                                  e.currentTarget.style.boxShadow = style.boxShadow || "none";
+                                }}
+                                title={`${task.title}${task.projectName ? ` - ${task.projectName}` : ""}${task.dueDate ? ` (Vence: ${new Date(task.dueDate).toLocaleDateString("es-ES")})` : ""}`}
+                              >
+                                <span style={{ marginRight: "4px", fontSize: "12px" }}>
+                                  {taskStatus === "overdue" ? "⚠️" : taskStatus === "due-today" ? "🔥" : taskStatus === "due-soon" ? "⏰" : taskStatus === "completed" ? "✅" : "📋"}
+                                </span>
+                                {task.title}
+                              </div>
+                            );
+                          })}
+                          {dayTasks.length > 3 && (
+                            <div
+                              style={{
+                                fontSize: "10px",
+                                color: "var(--text-secondary)",
+                                fontStyle: "italic",
+                                padding: "2px 6px",
+                                textAlign: "center",
+                              }}
+                            >
+                              +{dayTasks.length - 3} tarea{dayTasks.length - 3 > 1 ? "s" : ""} más
+                            </div>
+                          )}
                         </div>
                       )}
                     </div>
