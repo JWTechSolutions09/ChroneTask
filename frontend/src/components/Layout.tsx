@@ -761,6 +761,15 @@ export default function Layout({ children, organizationId, usageType: propUsageT
                 forceShowLabel={isMobile && sidebarOpen}
                 onNavigate={closeMobileMenu}
               />
+              <NavItem
+                icon="✅"
+                label="To Do"
+                to="/personal/todo"
+                active={isActive("/personal/todo")}
+                collapsed={effectiveCollapsed}
+                forceShowLabel={isMobile && sidebarOpen}
+                onNavigate={closeMobileMenu}
+              />
             </>
           ) : !loadingUsageType && isTeamMode ? (
             <>
