@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState, useCallback, useMemo } from "react";
 import { useParams, Link, useLocation } from "react-router-dom";
 import { http } from "../api/http";
 import Layout from "../components/Layout";
@@ -164,22 +164,100 @@ export default function Timeline() {
     }
   };
 
-  const getTasksForDate = (date: Date) => {
+  // Determinar el estado de una tarea basado en su fecha límite
+  const getTaskUrgencyStatus = useCallback((task: Task) => {
+    if (task.status === "Done") return "completed";
+    if (!task.dueDate) return "normal";
+    
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const dueDate = new Date(task.dueDate);
+    dueDate.setHours(0, 0, 0, 0);
+    const diffTime = dueDate.getTime() - today.getTime();
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    
+    if (diffDays < 0) return "overdue";
+    if (diffDays === 0) return "due-today";
+    if (diffDays <= 2) return "due-soon";
+    return "normal";
+  }, []);
+
+  // Obtener color y estilo según el estado de urgencia
+  const getTaskStyle = useCallback((task: Task) => {
+    const urgencyStatus = getTaskUrgencyStatus(task);
+    
+    const styles = {
+      overdue: {
+        backgroundColor: "#dc3545",
+        color: "white",
+        borderLeft: "4px solid #a0283a",
+        boxShadow: "0 4px 8px rgba(220, 53, 69, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.1)",
+        fontWeight: 700,
+        icon: "⚠️",
+      },
+      "due-today": {
+        backgroundColor: "#ffc107",
+        color: "#212529",
+        borderLeft: "4px solid #ff9800",
+        boxShadow: "0 4px 8px rgba(255, 193, 7, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.2)",
+        fontWeight: 700,
+        icon: "🔥",
+      },
+      "due-soon": {
+        backgroundColor: "#ff9800",
+        color: "white",
+        borderLeft: "4px solid #f57c00",
+        boxShadow: "0 3px 6px rgba(255, 152, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.1)",
+        fontWeight: 600,
+        icon: "⏰",
+      },
+      completed: {
+        backgroundColor: "#28a745",
+        color: "white",
+        borderLeft: "4px solid #1e7e34",
+        boxShadow: "0 2px 4px rgba(40, 167, 69, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.1)",
+        fontWeight: 500,
+        opacity: 0.85,
+        icon: "✅",
+      },
+      normal: {
+        backgroundColor: "#007bff",
+        color: "white",
+        borderLeft: "4px solid #0056b3",
+        boxShadow: "0 2px 4px rgba(0, 123, 255, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.1)",
+        fontWeight: 500,
+        icon: "📋",
+      },
+    };
+    
+    return styles[urgencyStatus] || styles.normal;
+  }, [getTaskUrgencyStatus]);
+
+  const getTasksForDate = useCallback((date: Date) => {
     return tasks.filter((task) => {
-      const taskStart = task.startDate ? new Date(task.startDate) : null;
+      // Priorizar dueDate sobre startDate
       const taskDue = task.dueDate ? new Date(task.dueDate) : null;
+      const taskStart = task.startDate ? new Date(task.startDate) : null;
       const dateStr = date.toISOString().split("T")[0];
 
-      if (taskStart && taskDue) {
-        return date >= taskStart && date <= taskDue;
-      } else if (taskStart) {
+      // Si hay dueDate, usar ese como referencia principal
+      if (taskDue) {
+        const dueStr = taskDue.toISOString().split("T")[0];
+        // Si también hay startDate, mostrar en el rango
+        if (taskStart) {
+          const startStr = taskStart.toISOString().split("T")[0];
+          return dateStr >= startStr && dateStr <= dueStr;
+        }
+        // Solo dueDate, mostrar solo en ese día
+        return dateStr === dueStr;
+      }
+      // Si no hay dueDate, usar startDate
+      if (taskStart) {
         return dateStr === taskStart.toISOString().split("T")[0];
-      } else if (taskDue) {
-        return dateStr === taskDue.toISOString().split("T")[0];
       }
       return false;
     });
-  };
+  }, [tasks]);
 
   const navigateDate = (direction: "prev" | "next") => {
     const newDate = new Date(currentDate);
@@ -206,31 +284,43 @@ export default function Timeline() {
     );
   }
 
-  const days = getDaysInView();
-  const viewTitle = view === "week" 
-    ? `Semana del ${formatDate(days[0])}`
-    : currentDate.toLocaleDateString("es-ES", { month: "long", year: "numeric" });
+  const days = useMemo(() => getDaysInView(), [view, currentDate]);
+  const viewTitle = useMemo(() => {
+    return view === "week" 
+      ? `Semana del ${formatDate(days[0])}`
+      : currentDate.toLocaleDateString("es-ES", { month: "long", year: "numeric" });
+  }, [view, days, currentDate]);
 
   return (
-    <Layout organizationId={organizationId}>
+    <Layout organizationId={isPersonalMode || isPersonalRoute ? undefined : organizationId}>
       <div style={{ flex: 1, overflowY: "auto", backgroundColor: "var(--bg-secondary)" }}>
         <PageHeader
           title="Cronograma"
           subtitle={viewTitle}
-          breadcrumbs={[
-            { label: t.organizations, to: "/org-select" },
-            { label: "Dashboard", to: `/org/${organizationId}/dashboard` },
-            { label: "Cronograma" },
-          ]}
+          breadcrumbs={
+            isPersonalMode || isPersonalRoute
+              ? [{ label: "Dashboard", to: "/personal/dashboard" }, { label: "Cronograma" }]
+              : [
+                  { label: t.organizations, to: "/org-select" },
+                  { label: "Dashboard", to: `/org/${organizationId}/dashboard` },
+                  { label: "Cronograma" },
+                ]
+          }
           actions={
             <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
               <select
                 value={projectId || ""}
                 onChange={(e) => {
                   if (e.target.value) {
-                    window.location.href = `/org/${organizationId}/project/${e.target.value}/timeline`;
+                    const path = isPersonalMode || isPersonalRoute
+                      ? `/personal/project/${e.target.value}/timeline`
+                      : `/org/${organizationId}/project/${e.target.value}/timeline`;
+                    window.location.href = path;
                   } else {
-                    window.location.href = `/org/${organizationId}/timeline`;
+                    const path = isPersonalMode || isPersonalRoute
+                      ? `/personal/timeline`
+                      : `/org/${organizationId}/timeline`;
+                    window.location.href = path;
                   }
                 }}
                 style={{
@@ -293,28 +383,76 @@ export default function Timeline() {
           {loading ? (
             <div className="loading">Cargando cronograma...</div>
           ) : (
-            <Card style={{ overflowX: "auto", width: "100%" }}>
-              <div style={{ display: "flex", minWidth: "100%" }}>
-                {/* Day Headers */}
-                <div style={{ minWidth: "200px", borderRight: "1px solid var(--border-color)", padding: "12px" }}>
-                  <div style={{ fontWeight: 600, color: "var(--text-primary)", marginBottom: "8px" }}>Tarea</div>
-                </div>
-                {days.map((day, idx) => (
-                  <div
-                    key={idx}
-                    style={{
-                      minWidth: view === "week" ? "150px" : "80px",
-                      borderRight: idx < days.length - 1 ? "1px solid var(--border-color)" : "none",
-                      padding: "12px",
-                      textAlign: "center",
-                      backgroundColor: day.toDateString() === new Date().toDateString() ? "var(--bg-secondary)" : "transparent",
-                    }}
-                  >
-                    <div style={{ fontWeight: 600, color: "var(--text-primary)", fontSize: "14px" }}>
-                      {formatDate(day)}
-                    </div>
+            <Card style={{ overflowX: "auto", width: "100%", padding: 0 }}>
+              <div style={{ 
+                display: "flex", 
+                minWidth: "100%",
+                borderBottom: "2px solid var(--border-color)",
+              }}>
+                {/* Day Headers - Mejorados */}
+                <div style={{ 
+                  minWidth: "220px", 
+                  borderRight: "2px solid var(--border-color)", 
+                  padding: "14px",
+                  backgroundColor: "var(--bg-tertiary)",
+                  position: "sticky",
+                  left: 0,
+                  zIndex: 20,
+                  boxShadow: "2px 0 4px rgba(0, 0, 0, 0.05)",
+                }}>
+                  <div style={{ fontWeight: 700, color: "var(--text-primary)", fontSize: "14px", textTransform: "uppercase", letterSpacing: "0.5px" }}>
+                    Tarea
                   </div>
-                ))}
+                </div>
+                {days.map((day, idx) => {
+                  const isToday = day.toDateString() === new Date().toDateString();
+                  const tasksForDay = getTasksForDate(day);
+                  const hasOverdue = tasksForDay.some(t => getTaskUrgencyStatus(t) === "overdue");
+                  const hasDueToday = tasksForDay.some(t => getTaskUrgencyStatus(t) === "due-today");
+                  
+                  return (
+                    <div
+                      key={idx}
+                      style={{
+                        minWidth: view === "week" ? "150px" : "80px",
+                        borderRight: idx < days.length - 1 ? "1px solid var(--border-color)" : "none",
+                        padding: "12px",
+                        textAlign: "center",
+                        backgroundColor: isToday 
+                          ? "var(--bg-highlight)" 
+                          : hasOverdue 
+                          ? "rgba(220, 53, 69, 0.05)"
+                          : hasDueToday
+                          ? "rgba(255, 193, 7, 0.05)"
+                          : "var(--bg-tertiary)",
+                        borderTop: isToday ? "3px solid var(--primary)" : "none",
+                        position: "relative",
+                      }}
+                    >
+                      <div style={{ 
+                        fontWeight: isToday ? 700 : 600, 
+                        color: isToday ? "var(--primary)" : "var(--text-primary)", 
+                        fontSize: "13px",
+                        marginBottom: "4px",
+                      }}>
+                        {formatDate(day)}
+                      </div>
+                      {tasksForDay.length > 0 && (
+                        <div style={{
+                          fontSize: "10px",
+                          color: hasOverdue ? "#dc3545" : hasDueToday ? "#ffc107" : "var(--text-secondary)",
+                          fontWeight: hasOverdue || hasDueToday ? 600 : 400,
+                          backgroundColor: hasOverdue ? "rgba(220, 53, 69, 0.1)" : hasDueToday ? "rgba(255, 193, 7, 0.1)" : "var(--bg-secondary)",
+                          borderRadius: "10px",
+                          padding: "2px 6px",
+                          display: "inline-block",
+                        }}>
+                          {tasksForDay.length} tarea{tasksForDay.length > 1 ? "s" : ""}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
               </div>
 
               {/* Task Rows */}
@@ -324,35 +462,92 @@ export default function Timeline() {
                 </div>
               ) : (
                 tasks.map((task) => {
-                  const taskStart = task.startDate ? new Date(task.startDate) : null;
+                  // Priorizar dueDate sobre startDate
                   const taskDue = task.dueDate ? new Date(task.dueDate) : null;
-                  const startIdx = taskStart ? days.findIndex((d) => d.toDateString() === taskStart.toDateString()) : -1;
-                  const endIdx = taskDue ? days.findIndex((d) => d.toDateString() === taskDue.toDateString()) : -1;
+                  const taskStart = task.startDate ? new Date(task.startDate) : null;
+                  
+                  // Si hay dueDate, usarlo como fecha final; si no, usar startDate como única fecha
+                  let startIdx = -1;
+                  let endIdx = -1;
+                  
+                  if (taskDue && taskStart) {
+                    // Rango: desde startDate hasta dueDate
+                    startIdx = days.findIndex((d) => d.toDateString() === taskStart.toDateString());
+                    endIdx = days.findIndex((d) => d.toDateString() === taskDue.toDateString());
+                  } else if (taskDue) {
+                    // Solo dueDate: mostrar solo en ese día
+                    endIdx = days.findIndex((d) => d.toDateString() === taskDue.toDateString());
+                    startIdx = endIdx;
+                  } else if (taskStart) {
+                    // Solo startDate: mostrar solo en ese día
+                    startIdx = days.findIndex((d) => d.toDateString() === taskStart.toDateString());
+                    endIdx = startIdx;
+                  }
+                  
                   const span = startIdx >= 0 && endIdx >= 0 ? endIdx - startIdx + 1 : 1;
+                  const taskStyle = getTaskStyle(task);
 
                   return (
-                    <div key={task.id} style={{ display: "flex", borderTop: "1px solid var(--border-color)" }}>
+                    <div 
+                      key={task.id} 
+                      style={{ 
+                        display: "flex", 
+                        borderTop: "1px solid var(--border-color)",
+                        transition: "background-color 0.2s ease",
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.backgroundColor = "var(--hover-bg)";
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.backgroundColor = "transparent";
+                      }}
+                    >
                       <div
                         style={{
-                          minWidth: "200px",
-                          borderRight: "1px solid var(--border-color)",
-                          padding: "12px",
+                          minWidth: "220px",
+                          borderRight: "2px solid var(--border-color)",
+                          padding: "14px",
                           display: "flex",
                           flexDirection: "column",
-                          gap: "4px",
+                          gap: "6px",
+                          backgroundColor: "var(--bg-primary)",
+                          position: "sticky",
+                          left: 0,
+                          zIndex: 10,
+                          boxShadow: "2px 0 4px rgba(0, 0, 0, 0.05)",
                         }}
                       >
-                        <div style={{ fontWeight: 600, color: "var(--text-primary)", fontSize: "14px" }}>
-                          {task.title}
+                        <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                          <span style={{ fontSize: "16px" }}>{taskStyle.icon}</span>
+                          <div style={{ fontWeight: 600, color: "var(--text-primary)", fontSize: "14px", flex: 1 }}>
+                            {task.title}
+                          </div>
                         </div>
                         {task.projectName && (
-                          <div style={{ fontSize: "12px", color: "var(--text-secondary)" }}>
-                            📁 {task.projectName}
+                          <div style={{ fontSize: "12px", color: "var(--text-secondary)", display: "flex", alignItems: "center", gap: "4px" }}>
+                            <span>📁</span>
+                            <span>{task.projectName}</span>
                           </div>
                         )}
                         {task.assignedToName && (
-                          <div style={{ fontSize: "12px", color: "var(--text-secondary)" }}>
-                            👤 {task.assignedToName}
+                          <div style={{ fontSize: "12px", color: "var(--text-secondary)", display: "flex", alignItems: "center", gap: "4px" }}>
+                            <span>👤</span>
+                            <span>{task.assignedToName}</span>
+                          </div>
+                        )}
+                        {task.dueDate && (
+                          <div style={{ 
+                            fontSize: "11px", 
+                            color: getTaskUrgencyStatus(task) === "overdue" ? "#dc3545" : 
+                                   getTaskUrgencyStatus(task) === "due-today" ? "#ffc107" : 
+                                   "var(--text-secondary)",
+                            fontWeight: getTaskUrgencyStatus(task) === "overdue" || getTaskUrgencyStatus(task) === "due-today" ? 600 : 400,
+                            display: "flex", 
+                            alignItems: "center", 
+                            gap: "4px" 
+                          }}>
+                            <span>📅</span>
+                            <span>Vence: {new Date(task.dueDate).toLocaleDateString("es-ES", { day: "numeric", month: "short" })}</span>
                           </div>
                         )}
                       </div>
@@ -365,37 +560,86 @@ export default function Timeline() {
                           return (
                             <div
                               key={idx}
+                              onClick={() => {
+                                const projectPath = isPersonalMode || isPersonalRoute
+                                  ? `/personal/project/${task.projectId}/board`
+                                  : `/org/${organizationId}/project/${task.projectId}/board`;
+                                window.location.href = projectPath;
+                              }}
                               style={{
                                 minWidth: view === "week" ? "150px" : "80px",
                                 borderRight: idx < days.length - 1 ? "1px solid var(--border-color)" : "none",
-                                padding: "8px",
+                                padding: "6px",
                                 position: "relative",
+                                cursor: "pointer",
                               }}
                             >
                               <div
                                 style={{
-                                  backgroundColor: task.status === "Done" ? "#28a745" : task.status === "Blocked" ? "#dc3545" : "#007bff",
-                                  color: "white",
-                                  padding: "8px",
-                                  borderRadius: "6px",
-                                  fontSize: "12px",
-                                  fontWeight: 600,
-                                  minHeight: "40px",
+                                  ...taskStyle,
+                                  padding: "10px 12px",
+                                  borderRadius: "8px",
+                                  fontSize: "13px",
+                                  minHeight: "50px",
                                   display: "flex",
-                                  alignItems: "center",
+                                  flexDirection: "column",
+                                  alignItems: "flex-start",
                                   justifyContent: "center",
-                                  width: `calc(${span * 100}% - ${(span - 1) * 1}px)`,
+                                  gap: "4px",
+                                  width: span > 1 ? `calc(${span * 100}% - ${(span - 1) * 6}px)` : "100%",
                                   wordBreak: "break-word",
                                   whiteSpace: "normal",
-                                  lineHeight: "1.3",
+                                  lineHeight: "1.4",
+                                  transition: "all 0.2s ease",
+                                  position: "relative",
+                                  overflow: "hidden",
                                 }}
+                                onMouseEnter={(e) => {
+                                  e.currentTarget.style.transform = "translateY(-2px)";
+                                  e.currentTarget.style.boxShadow = taskStyle.boxShadow?.replace("0 4px", "0 6px").replace("0 3px", "0 5px").replace("0 2px", "0 4px") || "0 4px 12px rgba(0, 0, 0, 0.2)";
+                                }}
+                                onMouseLeave={(e) => {
+                                  e.currentTarget.style.transform = "translateY(0)";
+                                  e.currentTarget.style.boxShadow = taskStyle.boxShadow || "none";
+                                }}
+                                title={`${task.title}${task.dueDate ? ` - Vence: ${new Date(task.dueDate).toLocaleDateString("es-ES")}` : ""}`}
                               >
-                                {task.title}
+                                <div style={{ display: "flex", alignItems: "center", gap: "6px", width: "100%" }}>
+                                  <span style={{ fontSize: "14px" }}>{taskStyle.icon}</span>
+                                  <span style={{ fontWeight: taskStyle.fontWeight, flex: 1 }}>{task.title}</span>
+                                </div>
+                                {task.dueDate && span > 1 && (
+                                  <div style={{ fontSize: "10px", opacity: 0.9, marginTop: "2px" }}>
+                                    📅 {new Date(task.dueDate).toLocaleDateString("es-ES", { day: "numeric", month: "short" })}
+                                  </div>
+                                )}
                               </div>
                             </div>
                           );
                         } else if (idx > startIdx && idx <= endIdx) {
-                          return <div key={idx} style={{ minWidth: view === "week" ? "150px" : "80px" }} />;
+                          return (
+                            <div 
+                              key={idx} 
+                              style={{ 
+                                minWidth: view === "week" ? "150px" : "80px",
+                                borderRight: idx < days.length - 1 ? "1px solid var(--border-color)" : "none",
+                                padding: "6px",
+                                position: "relative",
+                              }}
+                            >
+                              {/* Continuación visual de la barra */}
+                              <div
+                                style={{
+                                  width: "100%",
+                                  height: "50px",
+                                  backgroundColor: taskStyle.backgroundColor,
+                                  opacity: 0.3,
+                                  borderRadius: "4px",
+                                  borderLeft: taskStyle.borderLeft,
+                                }}
+                              />
+                            </div>
+                          );
                         } else {
                           return (
                             <div
@@ -403,7 +647,7 @@ export default function Timeline() {
                               style={{
                                 minWidth: view === "week" ? "150px" : "80px",
                                 borderRight: idx < days.length - 1 ? "1px solid var(--border-color)" : "none",
-                                padding: "8px",
+                                padding: "6px",
                               }}
                             />
                           );
