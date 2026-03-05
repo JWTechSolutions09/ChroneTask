@@ -22,6 +22,7 @@ public class ChroneTaskDbContext : DbContext
     public DbSet<CommentReaction> CommentReactions => Set<CommentReaction>();
     public DbSet<Notification> Notifications => Set<Notification>();
     public DbSet<ProjectNote> ProjectNotes => Set<ProjectNote>();
+    public DbSet<PersonalNote> PersonalNotes => Set<PersonalNote>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -281,6 +282,22 @@ public class ChroneTaskDbContext : DbContext
                 .WithMany()
                 .HasForeignKey(n => n.UserId)
                 .OnDelete(DeleteBehavior.Restrict);
+        });
+
+        // PersonalNote configuration
+        modelBuilder.Entity<PersonalNote>(entity =>
+        {
+            entity.HasKey(x => x.Id);
+            entity.Property(x => x.Title).HasMaxLength(500);
+            entity.Property(x => x.Content).HasMaxLength(5000);
+            entity.Property(x => x.Color).HasMaxLength(20);
+            entity.Property(x => x.CanvasData).HasMaxLength(10000);
+            entity.Property(x => x.ImageUrl).HasMaxLength(1000);
+
+            entity.HasOne(n => n.User)
+                .WithMany()
+                .HasForeignKey(n => n.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
         });
     }
 }
