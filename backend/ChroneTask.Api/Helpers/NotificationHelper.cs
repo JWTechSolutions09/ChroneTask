@@ -51,7 +51,12 @@ public static class NotificationHelper
         string newStatus,
         Guid triggeredByUserId)
     {
-        // Notificar al asignado si existe
+        // Obtener el nombre del usuario que hizo el cambio
+        var changer = await db.Users
+            .FirstOrDefaultAsync(u => u.Id == triggeredByUserId);
+        var changerName = changer?.FullName ?? "Un usuario";
+
+        // Notificar al asignado si existe y no es el que hizo el cambio
         if (task.AssignedToId.HasValue && task.AssignedToId.Value != triggeredByUserId)
         {
             await CreateNotificationAsync(
@@ -59,13 +64,13 @@ public static class NotificationHelper
                 task.AssignedToId.Value,
                 "task_status_change",
                 "Cambio de estado de tarea",
-                $"La tarea '{task.Title}' cambió de '{oldStatus}' a '{newStatus}'",
+                $"{changerName} cambió el estado de la tarea '{task.Title}' de '{oldStatus}' a '{newStatus}'",
                 task.ProjectId,
                 task.Id,
                 triggeredByUserId);
         }
 
-        // Notificar a miembros del proyecto (excepto al que hizo el cambio)
+        // Notificar a TODOS los miembros del proyecto (excepto al que hizo el cambio)
         var projectMembers = await db.ProjectMembers
             .Where(pm => pm.ProjectId == task.ProjectId && pm.UserId != triggeredByUserId)
             .Select(pm => pm.UserId)
@@ -73,12 +78,16 @@ public static class NotificationHelper
 
         foreach (var memberId in projectMembers)
         {
+            // No notificar al asignado dos veces
+            if (task.AssignedToId.HasValue && task.AssignedToId.Value == memberId)
+                continue;
+
             await CreateNotificationAsync(
                 db,
                 memberId,
                 "task_status_change",
                 "Cambio de estado de tarea",
-                $"La tarea '{task.Title}' cambió de '{oldStatus}' a '{newStatus}'",
+                $"{changerName} cambió el estado de la tarea '{task.Title}' de '{oldStatus}' a '{newStatus}'",
                 task.ProjectId,
                 task.Id,
                 triggeredByUserId);
@@ -90,7 +99,12 @@ public static class NotificationHelper
         TaskEntity task,
         Guid triggeredByUserId)
     {
-        // Notificar a miembros del proyecto
+        // Obtener el nombre del usuario que completó la tarea
+        var completer = await db.Users
+            .FirstOrDefaultAsync(u => u.Id == triggeredByUserId);
+        var completerName = completer?.FullName ?? "Un usuario";
+
+        // Notificar a TODOS los miembros del proyecto (excepto al que completó)
         var projectMembers = await db.ProjectMembers
             .Where(pm => pm.ProjectId == task.ProjectId && pm.UserId != triggeredByUserId)
             .Select(pm => pm.UserId)
@@ -103,7 +117,7 @@ public static class NotificationHelper
                 memberId,
                 "task_completed",
                 "Tarea completada",
-                $"La tarea '{task.Title}' ha sido completada",
+                $"{completerName} completó la tarea '{task.Title}'",
                 task.ProjectId,
                 task.Id,
                 triggeredByUserId);
@@ -115,7 +129,12 @@ public static class NotificationHelper
         TaskEntity task,
         Guid triggeredByUserId)
     {
-        // Notificar al asignado si existe
+        // Obtener el nombre del usuario que bloqueó la tarea
+        var blocker = await db.Users
+            .FirstOrDefaultAsync(u => u.Id == triggeredByUserId);
+        var blockerName = blocker?.FullName ?? "Un usuario";
+
+        // Notificar al asignado si existe y no es el que bloqueó
         if (task.AssignedToId.HasValue && task.AssignedToId.Value != triggeredByUserId)
         {
             await CreateNotificationAsync(
@@ -123,24 +142,35 @@ public static class NotificationHelper
                 task.AssignedToId.Value,
                 "task_blocked",
                 "Tarea bloqueada",
-                $"La tarea '{task.Title}' ha sido bloqueada",
+                $"{blockerName} bloqueó la tarea '{task.Title}'",
                 task.ProjectId,
                 task.Id,
                 triggeredByUserId);
         }
 
-        // Notificar a PMs del proyecto
-        var projectPMs = await db.ProjectMembers
-            .Where(pm => pm.ProjectId == task.ProjectId && pm.Role == "pm" && pm.UserId != triggeredByUserId)
+        // Notificar a TODOS los miembros del proyecto (excepto al que bloqueó)
+        var projectMembers = await db.ProjectMembers
+            .Where(pm => pm.ProjectId == task.ProjectId && pm.UserId != triggeredByUserId)
             .Select(pm => pm.UserId)
             .ToListAsync();
 
-        foreach (var pmId in projectPMs)
+        foreach (var memberId in projectMembers)
         {
+            // No notificar al asignado dos veces
+            if (task.AssignedToId.HasValue && task.AssignedToId.Value == memberId)
+                continue;
+
             await CreateNotificationAsync(
                 db,
-                pmId,
+                memberId,
                 "task_blocked",
+                "Tarea bloqueada",
+                $"{blockerName} bloqueó la tarea '{task.Title}'",
+                task.ProjectId,
+                task.Id,
+                triggeredByUserId);
+        }
+    }
                 "Tarea bloqueada",
                 $"La tarea '{task.Title}' ha sido bloqueada",
                 task.ProjectId,
@@ -496,5 +526,73 @@ public static class NotificationHelper
                 task.Id,
                 triggeredByUserId);
         }
+    }
+
+    public static async SystemTask NotifyNewProjectNoteAsync(
+        ChroneTaskDbContext db,
+        ProjectNote note,
+        Guid triggeredByUserId)
+    {
+        // Obtener el nombre del usuario que creó la nota
+        var creator = await db.Users
+            .FirstOrDefaultAsync(u => u.Id == triggeredByUserId);
+        var creatorName = creator?.FullName ?? "Un usuario";
+
+        // Obtener el proyecto para verificar si es organizacional o personal
+        var project = await db.Projects
+            .FirstOrDefaultAsync(p => p.Id == note.ProjectId);
+
+        if (project == null) return;
+
+        // Si es un proyecto organizacional, notificar a todos los miembros de la organización
+        if (project.OrganizationId.HasValue)
+        {
+            var orgMembers = await db.OrganizationMembers
+                .Where(om => om.OrganizationId == project.OrganizationId.Value && om.UserId != triggeredByUserId)
+                .Select(om => om.UserId)
+                .ToListAsync();
+
+            foreach (var memberId in orgMembers)
+            {
+                await CreateNotificationAsync(
+                    db,
+                    memberId,
+                    "new_project_note",
+                    "Nueva nota del proyecto",
+                    $"{creatorName} agregó una nota al proyecto",
+                    note.ProjectId,
+                    null,
+                    triggeredByUserId);
+            }
+        }
+
+        // Notificar a TODOS los miembros del proyecto (excepto al creador)
+        var projectMembers = await db.ProjectMembers
+            .Where(pm => pm.ProjectId == note.ProjectId && pm.UserId != triggeredByUserId)
+            .Select(pm => pm.UserId)
+            .ToListAsync();
+
+        foreach (var memberId in projectMembers)
+        {
+            await CreateNotificationAsync(
+                db,
+                memberId,
+                "new_project_note",
+                "Nueva nota del proyecto",
+                $"{creatorName} agregó una nota al proyecto",
+                note.ProjectId,
+                null,
+                triggeredByUserId);
+        }
+    }
+
+    public static async SystemTask NotifyNewPersonalNoteAsync(
+        ChroneTaskDbContext db,
+        PersonalNote note,
+        Guid triggeredByUserId)
+    {
+        // Para notas personales, solo notificar al usuario mismo (opcional)
+        // O podemos no notificar ya que es personal
+        // Por ahora, no notificamos para evitar spam
     }
 }

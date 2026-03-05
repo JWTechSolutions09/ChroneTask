@@ -54,13 +54,16 @@ const isLightColor = (color: string): boolean => {
   return luminance > 0.5;
 };
 
-// Función para obtener el color de texto apropiado según el fondo
+// Función para obtener el color de texto apropiado según el fondo y el tema
 const getTextColor = (backgroundColor: string): string => {
+  // Obtener el tema actual del documento
+  const isDarkMode = document.documentElement.getAttribute('data-theme') === 'dark';
+  
   if (isLightColor(backgroundColor)) {
-    // Para fondos claros, usar texto oscuro
-    return "var(--text-primary)";
+    // Para fondos claros, usar texto oscuro (siempre negro/oscuro)
+    return isDarkMode ? "#ffffff" : "#212529"; // En modo oscuro, si el fondo es claro, usar blanco; en modo claro, usar negro
   } else {
-    // Para fondos oscuros, usar texto claro
+    // Para fondos oscuros, usar texto claro (siempre blanco)
     return "#ffffff";
   }
 };

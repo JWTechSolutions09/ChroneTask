@@ -78,6 +78,9 @@ public class PersonalNotesController : ControllerBase
 
         await _db.Entry(note).Reference(n => n.User).LoadAsync();
 
+        // Notificar al usuario sobre su nueva nota personal (opcional)
+        await NotificationHelper.NotifyNewPersonalNoteAsync(_db, note, userId);
+
         return Ok(new PersonalNoteResponse
         {
             Id = note.Id,

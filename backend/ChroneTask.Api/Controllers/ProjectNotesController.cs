@@ -94,6 +94,9 @@ public class ProjectNotesController : ControllerBase
 
         await _db.Entry(note).Reference(n => n.User).LoadAsync();
 
+        // Notificar a los miembros del proyecto sobre la nueva nota
+        await NotificationHelper.NotifyNewProjectNoteAsync(_db, note, userId);
+
         return Ok(new ProjectNoteResponse
         {
             Id = note.Id,

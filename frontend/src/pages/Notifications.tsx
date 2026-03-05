@@ -40,6 +40,7 @@ const NOTIFICATION_ICONS: Record<string, string> = {
   task_assigned: "👤",
   task_unassigned: "👤",
   calendar_reminder: "⏰",
+  new_project_note: "📝",
 };
 
 const NOTIFICATION_COLORS: Record<string, string> = {
@@ -57,6 +58,7 @@ const NOTIFICATION_COLORS: Record<string, string> = {
   task_assigned: "#007bff",
   task_unassigned: "#6c757d",
   calendar_reminder: "#ffc107",
+  new_project_note: "#6f42c1",
 };
 
 export default function Notifications() {

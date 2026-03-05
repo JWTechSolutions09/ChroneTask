@@ -389,14 +389,21 @@ public class TasksController : ControllerBase
         if (!isMember)
             return StatusCode(403, new { message = "You are not a member of this project" });
 
-        // Guardar el asignado anterior para notificaciones
+        // Guardar el asignado anterior y el estado anterior para notificaciones
         var previousAssignedToId = task.AssignedToId;
+        var previousStatus = task.Status;
 
         task.Title = request.Title.Trim();
         task.Description = string.IsNullOrWhiteSpace(request.Description) ? null : request.Description.Trim();
         task.Type = request.Type;
         task.Priority = string.IsNullOrWhiteSpace(request.Priority) ? null : request.Priority;
         task.AssignedToId = request.AssignedToId;
+        
+        // Si se actualiza el estado, también guardarlo
+        if (!string.IsNullOrWhiteSpace(request.Status))
+        {
+            task.Status = request.Status;
+        }
         
         // Convertir fechas a UTC si no lo están (PostgreSQL requiere UTC)
         if (request.StartDate.HasValue)
@@ -451,6 +458,23 @@ public class TasksController : ControllerBase
         if (previousAssignedToId != task.AssignedToId)
         {
             await NotificationHelper.NotifyTaskAssignedAsync(_db, task, previousAssignedToId, userId);
+        }
+
+        // Notificar si cambió el estado
+        if (!string.IsNullOrWhiteSpace(request.Status) && previousStatus != task.Status)
+        {
+            if (task.Status == "Done")
+            {
+                await NotificationHelper.NotifyTaskCompletedAsync(_db, task, userId);
+            }
+            else if (task.Status == "Blocked")
+            {
+                await NotificationHelper.NotifyTaskBlockedAsync(_db, task, userId);
+            }
+            else
+            {
+                await NotificationHelper.NotifyTaskStatusChangeAsync(_db, task, previousStatus, task.Status, userId);
+            }
         }
 
         // Recargar el usuario asignado si cambió
