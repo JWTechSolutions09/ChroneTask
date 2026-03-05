@@ -14,8 +14,8 @@ public class ProjectCreateRequest
     [MaxLength(50)]
     public string? Template { get; set; } // "Software", "Operaciones", "Soporte"
 
-    [MaxLength(500)]
-    public string? ImageUrl { get; set; } // URL de imagen del proyecto
+    // ImageUrl puede ser base64, por lo que no tiene límite
+    public string? ImageUrl { get; set; } // URL de imagen del proyecto o base64
 
     public int? SlaHours { get; set; } // SLA in hours
     public int? SlaWarningThreshold { get; set; } // Warning threshold in hours

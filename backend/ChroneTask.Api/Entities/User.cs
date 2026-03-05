@@ -17,7 +17,7 @@ public class User
     [Required]
     public string PasswordHash { get; set; } = string.Empty;
 
-    [MaxLength(500)]
+    // ProfilePictureUrl puede ser base64, por lo que no tiene límite (TEXT)
     public string? ProfilePictureUrl { get; set; }
 
     [MaxLength(20)]

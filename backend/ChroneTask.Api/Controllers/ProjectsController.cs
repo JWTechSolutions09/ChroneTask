@@ -118,7 +118,8 @@ public class ProjectsController : ControllerBase
             Description = string.IsNullOrWhiteSpace(request.Description) ? null : request.Description.Trim(),
             OrganizationId = organizationId,
             Template = string.IsNullOrWhiteSpace(request.Template) ? null : request.Template.Trim(),
-            ImageUrl = string.IsNullOrWhiteSpace(request.ImageUrl) ? null : request.ImageUrl.Trim(),
+            // ImageUrl puede ser base64, no hacer Trim si es muy largo, solo si no está vacío
+            ImageUrl = string.IsNullOrWhiteSpace(request.ImageUrl) ? null : request.ImageUrl,
             SlaHours = request.SlaHours,
             SlaWarningThreshold = request.SlaWarningThreshold
         };
@@ -184,7 +185,8 @@ public class ProjectsController : ControllerBase
         project.Name = request.Name.Trim();
         project.Description = string.IsNullOrWhiteSpace(request.Description) ? null : request.Description.Trim();
         project.Template = string.IsNullOrWhiteSpace(request.Template) ? null : request.Template.Trim();
-        project.ImageUrl = string.IsNullOrWhiteSpace(request.ImageUrl) ? null : request.ImageUrl.Trim();
+        // ImageUrl puede ser base64, no hacer Trim si es muy largo, solo si no está vacío
+        project.ImageUrl = string.IsNullOrWhiteSpace(request.ImageUrl) ? null : request.ImageUrl;
         project.SlaHours = request.SlaHours;
         project.SlaWarningThreshold = request.SlaWarningThreshold;
         project.UpdatedAt = DateTime.UtcNow;

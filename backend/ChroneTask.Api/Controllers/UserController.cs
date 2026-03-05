@@ -88,8 +88,9 @@ public class UserController : ControllerBase
             if (!string.IsNullOrWhiteSpace(request.FullName))
                 user.FullName = request.FullName.Trim();
 
+            // ProfilePictureUrl puede ser base64, no hacer Trim si es muy largo, solo si no está vacío
             if (!string.IsNullOrWhiteSpace(request.ProfilePictureUrl))
-                user.ProfilePictureUrl = request.ProfilePictureUrl.Trim();
+                user.ProfilePictureUrl = request.ProfilePictureUrl;
 
             // Permitir actualizar UsageType desde UpdateProfile
             if (!string.IsNullOrWhiteSpace(request.UsageType))
@@ -356,69 +357,107 @@ public class UserController : ControllerBase
     [HttpPost("me/projects")]
     public async Task<ActionResult<ProjectResponse>> CreatePersonalProject([FromBody] ProjectCreateRequest request)
     {
-        var userId = UserContext.GetUserId(User);
-
-        // Verificar que el usuario existe
-        var user = await _db.Users
-            .FirstOrDefaultAsync(u => u.Id == userId);
-
-        if (user is null)
-            return NotFound();
-
-        // Crear el proyecto - EXACTAMENTE como en ProjectsController
-        var project = new Project
+        try
         {
-            Name = request.Name.Trim(),
-            Description = string.IsNullOrWhiteSpace(request.Description) ? null : request.Description.Trim(),
-            OrganizationId = null, // Proyecto personal, sin organización
-            UserId = userId, // Asignar al usuario
-            Template = string.IsNullOrWhiteSpace(request.Template) ? null : request.Template.Trim(),
-            ImageUrl = string.IsNullOrWhiteSpace(request.ImageUrl) ? null : request.ImageUrl.Trim(),
-            SlaHours = request.SlaHours,
-            SlaWarningThreshold = request.SlaWarningThreshold
-        };
+            // Validar ModelState
+            if (!ModelState.IsValid)
+            {
+                var errors = ModelState.SelectMany(x => x.Value?.Errors.Select(e => e.ErrorMessage) ?? Enumerable.Empty<string>());
+                Console.WriteLine($"❌ ModelState inválido en CreatePersonalProject: {string.Join(", ", errors)}");
+                return BadRequest(new { message = "Invalid request data", errors = errors.ToList() });
+            }
 
-        _db.Projects.Add(project);
+            var userId = UserContext.GetUserId(User);
 
-        // Agregar al usuario como miembro del proyecto - EXACTAMENTE como en ProjectsController
-        _db.ProjectMembers.Add(new ProjectMember
+            // Verificar que el usuario existe
+            var user = await _db.Users
+                .FirstOrDefaultAsync(u => u.Id == userId);
+
+            if (user is null)
+                return NotFound(new { message = "User not found" });
+
+            // Validar que el nombre no esté vacío
+            if (string.IsNullOrWhiteSpace(request?.Name))
+            {
+                return BadRequest(new { message = "Project name is required" });
+            }
+
+            // Crear el proyecto - EXACTAMENTE como en ProjectsController
+            var project = new Project
+            {
+                Name = request.Name.Trim(),
+                Description = string.IsNullOrWhiteSpace(request.Description) ? null : request.Description.Trim(),
+                OrganizationId = null, // Proyecto personal, sin organización
+                UserId = userId, // Asignar al usuario
+                Template = string.IsNullOrWhiteSpace(request.Template) ? null : request.Template.Trim(),
+                // ImageUrl puede ser base64, no hacer Trim si es muy largo, solo si no está vacío
+                ImageUrl = string.IsNullOrWhiteSpace(request.ImageUrl) ? null : request.ImageUrl,
+                SlaHours = request.SlaHours,
+                SlaWarningThreshold = request.SlaWarningThreshold
+            };
+
+            _db.Projects.Add(project);
+
+            // Agregar al usuario como miembro del proyecto - EXACTAMENTE como en ProjectsController
+            _db.ProjectMembers.Add(new ProjectMember
+            {
+                Project = project, // Usar Project (navegación) como en el código original
+                UserId = userId,
+                Role = "pm" // Usar "pm" como en el código original, no "owner"
+            });
+
+            // Guardar TODO en un solo SaveChangesAsync - EXACTAMENTE como en ProjectsController
+            await _db.SaveChangesAsync();
+
+            // Notificar al usuario sobre su nuevo proyecto personal (opcional, pero útil para confirmación)
+            await NotificationHelper.CreateNotificationAsync(
+                _db,
+                userId,
+                "new_project",
+                "Proyecto personal creado",
+                $"Has creado el proyecto '{project.Name}'",
+                project.Id,
+                null,
+                userId);
+
+            return CreatedAtAction(nameof(GetPersonalProjects), new { }, new ProjectResponse
+            {
+                Id = project.Id,
+                Name = project.Name,
+                Description = project.Description,
+                OrganizationId = project.OrganizationId,
+                UserId = project.UserId,
+                Template = project.Template,
+                IsActive = project.IsActive,
+                CreatedAt = project.CreatedAt,
+                UpdatedAt = project.UpdatedAt,
+                TaskCount = 0,
+                ActiveTaskCount = 0,
+                ImageUrl = project.ImageUrl,
+                SlaHours = project.SlaHours,
+                SlaWarningThreshold = project.SlaWarningThreshold
+            });
+        }
+        catch (DbUpdateException dbEx)
         {
-            Project = project, // Usar Project (navegación) como en el código original
-            UserId = userId,
-            Role = "pm" // Usar "pm" como en el código original, no "owner"
-        });
-
-        // Guardar TODO en un solo SaveChangesAsync - EXACTAMENTE como en ProjectsController
-        await _db.SaveChangesAsync();
-
-        // Notificar al usuario sobre su nuevo proyecto personal (opcional, pero útil para confirmación)
-        await NotificationHelper.CreateNotificationAsync(
-            _db,
-            userId,
-            "new_project",
-            "Proyecto personal creado",
-            $"Has creado el proyecto '{project.Name}'",
-            project.Id,
-            null,
-            userId);
-
-        return CreatedAtAction(nameof(GetPersonalProjects), new { }, new ProjectResponse
+            Console.WriteLine($"❌ Error de base de datos en CreatePersonalProject: {dbEx.Message}");
+            if (dbEx.InnerException != null)
+            {
+                Console.WriteLine($"❌ InnerException: {dbEx.InnerException.Message}");
+            }
+            return StatusCode(500, new { message = "Database error while creating project", error = dbEx.Message });
+        }
+        catch (Exception ex)
         {
-            Id = project.Id,
-            Name = project.Name,
-            Description = project.Description,
-            OrganizationId = project.OrganizationId,
-            UserId = project.UserId,
-            Template = project.Template,
-            IsActive = project.IsActive,
-            CreatedAt = project.CreatedAt,
-            UpdatedAt = project.UpdatedAt,
-            TaskCount = 0,
-            ActiveTaskCount = 0,
-            ImageUrl = project.ImageUrl,
-            SlaHours = project.SlaHours,
-            SlaWarningThreshold = project.SlaWarningThreshold
-        });
+            Console.WriteLine($"❌ Error en CreatePersonalProject: {ex.Message}");
+            Console.WriteLine($"❌ Tipo: {ex.GetType().Name}");
+            Console.WriteLine($"❌ StackTrace: {ex.StackTrace}");
+            if (ex.InnerException != null)
+            {
+                Console.WriteLine($"❌ InnerException: {ex.InnerException.Message}");
+            }
+            return StatusCode(500, new { message = "Error creating project", error = ex.Message });
+        }
     }
 
     // GET: api/users/me/projects/{id}
@@ -485,7 +524,8 @@ public class UserController : ControllerBase
             project.Name = request.Name.Trim();
             project.Description = string.IsNullOrWhiteSpace(request.Description) ? null : request.Description.Trim();
             project.Template = string.IsNullOrWhiteSpace(request.Template) ? null : request.Template.Trim();
-            project.ImageUrl = string.IsNullOrWhiteSpace(request.ImageUrl) ? null : request.ImageUrl.Trim();
+            // ImageUrl puede ser base64, no hacer Trim si es muy largo, solo si no está vacío
+            project.ImageUrl = string.IsNullOrWhiteSpace(request.ImageUrl) ? null : request.ImageUrl;
             project.SlaHours = request.SlaHours;
             project.SlaWarningThreshold = request.SlaWarningThreshold;
             project.UpdatedAt = DateTime.UtcNow;

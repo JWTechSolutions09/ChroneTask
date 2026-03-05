@@ -36,9 +36,12 @@ public class ChroneTaskDbContext : DbContext
             entity.Property(x => x.Slug).HasMaxLength(80);
             entity.HasIndex(x => x.Slug).IsUnique().HasFilter("\"Slug\" IS NOT NULL");
         });
-        modelBuilder.Entity<User>()
-    .HasIndex(u => u.Email)
-    .IsUnique();
+        modelBuilder.Entity<User>(entity =>
+        {
+            entity.HasIndex(u => u.Email).IsUnique();
+            // ProfilePictureUrl puede ser base64, por lo que no tiene límite (TEXT)
+            entity.Property(u => u.ProfilePictureUrl).HasColumnType("text");
+        });
 
         modelBuilder.Entity<OrganizationMember>(entity =>
         {
@@ -63,6 +66,8 @@ public class ChroneTaskDbContext : DbContext
             entity.Property(x => x.Name).IsRequired().HasMaxLength(120);
             entity.Property(x => x.Description).HasMaxLength(500);
             entity.Property(x => x.Template).HasMaxLength(50);
+            // ImageUrl puede ser base64, por lo que no tiene límite (TEXT)
+            entity.Property(x => x.ImageUrl).HasColumnType("text");
 
             // Relación opcional con Organization (para proyectos empresariales/de equipo)
             entity.HasOne(p => p.Organization)

@@ -24,8 +24,8 @@ public class Project
     [MaxLength(50)]
     public string? Template { get; set; } // "Software", "Operaciones", "Soporte"
 
-    [MaxLength(500)]
-    public string? ImageUrl { get; set; } // URL de imagen del proyecto
+    // ImageUrl puede ser base64, por lo que no tiene límite (TEXT)
+    public string? ImageUrl { get; set; } // URL de imagen del proyecto o base64
 
     // SLA Configuration
     public int? SlaHours { get; set; } // SLA in hours (null = no SLA)
