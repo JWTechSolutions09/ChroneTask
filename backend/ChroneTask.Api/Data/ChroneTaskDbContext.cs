@@ -23,6 +23,7 @@ public class ChroneTaskDbContext : DbContext
     public DbSet<Notification> Notifications => Set<Notification>();
     public DbSet<ProjectNote> ProjectNotes => Set<ProjectNote>();
     public DbSet<PersonalNote> PersonalNotes => Set<PersonalNote>();
+    public DbSet<PersonalCalendarEvent> PersonalCalendarEvents => Set<PersonalCalendarEvent>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -300,6 +301,33 @@ public class ChroneTaskDbContext : DbContext
                 .WithMany()
                 .HasForeignKey(n => n.UserId)
                 .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        // PersonalCalendarEvent configuration
+        modelBuilder.Entity<PersonalCalendarEvent>(entity =>
+        {
+            entity.HasKey(x => x.Id);
+            entity.Property(x => x.Title).IsRequired().HasMaxLength(200);
+            entity.Property(x => x.Description).HasMaxLength(2000);
+            entity.Property(x => x.Color).HasMaxLength(20);
+            entity.Property(x => x.Type).HasMaxLength(50);
+
+            entity.HasOne(e => e.User)
+                .WithMany()
+                .HasForeignKey(e => e.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasOne(e => e.RelatedTask)
+                .WithMany()
+                .HasForeignKey(e => e.RelatedTaskId)
+                .OnDelete(DeleteBehavior.SetNull);
+
+            entity.HasOne(e => e.RelatedProject)
+                .WithMany()
+                .HasForeignKey(e => e.RelatedProjectId)
+                .OnDelete(DeleteBehavior.SetNull);
+
+            entity.HasIndex(e => new { e.UserId, e.StartDate });
         });
     }
 }

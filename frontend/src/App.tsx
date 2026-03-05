@@ -13,6 +13,7 @@ import Notifications from "./pages/Notifications";
 import Analytics from "./pages/Analytics";
 import Timeline from "./pages/Timeline";
 import Notes from "./pages/Notes";
+import Calendar from "./pages/Calendar";
 import { isAuthed } from "./auth/token";
 import { setNavigateFunction } from "./api/http";
 import { useUserUsageType } from "./hooks/useUserUsageType";
@@ -227,6 +228,14 @@ function AppContent() {
                 element={
                     <PrivateRoute>
                         <Notifications />
+                    </PrivateRoute>
+                }
+            />
+            <Route
+                path="/personal/calendar"
+                element={
+                    <PrivateRoute>
+                        <Calendar />
                     </PrivateRoute>
                 }
             />

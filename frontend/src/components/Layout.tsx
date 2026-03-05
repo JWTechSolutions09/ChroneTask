@@ -752,6 +752,15 @@ export default function Layout({ children, organizationId, usageType: propUsageT
                 forceShowLabel={isMobile && sidebarOpen}
                 onNavigate={closeMobileMenu}
               />
+              <NavItem
+                icon="📆"
+                label="Calendario"
+                to="/personal/calendar"
+                active={isActive("/personal/calendar")}
+                collapsed={effectiveCollapsed}
+                forceShowLabel={isMobile && sidebarOpen}
+                onNavigate={closeMobileMenu}
+              />
             </>
           ) : !loadingUsageType && isTeamMode ? (
             <>
