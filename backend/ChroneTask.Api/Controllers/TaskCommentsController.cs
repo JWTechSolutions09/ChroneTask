@@ -107,6 +107,16 @@ public class TaskCommentsController : ControllerBase
             await _db.SaveChangesAsync();
         }
 
+        // Obtener la tarea y miembros del proyecto para notificaciones y menciones
+        var task = await _db.Tasks
+            .Include(t => t.Project)
+            .FirstOrDefaultAsync(t => t.Id == taskId);
+
+        var projectMembers = await _db.ProjectMembers
+            .Where(pm => pm.ProjectId == projectId && pm.UserId != userId)
+            .Select(pm => pm.UserId)
+            .ToListAsync();
+
         // Usar el helper mejorado para notificaciones de comentarios
         await NotificationHelper.NotifyNewCommentAsync(_db, comment, projectId, taskId, userId);
 
@@ -138,6 +148,7 @@ public class TaskCommentsController : ControllerBase
                     }
                 }
             }
+            await _db.SaveChangesAsync();
         }
 
         await _db.SaveChangesAsync();

@@ -169,7 +169,8 @@ public class TasksController : ControllerBase
             // Validar modelo
             if (!ModelState.IsValid)
             {
-                Console.WriteLine($"❌ ModelState inválido: {string.Join(", ", ModelState.SelectMany(x => x.Value.Errors.Select(e => e.ErrorMessage)))}");
+                var errors = ModelState.SelectMany(x => x.Value?.Errors.Select(e => e.ErrorMessage) ?? Enumerable.Empty<string>());
+                Console.WriteLine($"❌ ModelState inválido: {string.Join(", ", errors)}");
                 return BadRequest(ModelState);
             }
 
