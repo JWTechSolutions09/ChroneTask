@@ -467,46 +467,48 @@ export default function Projects() {
                         </span>
                       </div>
                     </Link>
-                    <button
-                      onClick={(e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        setShowMemberModal({ projectId: project.id, projectName: project.name });
-                      }}
-                      style={{
-                        position: "absolute",
-                        top: "16px",
-                        right: "16px",
-                        padding: "8px 12px",
-                        borderRadius: "8px",
-                        border: "1px solid rgba(0, 123, 255, 0.3)",
-                        backgroundColor: "rgba(255, 255, 255, 0.95)",
-                        color: "#007bff",
-                        cursor: "pointer",
-                        fontSize: "13px",
-                        display: "flex",
-                        alignItems: "center",
-                        gap: "6px",
-                        fontWeight: 600,
-                        transition: "all 0.2s",
-                        zIndex: 10,
-                        boxShadow: "0 2px 8px rgba(0, 0, 0, 0.15)",
-                        backdropFilter: "blur(10px)",
-                      }}
-                      onMouseEnter={(e) => {
-                        e.currentTarget.style.backgroundColor = "#e7f3ff";
-                        e.currentTarget.style.transform = "scale(1.05)";
-                        e.currentTarget.style.boxShadow = "0 4px 12px rgba(0, 123, 255, 0.25)";
-                      }}
-                      onMouseLeave={(e) => {
-                        e.currentTarget.style.backgroundColor = "rgba(255, 255, 255, 0.95)";
-                        e.currentTarget.style.transform = "scale(1)";
-                        e.currentTarget.style.boxShadow = "0 2px 8px rgba(0, 0, 0, 0.15)";
-                      }}
-                      title="Gestionar miembros del proyecto"
-                    >
-                      👥 Miembros
-                    </button>
+                    {!isPersonalMode && !isPersonalRoute && organizationId && (
+                      <button
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          setShowMemberModal({ projectId: project.id, projectName: project.name });
+                        }}
+                        style={{
+                          position: "absolute",
+                          top: "16px",
+                          right: "16px",
+                          padding: "8px 12px",
+                          borderRadius: "8px",
+                          border: "1px solid rgba(0, 123, 255, 0.3)",
+                          backgroundColor: "rgba(255, 255, 255, 0.95)",
+                          color: "#007bff",
+                          cursor: "pointer",
+                          fontSize: "13px",
+                          display: "flex",
+                          alignItems: "center",
+                          gap: "6px",
+                          fontWeight: 600,
+                          transition: "all 0.2s",
+                          zIndex: 10,
+                          boxShadow: "0 2px 8px rgba(0, 0, 0, 0.15)",
+                          backdropFilter: "blur(10px)",
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.backgroundColor = "#e7f3ff";
+                          e.currentTarget.style.transform = "scale(1.05)";
+                          e.currentTarget.style.boxShadow = "0 4px 12px rgba(0, 123, 255, 0.25)";
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.backgroundColor = "rgba(255, 255, 255, 0.95)";
+                          e.currentTarget.style.transform = "scale(1)";
+                          e.currentTarget.style.boxShadow = "0 2px 8px rgba(0, 0, 0, 0.15)";
+                        }}
+                        title="Gestionar miembros del proyecto"
+                      >
+                        👥 Miembros
+                      </button>
+                    )}
                   </Card>
                 );
               })}
