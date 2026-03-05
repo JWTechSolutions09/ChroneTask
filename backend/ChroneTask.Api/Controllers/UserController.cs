@@ -391,6 +391,17 @@ public class UserController : ControllerBase
         // Guardar TODO en un solo SaveChangesAsync - EXACTAMENTE como en ProjectsController
         await _db.SaveChangesAsync();
 
+        // Notificar al usuario sobre su nuevo proyecto personal (opcional, pero útil para confirmación)
+        await NotificationHelper.CreateNotificationAsync(
+            _db,
+            userId,
+            "new_project",
+            "Proyecto personal creado",
+            $"Has creado el proyecto '{project.Name}'",
+            project.Id,
+            null,
+            userId);
+
         return CreatedAtAction(nameof(GetPersonalProjects), new { }, new ProjectResponse
         {
             Id = project.Id,
@@ -617,6 +628,9 @@ public class UserController : ControllerBase
 
             _db.ProjectMembers.Add(projectMember);
             await _db.SaveChangesAsync();
+
+            // Notificar al nuevo miembro y a otros miembros del proyecto
+            await NotificationHelper.NotifyProjectMemberAddedAsync(_db, id, request.UserId, userId);
 
             // Cargar información del usuario
             await _db.Entry(projectMember).Reference(m => m.User).LoadAsync();

@@ -107,51 +107,8 @@ public class TaskCommentsController : ControllerBase
             await _db.SaveChangesAsync();
         }
 
-        // Obtener la tarea para notificaciones
-        var task = await _db.Tasks
-            .Include(t => t.Project)
-            .FirstOrDefaultAsync(t => t.Id == taskId);
-
-        // Crear notificación para el asignado de la tarea (si existe y no es el que comentó)
-        if (task != null && task.AssignedToId.HasValue && task.AssignedToId.Value != userId)
-        {
-            var notification = new Notification
-            {
-                UserId = task.AssignedToId.Value,
-                Type = "new_comment",
-                Title = "Nuevo comentario en tarea",
-                Message = $"Nuevo comentario en la tarea: {task.Title}",
-                ProjectId = projectId,
-                TaskId = taskId,
-                TriggeredByUserId = userId
-            };
-            _db.Notifications.Add(notification);
-        }
-
-        // Crear notificaciones para miembros del proyecto (excepto el que comentó)
-        var projectMembers = await _db.ProjectMembers
-            .Where(pm => pm.ProjectId == projectId && pm.UserId != userId)
-            .Select(pm => pm.UserId)
-            .ToListAsync();
-
-        foreach (var memberId in projectMembers)
-        {
-            // No notificar al asignado dos veces
-            if (task != null && task.AssignedToId.HasValue && task.AssignedToId.Value == memberId)
-                continue;
-
-            var notification = new Notification
-            {
-                UserId = memberId,
-                Type = "new_comment",
-                Title = "Nuevo comentario en tarea",
-                Message = $"Nuevo comentario en la tarea: {task?.Title ?? "Tarea"}",
-                ProjectId = projectId,
-                TaskId = taskId,
-                TriggeredByUserId = userId
-            };
-            _db.Notifications.Add(notification);
-        }
+        // Usar el helper mejorado para notificaciones de comentarios
+        await NotificationHelper.NotifyNewCommentAsync(_db, comment, projectId, taskId, userId);
 
         // Crear notificaciones para @mentions
         if (request.Mentions != null && request.Mentions.Any())

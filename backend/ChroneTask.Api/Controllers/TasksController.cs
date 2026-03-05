@@ -289,6 +289,9 @@ public class TasksController : ControllerBase
             await _db.SaveChangesAsync();
             Console.WriteLine($"✅ Tarea guardada exitosamente con ID: {task.Id}");
 
+            // Notificar a los miembros del proyecto sobre la nueva tarea
+            await NotificationHelper.NotifyNewTaskAsync(_db, task, userId);
+
             // Cargar el usuario asignado si existe
             string? assignedToName = null;
             if (task.AssignedToId.HasValue)
@@ -385,6 +388,9 @@ public class TasksController : ControllerBase
         if (!isMember)
             return StatusCode(403, new { message = "You are not a member of this project" });
 
+        // Guardar el asignado anterior para notificaciones
+        var previousAssignedToId = task.AssignedToId;
+
         task.Title = request.Title.Trim();
         task.Description = string.IsNullOrWhiteSpace(request.Description) ? null : request.Description.Trim();
         task.Type = request.Type;
@@ -439,6 +445,12 @@ public class TasksController : ControllerBase
         task.UpdatedAt = DateTime.UtcNow;
 
         await _db.SaveChangesAsync();
+
+        // Notificar si cambió la asignación
+        if (previousAssignedToId != task.AssignedToId)
+        {
+            await NotificationHelper.NotifyTaskAssignedAsync(_db, task, previousAssignedToId, userId);
+        }
 
         // Recargar el usuario asignado si cambió
         if (task.AssignedToId.HasValue)
@@ -497,10 +509,19 @@ public class TasksController : ControllerBase
                 return BadRequest(new { message = "The assigned user must be a member of the project" });
         }
 
+        // Guardar el asignado anterior para notificaciones
+        var previousAssignedToId = task.AssignedToId;
+
         task.AssignedToId = assignedToId;
         task.UpdatedAt = DateTime.UtcNow;
 
         await _db.SaveChangesAsync();
+
+        // Notificar si cambió la asignación
+        if (previousAssignedToId != task.AssignedToId)
+        {
+            await NotificationHelper.NotifyTaskAssignedAsync(_db, task, previousAssignedToId, userId);
+        }
 
         // Recargar el usuario asignado si existe
         if (task.AssignedToId.HasValue)

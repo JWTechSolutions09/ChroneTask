@@ -135,6 +135,9 @@ public class ProjectsController : ControllerBase
 
         await _db.SaveChangesAsync();
 
+        // Notificar a los miembros de la organización sobre el nuevo proyecto
+        await NotificationHelper.NotifyNewProjectAsync(_db, project, userId);
+
         return CreatedAtAction(nameof(GetById), new { organizationId, id = project.Id }, new ProjectResponse
         {
             Id = project.Id,
@@ -310,6 +313,9 @@ public class ProjectsController : ControllerBase
 
             _db.ProjectMembers.Add(projectMember);
             await _db.SaveChangesAsync();
+
+            // Notificar al nuevo miembro y a otros miembros del proyecto
+            await NotificationHelper.NotifyProjectMemberAddedAsync(_db, id, request.UserId, userId);
 
             // Cargar información del usuario
             await _db.Entry(projectMember).Reference(m => m.User).LoadAsync();

@@ -166,6 +166,9 @@ public class PersonalCalendarEventsController : ControllerBase
         _db.PersonalCalendarEvents.Add(calendarEvent);
         await _db.SaveChangesAsync();
 
+        // Notificar al usuario sobre el nuevo evento del calendario
+        await NotificationHelper.NotifyNewCalendarEventAsync(_db, calendarEvent, userId);
+
         // Crear notificación de recordatorio si está configurado
         if (calendarEvent.HasReminder && calendarEvent.ReminderMinutesBefore.HasValue)
         {

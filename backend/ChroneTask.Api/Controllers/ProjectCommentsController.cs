@@ -91,6 +91,9 @@ public class ProjectCommentsController : ControllerBase
         _db.ProjectComments.Add(comment);
         await _db.SaveChangesAsync();
 
+        // Notificar a los miembros del proyecto sobre el nuevo comentario
+        await NotificationHelper.NotifyNewProjectCommentAsync(_db, comment, projectId, userId);
+
         // Agregar adjuntos si existen
         if (request.Attachments != null && request.Attachments.Any())
         {
