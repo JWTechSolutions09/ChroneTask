@@ -233,6 +233,24 @@ export default function Projects() {
                       { label: "Software", value: "Software" },
                       { label: "Operaciones", value: "Operaciones" },
                       { label: "Soporte", value: "Soporte" },
+                      { label: "Marketing", value: "Marketing" },
+                      { label: "Ventas", value: "Ventas" },
+                      { label: "Diseño", value: "Diseño" },
+                      { label: "Producto", value: "Producto" },
+                      { label: "Recursos Humanos", value: "Recursos Humanos" },
+                      { label: "Finanzas", value: "Finanzas" },
+                      { label: "Legal", value: "Legal" },
+                      { label: "Investigación", value: "Investigación" },
+                      { label: "Eventos", value: "Eventos" },
+                      { label: "Capacitación", value: "Capacitación" },
+                      { label: "Innovación", value: "Innovación" },
+                      { label: "Calidad", value: "Calidad" },
+                      { label: "Tareas Personales", value: "Tareas Personales" },
+                      { label: "Estudios", value: "Estudios" },
+                      { label: "Fitness", value: "Fitness" },
+                      { label: "Viajes", value: "Viajes" },
+                      { label: "Finanzas Personales", value: "Finanzas Personales" },
+                      { label: "Hogar", value: "Hogar" },
                     ],
                     onChange: setFilterTemplate,
                   },
@@ -650,9 +668,33 @@ export default function Projects() {
                   }}
                 >
                   <option value="">Sin plantilla</option>
-                  <option value="Software">Software</option>
-                  <option value="Operaciones">Operaciones</option>
-                  <option value="Soporte">Soporte</option>
+                  <optgroup label="💼 Empresarial">
+                    <option value="Software">Software</option>
+                    <option value="Operaciones">Operaciones</option>
+                    <option value="Soporte">Soporte</option>
+                    <option value="Marketing">Marketing</option>
+                    <option value="Ventas">Ventas</option>
+                    <option value="Producto">Producto</option>
+                    <option value="Recursos Humanos">Recursos Humanos</option>
+                    <option value="Finanzas">Finanzas</option>
+                    <option value="Legal">Legal</option>
+                    <option value="Calidad">Calidad</option>
+                  </optgroup>
+                  <optgroup label="👥 Equipo">
+                    <option value="Diseño">Diseño</option>
+                    <option value="Investigación">Investigación</option>
+                    <option value="Eventos">Eventos</option>
+                    <option value="Capacitación">Capacitación</option>
+                    <option value="Innovación">Innovación</option>
+                  </optgroup>
+                  <optgroup label="👤 Personal">
+                    <option value="Tareas Personales">Tareas Personales</option>
+                    <option value="Estudios">Estudios</option>
+                    <option value="Fitness">Fitness</option>
+                    <option value="Viajes">Viajes</option>
+                    <option value="Finanzas Personales">Finanzas Personales</option>
+                    <option value="Hogar">Hogar</option>
+                  </optgroup>
                 </select>
               </div>
               <ImageUpload

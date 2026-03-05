@@ -405,7 +405,7 @@ export default function Layout({ children, organizationId, usageType: propUsageT
               }}
             >
               <img 
-                src="/logosidebar.png" 
+                src="/logolanding.png" 
                 alt="ChroneTask Logo" 
                 style={{
                   width: "100%",
