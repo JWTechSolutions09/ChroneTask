@@ -24,7 +24,6 @@ public class ChroneTaskDbContext : DbContext
     public DbSet<ProjectNote> ProjectNotes => Set<ProjectNote>();
     public DbSet<PersonalNote> PersonalNotes => Set<PersonalNote>();
     public DbSet<PersonalCalendarEvent> PersonalCalendarEvents => Set<PersonalCalendarEvent>();
-    public DbSet<PersonalTodoItem> PersonalTodoItems => Set<PersonalTodoItem>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -329,24 +328,6 @@ public class ChroneTaskDbContext : DbContext
                 .OnDelete(DeleteBehavior.SetNull);
 
             entity.HasIndex(e => new { e.UserId, e.StartDate });
-        });
-
-        // PersonalTodoItem configuration
-        modelBuilder.Entity<PersonalTodoItem>(entity =>
-        {
-            entity.HasKey(x => x.Id);
-            entity.Property(x => x.Title).IsRequired().HasMaxLength(500);
-            entity.Property(x => x.Description).HasMaxLength(2000);
-            entity.Property(x => x.Priority).HasMaxLength(20);
-            entity.Property(x => x.Color).HasMaxLength(20);
-
-            entity.HasOne(t => t.User)
-                .WithMany()
-                .HasForeignKey(t => t.UserId)
-                .OnDelete(DeleteBehavior.Cascade);
-
-            entity.HasIndex(t => new { t.UserId, t.DueDate });
-            entity.HasIndex(t => new { t.UserId, t.IsCompleted });
         });
     }
 }
