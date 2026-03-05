@@ -47,9 +47,10 @@ export default function Layout({ children, organizationId, usageType: propUsageT
   const [loading, setLoading] = useState(false);
 
   // Determinar si mostrar secciones de organización/equipo
-  const showOrgSections = usageType === "business" || usageType === "team";
-  const isPersonalMode = usageType === "personal";
-  const isTeamMode = usageType === "team";
+  // Solo mostrar si NO está cargando Y definitivamente NO es modo personal
+  const showOrgSections = !loadingUsageType && (usageType === "business" || usageType === "team");
+  const isPersonalMode = !loadingUsageType && usageType === "personal";
+  const isTeamMode = !loadingUsageType && usageType === "team";
   const orgLabel = isTeamMode ? "Equipo" : "Organización";
 
   // Detectar si estamos en móvil y manejar resize
@@ -128,10 +129,19 @@ export default function Layout({ children, organizationId, usageType: propUsageT
     }
   }, [organizationId, isPersonalMode]);
 
+  // Limpiar organizaciones cuando se detecta modo personal
+  useEffect(() => {
+    if (isPersonalMode) {
+      setOrgs([]);
+      setCurrentOrg(null);
+      setProjects([]);
+    }
+  }, [isPersonalMode]);
+
   // Solo cargar datos cuando cambie organizationId (NO en modo personal)
   useEffect(() => {
-    // No cargar nada en modo personal
-    if (isPersonalMode) return;
+    // No cargar nada en modo personal o mientras está cargando el tipo de uso
+    if (isPersonalMode || loadingUsageType) return;
     
     let isMounted = true;
     let timeoutId: NodeJS.Timeout | null = null;
@@ -497,7 +507,16 @@ export default function Layout({ children, organizationId, usageType: propUsageT
           }}
           className={isMobile && sidebarOpen ? "mobile-nav-open" : ""}
         >
-          {showOrgSections && organizationId ? (
+          {loadingUsageType ? (
+            <div style={{ 
+              padding: "20px", 
+              textAlign: "center", 
+              color: "var(--text-secondary)",
+              fontSize: "14px"
+            }}>
+              Cargando...
+            </div>
+          ) : !loadingUsageType && showOrgSections && organizationId ? (
             <>
               {/* Organization/Team Info */}
               {currentOrg && (
@@ -670,7 +689,7 @@ export default function Layout({ children, organizationId, usageType: propUsageT
                 </div>
               )}
             </>
-          ) : isPersonalMode ? (
+          ) : !loadingUsageType && isPersonalMode ? (
             <>
               {/* Modo Personal - Dashboard completo */}
               {!effectiveCollapsed && (
@@ -734,7 +753,7 @@ export default function Layout({ children, organizationId, usageType: propUsageT
                 onNavigate={closeMobileMenu}
               />
             </>
-          ) : isTeamMode ? (
+          ) : !loadingUsageType && isTeamMode ? (
             <>
               {/* Modo Equipo */}
               <NavItem
@@ -747,7 +766,7 @@ export default function Layout({ children, organizationId, usageType: propUsageT
                 onNavigate={closeMobileMenu}
               />
             </>
-          ) : (
+          ) : !loadingUsageType && !isPersonalMode ? (
             <>
               {/* Modo Empresarial - Organizaciones */}
               <NavItem
@@ -769,7 +788,7 @@ export default function Layout({ children, organizationId, usageType: propUsageT
                 onNavigate={closeMobileMenu}
               />
             </>
-          )}
+          ) : null}
 
           {/* Bottom Actions */}
           <div style={{ marginTop: "auto", paddingTop: "16px", borderTop: "1px solid var(--border-color)" }}>
