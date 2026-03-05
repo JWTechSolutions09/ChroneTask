@@ -7,7 +7,6 @@ import Card from "../components/Card";
 import Button from "../components/Button";
 import SearchBar from "../components/SearchBar";
 import AddProjectMemberModal from "../components/AddProjectMemberModal";
-import ImageUpload from "../components/ImageUpload";
 import { useToast } from "../contexts/ToastContext";
 import { useTerminology } from "../hooks/useTerminology";
 import { useUserUsageType } from "../hooks/useUserUsageType";
@@ -35,7 +34,6 @@ export default function Projects() {
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [template, setTemplate] = useState("");
-  const [imageUrl, setImageUrl] = useState("");
   const [slaHours, setSlaHours] = useState("");
   const [slaWarningThreshold, setSlaWarningThreshold] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
@@ -133,7 +131,7 @@ export default function Projects() {
           name: name.trim(),
           description: description.trim() || null,
           template: template.trim() || null,
-          imageUrl: imageUrl.trim() || null,
+          imageUrl: null,
           slaHours: slaHours ? parseInt(slaHours) : null,
           slaWarningThreshold: slaWarningThreshold ? parseInt(slaWarningThreshold) : null,
         });
@@ -148,7 +146,7 @@ export default function Projects() {
           name: name.trim(),
           description: description.trim() || null,
           template: template.trim() || null,
-          imageUrl: imageUrl.trim() || null,
+          imageUrl: null,
           slaHours: slaHours ? parseInt(slaHours) : null,
           slaWarningThreshold: slaWarningThreshold ? parseInt(slaWarningThreshold) : null,
         });
@@ -157,7 +155,6 @@ export default function Projects() {
       setName("");
       setDescription("");
       setTemplate("");
-      setImageUrl("");
       setSlaHours("");
       setSlaWarningThreshold("");
       await loadProjects();
@@ -174,7 +171,7 @@ export default function Projects() {
     } finally {
       setCreating(false);
     }
-  }, [organizationId, name, description, template, imageUrl, slaHours, slaWarningThreshold, loadProjects, showToast, isPersonalMode, isPersonalRoute, t]);
+  }, [organizationId, name, description, template, slaHours, slaWarningThreshold, loadProjects, showToast, isPersonalMode, isPersonalRoute, t]);
 
   // En modo personal, no requerir organizationId
   if (!isPersonalMode && !isPersonalRoute && !organizationId) {
@@ -697,48 +694,6 @@ export default function Projects() {
                     <option value="Hogar">Hogar</option>
                   </optgroup>
                 </select>
-              </div>
-              <ImageUpload
-                currentImageUrl={imageUrl || undefined}
-                onImageChange={(url) => setImageUrl(url)}
-                label="Imagen del Proyecto"
-                maxSizeMB={5}
-              />
-              <div>
-                <label
-                  style={{
-                    display: "block",
-                    marginBottom: "8px",
-                    fontSize: "15px",
-                    fontWeight: 600,
-                    color: "var(--text-primary)",
-                  }}
-                >
-                  O pega una URL de imagen
-                </label>
-                <input
-                  type="url"
-                  placeholder="https://ejemplo.com/imagen.jpg"
-                  value={imageUrl}
-                  onChange={(e) => setImageUrl(e.target.value)}
-                  disabled={creating}
-                  className="input"
-                  style={{
-                    padding: "12px 16px",
-                    borderRadius: "10px",
-                    border: "2px solid var(--border-color)",
-                    fontSize: "15px",
-                    transition: "all 0.2s",
-                  }}
-                  onFocus={(e) => {
-                    e.target.style.borderColor = "var(--primary)";
-                    e.target.style.boxShadow = "0 0 0 3px rgba(0, 123, 255, 0.1)";
-                  }}
-                  onBlur={(e) => {
-                    e.target.style.borderColor = "var(--border-color)";
-                    e.target.style.boxShadow = "none";
-                  }}
-                />
               </div>
               <div style={{ 
                 borderTop: "2px solid var(--border-color)", 
