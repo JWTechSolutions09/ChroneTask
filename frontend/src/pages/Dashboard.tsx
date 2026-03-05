@@ -314,7 +314,7 @@ export default function Dashboard() {
                 marginBottom: "20px",
               }}
             >
-              <h2 style={{ fontSize: "20px", fontWeight: 600, margin: 0, color: "#212529" }}>
+              <h2 style={{ fontSize: "20px", fontWeight: 600, margin: 0, color: "var(--text-primary)" }}>
                 Proyectos
               </h2>
             </div>
@@ -334,7 +334,7 @@ export default function Dashboard() {
                     style={{
                       marginTop: "12px",
                       fontSize: "14px",
-                      color: "#6c757d",
+                      color: "var(--text-secondary)",
                       display: "flex",
                       alignItems: "center",
                       gap: "8px",
@@ -357,10 +357,10 @@ export default function Dashboard() {
                 <div className="empty-state-icon" style={{ fontSize: "64px", marginBottom: "20px" }}>
                   📁
                 </div>
-                <h3 style={{ fontSize: "24px", fontWeight: 700, color: "#212529", marginBottom: "12px" }}>
+                <h3 style={{ fontSize: "24px", fontWeight: 700, color: "var(--text-primary)", marginBottom: "12px" }}>
                   No hay proyectos todavía
                 </h3>
-                <p style={{ fontSize: "16px", color: "#6c757d", marginBottom: "24px" }}>
+                <p style={{ fontSize: "16px", color: "var(--text-secondary)", marginBottom: "24px" }}>
                   Crea tu primer proyecto para comenzar a gestionar tareas y tiempo
                 </p>
                 <Link to={isPersonalMode || isPersonalRoute ? "/personal/projects" : `/org/${organizationId}/projects`}>
@@ -393,7 +393,7 @@ export default function Dashboard() {
                           padding: "12px",
                           fontSize: "12px",
                           fontWeight: 600,
-                          color: "#6c757d",
+                          color: "var(--text-secondary)",
                           textTransform: "uppercase",
                         }}
                       >
@@ -405,7 +405,7 @@ export default function Dashboard() {
                           padding: "12px",
                           fontSize: "12px",
                           fontWeight: 600,
-                          color: "#6c757d",
+                          color: "var(--text-secondary)",
                           textTransform: "uppercase",
                         }}
                       >
@@ -417,7 +417,7 @@ export default function Dashboard() {
                           padding: "12px",
                           fontSize: "12px",
                           fontWeight: 600,
-                          color: "#6c757d",
+                          color: "var(--text-secondary)",
                           textTransform: "uppercase",
                         }}
                       >
@@ -429,7 +429,7 @@ export default function Dashboard() {
                           padding: "12px",
                           fontSize: "12px",
                           fontWeight: 600,
-                          color: "#6c757d",
+                          color: "var(--text-secondary)",
                           textTransform: "uppercase",
                         }}
                       >
@@ -441,7 +441,7 @@ export default function Dashboard() {
                           padding: "12px",
                           fontSize: "12px",
                           fontWeight: 600,
-                          color: "#6c757d",
+                          color: "var(--text-secondary)",
                           textTransform: "uppercase",
                         }}
                       >
@@ -461,7 +461,7 @@ export default function Dashboard() {
                         <tr
                           key={project.id}
                           style={{
-                            borderBottom: "1px solid #e9ecef",
+                            borderBottom: "1px solid var(--border-color)",
                             cursor: "pointer",
                           }}
                           onMouseEnter={(e) => {
@@ -504,8 +504,8 @@ export default function Dashboard() {
                                 style={{
                                   padding: "4px 8px",
                                   borderRadius: "4px",
-                                  backgroundColor: "#e7f3ff",
-                                  color: "#007bff",
+                                  backgroundColor: "var(--bg-highlight)",
+                                  color: "var(--primary)",
                                   fontSize: "12px",
                                   fontWeight: 500,
                                 }}
@@ -513,7 +513,7 @@ export default function Dashboard() {
                                 {project.template}
                               </span>
                             ) : (
-                              <span style={{ color: "#adb5bd", fontSize: "12px" }}>—</span>
+                              <span style={{ color: "var(--text-tertiary)", fontSize: "12px" }}>—</span>
                             )}
                           </td>
                           <td style={{ padding: "12px", textAlign: "center" }}>
@@ -531,21 +531,21 @@ export default function Dashboard() {
                                   style={{
                                     height: "100%",
                                     width: `${progress}%`,
-                                    backgroundColor: "#007bff",
+                                    backgroundColor: "var(--primary)",
                                     transition: "width 0.3s",
                                   }}
                                 />
                               </div>
-                              <span style={{ fontSize: "12px", color: "#6c757d", minWidth: "40px" }}>
+                              <span style={{ fontSize: "12px", color: "var(--text-secondary)", minWidth: "40px" }}>
                                 {progress}%
                               </span>
                             </div>
                           </td>
                           <td style={{ padding: "12px", textAlign: "center" }}>
-                            <div style={{ fontSize: "14px", fontWeight: 600, color: "#212529" }}>
+                            <div style={{ fontSize: "14px", fontWeight: 600, color: "var(--text-primary)" }}>
                               {project.activeTaskCount}
                             </div>
-                            <div style={{ fontSize: "11px", color: "#6c757d" }}>
+                            <div style={{ fontSize: "11px", color: "var(--text-secondary)" }}>
                               de {project.taskCount}
                             </div>
                           </td>
@@ -560,7 +560,7 @@ export default function Dashboard() {
                                 padding: "6px 12px",
                                 borderRadius: "6px",
                                 backgroundColor: "var(--primary)",
-                                color: "white",
+                                color: "var(--text-inverted)",
                                 textDecoration: "none",
                                 fontSize: "12px",
                                 fontWeight: 500,
@@ -660,8 +660,8 @@ export default function Dashboard() {
                                 style={{
                                   padding: "2px 8px",
                                   borderRadius: "4px",
-                                  backgroundColor: "#e7f3ff",
-                                  color: "#007bff",
+                                  backgroundColor: "var(--bg-highlight)",
+                                  color: "var(--primary)",
                                   fontSize: "10px",
                                   fontWeight: 600,
                                 }}
@@ -694,7 +694,7 @@ export default function Dashboard() {
                               alignItems: "center",
                               marginBottom: "4px",
                               fontSize: "12px",
-                              color: "#6c757d",
+                              color: "var(--text-secondary)",
                             }}
                           >
                             <span>Progreso</span>
@@ -703,7 +703,7 @@ export default function Dashboard() {
                           <div
                             style={{
                               height: "6px",
-                              backgroundColor: "#e9ecef",
+                              backgroundColor: "var(--bg-tertiary)",
                               borderRadius: "3px",
                               overflow: "hidden",
                             }}
@@ -712,7 +712,7 @@ export default function Dashboard() {
                               style={{
                                 height: "100%",
                                 width: `${progress}%`,
-                                backgroundColor: "#007bff",
+                                backgroundColor: "var(--primary)",
                                 transition: "width 0.3s",
                               }}
                             />
@@ -724,16 +724,16 @@ export default function Dashboard() {
                             display: "flex",
                             justifyContent: "space-between",
                             fontSize: "13px",
-                            color: "#6c757d",
+                            color: "var(--text-secondary)",
                             paddingTop: "12px",
-                            borderTop: "1px solid #e9ecef",
+                            borderTop: "1px solid var(--border-color)",
                           }}
                         >
                           <span>
-                            <strong style={{ color: "#212529" }}>{project.activeTaskCount}</strong> activas
+                            <strong style={{ color: "var(--text-primary)" }}>{project.activeTaskCount}</strong> activas
                           </span>
                           <span>
-                            <strong style={{ color: "#212529" }}>{project.taskCount}</strong> total
+                            <strong style={{ color: "var(--text-primary)" }}>{project.taskCount}</strong> total
                           </span>
                         </div>
                       </Card>

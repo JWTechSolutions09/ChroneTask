@@ -37,6 +37,34 @@ const NOTE_COLORS = [
   "#E5D9FF", "#FFE5E5", "#E5E5FF", "#E5FFE5", "#FFF5E5"
 ];
 
+// Función para determinar si un color es claro u oscuro
+const isLightColor = (color: string): boolean => {
+  if (!color) return true; // Por defecto, asumimos que es claro
+  
+  // Convertir hex a RGB
+  const hex = color.replace('#', '');
+  const r = parseInt(hex.substr(0, 2), 16);
+  const g = parseInt(hex.substr(2, 2), 16);
+  const b = parseInt(hex.substr(4, 2), 16);
+  
+  // Calcular luminosidad relativa
+  const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+  
+  // Si la luminosidad es mayor a 0.5, es un color claro
+  return luminance > 0.5;
+};
+
+// Función para obtener el color de texto apropiado según el fondo
+const getTextColor = (backgroundColor: string): string => {
+  if (isLightColor(backgroundColor)) {
+    // Para fondos claros, usar texto oscuro
+    return "var(--text-primary)";
+  } else {
+    // Para fondos oscuros, usar texto claro
+    return "#ffffff";
+  }
+};
+
 export default function Notes() {
   const { organizationId, projectId } = useParams<{ organizationId?: string; projectId?: string }>();
   const location = useLocation();
@@ -560,8 +588,12 @@ export default function Notes() {
                     onMouseDown={(e) => handleMouseDown(e, note)}
                     style={{
                       padding: "8px 16px",
-                      backgroundColor: "rgba(255, 255, 255, 0.3)",
-                      borderBottom: "1px solid rgba(0, 0, 0, 0.1)",
+                      backgroundColor: isLightColor(note.color || "#FFE5E5") 
+                        ? "rgba(255, 255, 255, 0.3)" 
+                        : "rgba(0, 0, 0, 0.2)",
+                      borderBottom: isLightColor(note.color || "#FFE5E5")
+                        ? "1px solid rgba(0, 0, 0, 0.1)"
+                        : "1px solid rgba(255, 255, 255, 0.1)",
                       cursor: isMobile ? "default" : (draggedNote?.id === note.id ? "grabbing" : "grab"),
                       display: "flex",
                       alignItems: "center",
@@ -574,6 +606,7 @@ export default function Notes() {
                         display: "flex",
                         gap: "4px",
                         opacity: 0.5,
+                        color: getTextColor(note.color || "#FFE5E5"),
                       }}>
                         <div style={{ width: "4px", height: "4px", borderRadius: "50%", backgroundColor: "currentColor" }} />
                         <div style={{ width: "4px", height: "4px", borderRadius: "50%", backgroundColor: "currentColor" }} />
@@ -600,7 +633,7 @@ export default function Notes() {
                           backgroundColor: "transparent",
                           fontSize: "16px",
                           fontWeight: 600,
-                          color: "var(--text-primary)",
+                          color: getTextColor(note.color || "#FFE5E5"),
                           flex: 1,
                           outline: editingNoteId === note.id ? "2px solid rgba(0, 123, 255, 0.4)" : "none",
                           borderRadius: "6px",
@@ -632,7 +665,7 @@ export default function Notes() {
                           backgroundColor: "transparent",
                           fontSize: "18px",
                           fontWeight: 600,
-                          color: "var(--text-primary)",
+                          color: getTextColor(note.color || "#FFE5E5"),
                           flex: 1,
                           outline: editingNoteId === note.id ? "2px solid rgba(0, 123, 255, 0.3)" : "none",
                           borderRadius: "4px",
@@ -935,7 +968,7 @@ export default function Notes() {
                         border: "none",
                         backgroundColor: "transparent",
                         fontSize: "14px",
-                        color: "var(--text-primary)",
+                        color: getTextColor(note.color || "#FFE5E5"),
                         resize: "none",
                         outline: editingNoteId === note.id ? "2px solid rgba(0, 123, 255, 0.4)" : "none",
                         borderRadius: "8px",
