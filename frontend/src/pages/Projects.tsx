@@ -214,179 +214,10 @@ export default function Projects() {
           }
         />
 
-        <div style={{ padding: "24px" }}>
-          {/* Create Project Form */}
-          <Card style={{ marginBottom: "24px" }}>
-            <h2 style={{ fontSize: "18px", fontWeight: 600, marginBottom: "16px", color: "var(--text-primary)" }}>
-              Crear Nuevo Proyecto
-            </h2>
-            <form onSubmit={createProject} style={{ display: "grid", gap: "12px" }}>
-              <div>
-                <label
-                  style={{
-                    display: "block",
-                    marginBottom: "6px",
-                    fontSize: "14px",
-                    fontWeight: 500,
-                    color: "var(--text-primary)",
-                  }}
-                >
-                  Nombre del proyecto *
-                </label>
-                <input
-                  placeholder="Ej: Sistema de gestión"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  disabled={creating}
-                  required
-                  className="input"
-                />
-              </div>
-              <div>
-                <label
-                  style={{
-                    display: "block",
-                    marginBottom: "6px",
-                    fontSize: "14px",
-                    fontWeight: 500,
-                    color: "var(--text-primary)",
-                  }}
-                >
-                  Descripción
-                </label>
-                <textarea
-                  placeholder="Describe el propósito del proyecto..."
-                  value={description}
-                  onChange={(e) => setDescription(e.target.value)}
-                  disabled={creating}
-                  rows={3}
-                  className="textarea"
-                />
-              </div>
-              <div>
-                <label
-                  style={{
-                    display: "block",
-                    marginBottom: "6px",
-                    fontSize: "14px",
-                    fontWeight: 500,
-                    color: "var(--text-primary)",
-                  }}
-                >
-                  Plantilla
-                </label>
-                <select
-                  value={template}
-                  onChange={(e) => setTemplate(e.target.value)}
-                  disabled={creating}
-                  className="select"
-                >
-                  <option value="">Sin plantilla</option>
-                  <option value="Software">Software</option>
-                  <option value="Operaciones">Operaciones</option>
-                  <option value="Soporte">Soporte</option>
-                </select>
-              </div>
-              <ImageUpload
-                currentImageUrl={imageUrl || undefined}
-                onImageChange={(url) => setImageUrl(url)}
-                label="Imagen del Proyecto"
-                maxSizeMB={5}
-              />
-              <div>
-                <label
-                  style={{
-                    display: "block",
-                    marginBottom: "6px",
-                    fontSize: "14px",
-                    fontWeight: 500,
-                    color: "var(--text-primary)",
-                  }}
-                >
-                  O pega una URL de imagen
-                </label>
-                <input
-                  type="url"
-                  placeholder="https://ejemplo.com/imagen.jpg"
-                  value={imageUrl}
-                  onChange={(e) => setImageUrl(e.target.value)}
-                  disabled={creating}
-                  className="input"
-                />
-              </div>
-              <div style={{ borderTop: "1px solid var(--border-color)", paddingTop: "16px", marginTop: "8px" }}>
-                <h3 style={{ fontSize: "16px", fontWeight: 600, marginBottom: "12px", color: "var(--text-primary)" }}>
-                  Configuración de SLA (Opcional)
-                </h3>
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px" }}>
-                  <div>
-                    <label
-                      style={{
-                        display: "block",
-                        marginBottom: "6px",
-                        fontSize: "14px",
-                        fontWeight: 500,
-                        color: "var(--text-primary)",
-                      }}
-                    >
-                      SLA en horas
-                    </label>
-                    <input
-                      type="number"
-                      placeholder="Ej: 48"
-                      value={slaHours}
-                      onChange={(e) => setSlaHours(e.target.value)}
-                      disabled={creating}
-                      min="1"
-                      className="input"
-                    />
-                    <div style={{ fontSize: "12px", color: "var(--text-secondary)", marginTop: "4px" }}>
-                      Tiempo máximo para completar tareas
-                    </div>
-                  </div>
-                  <div>
-                    <label
-                      style={{
-                        display: "block",
-                        marginBottom: "6px",
-                        fontSize: "14px",
-                        fontWeight: 500,
-                        color: "var(--text-primary)",
-                      }}
-                    >
-                      Umbral de advertencia (horas)
-                    </label>
-                    <input
-                      type="number"
-                      placeholder="Ej: 38"
-                      value={slaWarningThreshold}
-                      onChange={(e) => setSlaWarningThreshold(e.target.value)}
-                      disabled={creating}
-                      min="1"
-                      className="input"
-                    />
-                    <div style={{ fontSize: "12px", color: "var(--text-secondary)", marginTop: "4px" }}>
-                      Avisar cuando queden estas horas
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <Button
-                type="submit"
-                variant="success"
-                disabled={!name.trim() || creating}
-                loading={creating}
-              >
-                Crear Proyecto
-              </Button>
-            </form>
-          </Card>
-
-          {err && <div className="alert alert-error">{err}</div>}
-
-          {/* Search and Filters */}
+        <div style={{ padding: "24px", maxWidth: "1400px", margin: "0 auto" }}>
+          {/* Search Bar - Arriba */}
           {projects.length > 0 && (
-            <Card style={{ marginBottom: "24px" }}>
+            <Card style={{ marginBottom: "24px", borderRadius: "12px", boxShadow: "0 2px 8px rgba(0, 0, 0, 0.08)" }}>
               <SearchBar
                 placeholder="Buscar proyectos por nombre o descripción..."
                 value={searchQuery}
@@ -416,6 +247,8 @@ export default function Projects() {
                     display: "flex",
                     alignItems: "center",
                     gap: "8px",
+                    paddingTop: "12px",
+                    borderTop: "1px solid var(--border-color)",
                   }}
                 >
                   <span>📊</span>
@@ -428,19 +261,40 @@ export default function Projects() {
             </Card>
           )}
 
+          {err && <div className="alert alert-error" style={{ marginBottom: "24px", borderRadius: "8px" }}>{err}</div>}
+
+          {/* Projects Grid - Arriba */}
           {loading ? (
-            <div className="loading">Cargando proyectos...</div>
-          ) : projects.length === 0 ? (
-            <div className="empty-state">
-              <div className="empty-state-icon">📁</div>
-              <p>No hay proyectos todavía. Crea uno para comenzar.</p>
+            <div className="loading" style={{ textAlign: "center", padding: "60px", fontSize: "16px", color: "var(--text-secondary)" }}>
+              Cargando proyectos...
             </div>
+          ) : projects.length === 0 ? (
+            <Card style={{ textAlign: "center", padding: "60px", borderRadius: "12px", boxShadow: "0 2px 8px rgba(0, 0, 0, 0.08)" }}>
+              <div style={{ fontSize: "64px", marginBottom: "20px" }}>📁</div>
+              <h3 style={{ fontSize: "20px", fontWeight: 600, marginBottom: "12px", color: "var(--text-primary)" }}>
+                No hay proyectos todavía
+              </h3>
+              <p style={{ fontSize: "14px", color: "var(--text-secondary)", marginBottom: "24px" }}>
+                Crea tu primer proyecto para comenzar a organizar tus tareas
+              </p>
+            </Card>
+          ) : filteredProjects.length === 0 ? (
+            <Card style={{ textAlign: "center", padding: "60px", borderRadius: "12px", boxShadow: "0 2px 8px rgba(0, 0, 0, 0.08)" }}>
+              <div style={{ fontSize: "48px", marginBottom: "20px" }}>🔍</div>
+              <h3 style={{ fontSize: "20px", fontWeight: 600, marginBottom: "12px", color: "var(--text-primary)" }}>
+                No se encontraron proyectos
+              </h3>
+              <p style={{ fontSize: "14px", color: "var(--text-secondary)" }}>
+                Intenta con otros términos de búsqueda o filtros
+              </p>
+            </Card>
           ) : (
             <div
               style={{
                 display: "grid",
-                gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))",
-                gap: "16px",
+                gridTemplateColumns: "repeat(auto-fill, minmax(320px, 1fr))",
+                gap: "20px",
+                marginBottom: "32px",
               }}
             >
               {filteredProjects.map((project) => {
@@ -449,13 +303,25 @@ export default function Projects() {
                     ? Math.round((project.activeTaskCount / project.taskCount) * 100)
                     : 0;
                 return (
-                  <Card key={project.id} hover className="hover-lift" style={{ position: "relative", overflow: "hidden" }}>
+                  <Card 
+                    key={project.id} 
+                    hover 
+                    className="hover-lift" 
+                    style={{ 
+                      position: "relative", 
+                      overflow: "hidden",
+                      borderRadius: "16px",
+                      boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
+                      transition: "all 0.3s ease",
+                      border: "1px solid rgba(0, 0, 0, 0.08)",
+                    }}
+                  >
                     {project.imageUrl && (
                       <div
                         style={{
                           width: "100%",
-                          height: "120px",
-                          margin: "-20px -20px 16px -20px",
+                          height: "140px",
+                          margin: "-20px -20px 20px -20px",
                           backgroundImage: `url(${project.imageUrl})`,
                           backgroundSize: "cover",
                           backgroundPosition: "center",
@@ -469,7 +335,7 @@ export default function Projects() {
                             left: 0,
                             right: 0,
                             bottom: 0,
-                            background: "linear-gradient(to bottom, rgba(0,0,0,0.1), rgba(0,0,0,0.3))",
+                            background: "linear-gradient(to bottom, rgba(0,0,0,0.1), rgba(0,0,0,0.4))",
                           }}
                         />
                       </div>
@@ -483,22 +349,24 @@ export default function Projects() {
                       style={{ textDecoration: "none", color: "inherit" }}
                       className="fade-in"
                     >
-                      <div style={{ marginBottom: "12px" }}>
+                      <div style={{ marginBottom: "16px" }}>
                         <div
                           style={{
                             display: "flex",
                             justifyContent: "space-between",
                             alignItems: "flex-start",
-                            marginBottom: "8px",
+                            marginBottom: "10px",
+                            gap: "8px",
                           }}
                         >
                           <h3
                             style={{
-                              fontSize: "18px",
-                              fontWeight: 600,
+                              fontSize: "20px",
+                              fontWeight: 700,
                               margin: 0,
                               color: "var(--text-primary)",
                               flex: 1,
+                              lineHeight: "1.3",
                             }}
                           >
                             {project.name}
@@ -506,12 +374,14 @@ export default function Projects() {
                           {project.template && (
                             <span
                               style={{
-                                padding: "4px 8px",
-                                borderRadius: "4px",
+                                padding: "6px 12px",
+                                borderRadius: "8px",
                                 backgroundColor: "#e7f3ff",
                                 color: "#007bff",
-                                fontSize: "11px",
+                                fontSize: "12px",
                                 fontWeight: 600,
+                                whiteSpace: "nowrap",
+                                boxShadow: "0 2px 4px rgba(0, 123, 255, 0.1)",
                               }}
                             >
                               {project.template}
@@ -521,12 +391,14 @@ export default function Projects() {
                         {project.description && (
                           <p
                             style={{
-                              fontSize: "13px",
+                              fontSize: "14px",
                               color: "var(--text-secondary)",
                               margin: 0,
+                              lineHeight: "1.5",
+                              display: "-webkit-box",
+                              WebkitLineClamp: 2,
+                              WebkitBoxOrient: "vertical",
                               overflow: "hidden",
-                              textOverflow: "ellipsis",
-                              whiteSpace: "nowrap",
                             }}
                           >
                             {project.description}
@@ -534,34 +406,36 @@ export default function Projects() {
                         )}
                       </div>
 
-                      <div style={{ marginBottom: "12px" }}>
+                      <div style={{ marginBottom: "16px" }}>
                         <div
                           style={{
                             display: "flex",
                             justifyContent: "space-between",
                             alignItems: "center",
-                            marginBottom: "4px",
-                            fontSize: "12px",
+                            marginBottom: "8px",
+                            fontSize: "13px",
                             color: "var(--text-secondary)",
                           }}
                         >
-                          <span>Progreso</span>
-                          <span>{progress}%</span>
+                          <span style={{ fontWeight: 500 }}>Progreso</span>
+                          <span style={{ fontWeight: 600, color: "var(--primary)" }}>{progress}%</span>
                         </div>
                         <div
                           style={{
-                            height: "6px",
+                            height: "8px",
                             backgroundColor: "var(--bg-tertiary)",
-                            borderRadius: "3px",
+                            borderRadius: "4px",
                             overflow: "hidden",
+                            boxShadow: "inset 0 1px 2px rgba(0, 0, 0, 0.1)",
                           }}
                         >
                           <div
                             style={{
                               height: "100%",
                               width: `${progress}%`,
-                              backgroundColor: "var(--primary)",
-                              transition: "width 0.3s",
+                              background: `linear-gradient(90deg, var(--primary) 0%, #0056b3 100%)`,
+                              transition: "width 0.5s ease",
+                              borderRadius: "4px",
                             }}
                           />
                         </div>
@@ -571,17 +445,25 @@ export default function Projects() {
                         style={{
                           display: "flex",
                           justifyContent: "space-between",
-                          fontSize: "13px",
+                          fontSize: "14px",
                           color: "var(--text-secondary)",
-                          paddingTop: "12px",
+                          paddingTop: "16px",
                           borderTop: "1px solid var(--border-color)",
                         }}
                       >
-                        <span>
-                          <strong style={{ color: "var(--text-primary)" }}>{project.activeTaskCount}</strong> activas
+                        <span style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                          <span style={{ fontSize: "18px" }}>📋</span>
+                          <span>
+                            <strong style={{ color: "var(--text-primary)", fontSize: "16px" }}>{project.activeTaskCount}</strong>{" "}
+                            <span style={{ fontSize: "12px" }}>activas</span>
+                          </span>
                         </span>
-                        <span>
-                          <strong style={{ color: "var(--text-primary)" }}>{project.taskCount}</strong> total
+                        <span style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                          <span style={{ fontSize: "18px" }}>✅</span>
+                          <span>
+                            <strong style={{ color: "var(--text-primary)", fontSize: "16px" }}>{project.taskCount}</strong>{" "}
+                            <span style={{ fontSize: "12px" }}>total</span>
+                          </span>
                         </span>
                       </div>
                     </Link>
@@ -593,27 +475,33 @@ export default function Projects() {
                       }}
                       style={{
                         position: "absolute",
-                        top: "12px",
-                        right: "12px",
-                        padding: "6px 10px",
-                        borderRadius: "6px",
-                        border: "1px solid #007bff",
-                        backgroundColor: "white",
+                        top: "16px",
+                        right: "16px",
+                        padding: "8px 12px",
+                        borderRadius: "8px",
+                        border: "1px solid rgba(0, 123, 255, 0.3)",
+                        backgroundColor: "rgba(255, 255, 255, 0.95)",
                         color: "#007bff",
                         cursor: "pointer",
-                        fontSize: "12px",
+                        fontSize: "13px",
                         display: "flex",
                         alignItems: "center",
-                        gap: "4px",
-                        fontWeight: 500,
+                        gap: "6px",
+                        fontWeight: 600,
                         transition: "all 0.2s",
                         zIndex: 10,
+                        boxShadow: "0 2px 8px rgba(0, 0, 0, 0.15)",
+                        backdropFilter: "blur(10px)",
                       }}
                       onMouseEnter={(e) => {
                         e.currentTarget.style.backgroundColor = "#e7f3ff";
+                        e.currentTarget.style.transform = "scale(1.05)";
+                        e.currentTarget.style.boxShadow = "0 4px 12px rgba(0, 123, 255, 0.25)";
                       }}
                       onMouseLeave={(e) => {
-                        e.currentTarget.style.backgroundColor = "white";
+                        e.currentTarget.style.backgroundColor = "rgba(255, 255, 255, 0.95)";
+                        e.currentTarget.style.transform = "scale(1)";
+                        e.currentTarget.style.boxShadow = "0 2px 8px rgba(0, 0, 0, 0.15)";
                       }}
                       title="Gestionar miembros del proyecto"
                     >
@@ -624,6 +512,304 @@ export default function Projects() {
               })}
             </div>
           )}
+
+          {/* Create Project Form - Abajo */}
+          <Card style={{ borderRadius: "16px", boxShadow: "0 4px 16px rgba(0, 0, 0, 0.1)", border: "2px dashed var(--border-color)" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "20px" }}>
+              <div style={{ 
+                width: "48px", 
+                height: "48px", 
+                borderRadius: "12px", 
+                backgroundColor: "var(--primary)", 
+                display: "flex", 
+                alignItems: "center", 
+                justifyContent: "center",
+                fontSize: "24px",
+                boxShadow: "0 4px 12px rgba(0, 123, 255, 0.3)",
+              }}>
+                ➕
+              </div>
+              <div>
+                <h2 style={{ fontSize: "22px", fontWeight: 700, margin: 0, color: "var(--text-primary)" }}>
+                  Crear Nuevo Proyecto
+                </h2>
+                <p style={{ fontSize: "14px", color: "var(--text-secondary)", margin: "4px 0 0 0" }}>
+                  Comienza un nuevo proyecto y organiza tus tareas
+                </p>
+              </div>
+            </div>
+            <form onSubmit={createProject} style={{ display: "grid", gap: "16px" }}>
+              <div>
+                <label
+                  style={{
+                    display: "block",
+                    marginBottom: "8px",
+                    fontSize: "15px",
+                    fontWeight: 600,
+                    color: "var(--text-primary)",
+                  }}
+                >
+                  Nombre del proyecto <span style={{ color: "#dc3545" }}>*</span>
+                </label>
+                <input
+                  placeholder="Ej: Sistema de gestión"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  disabled={creating}
+                  required
+                  className="input"
+                  style={{
+                    padding: "12px 16px",
+                    borderRadius: "10px",
+                    border: "2px solid var(--border-color)",
+                    fontSize: "15px",
+                    transition: "all 0.2s",
+                  }}
+                  onFocus={(e) => {
+                    e.target.style.borderColor = "var(--primary)";
+                    e.target.style.boxShadow = "0 0 0 3px rgba(0, 123, 255, 0.1)";
+                  }}
+                  onBlur={(e) => {
+                    e.target.style.borderColor = "var(--border-color)";
+                    e.target.style.boxShadow = "none";
+                  }}
+                />
+              </div>
+              <div>
+                <label
+                  style={{
+                    display: "block",
+                    marginBottom: "8px",
+                    fontSize: "15px",
+                    fontWeight: 600,
+                    color: "var(--text-primary)",
+                  }}
+                >
+                  Descripción
+                </label>
+                <textarea
+                  placeholder="Describe el propósito del proyecto..."
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                  disabled={creating}
+                  rows={3}
+                  className="textarea"
+                  style={{
+                    padding: "12px 16px",
+                    borderRadius: "10px",
+                    border: "2px solid var(--border-color)",
+                    fontSize: "15px",
+                    transition: "all 0.2s",
+                    resize: "vertical",
+                  }}
+                  onFocus={(e) => {
+                    e.target.style.borderColor = "var(--primary)";
+                    e.target.style.boxShadow = "0 0 0 3px rgba(0, 123, 255, 0.1)";
+                  }}
+                  onBlur={(e) => {
+                    e.target.style.borderColor = "var(--border-color)";
+                    e.target.style.boxShadow = "none";
+                  }}
+                />
+              </div>
+              <div>
+                <label
+                  style={{
+                    display: "block",
+                    marginBottom: "8px",
+                    fontSize: "15px",
+                    fontWeight: 600,
+                    color: "var(--text-primary)",
+                  }}
+                >
+                  Plantilla
+                </label>
+                <select
+                  value={template}
+                  onChange={(e) => setTemplate(e.target.value)}
+                  disabled={creating}
+                  className="select"
+                  style={{
+                    padding: "12px 16px",
+                    borderRadius: "10px",
+                    border: "2px solid var(--border-color)",
+                    fontSize: "15px",
+                    transition: "all 0.2s",
+                    backgroundColor: "white",
+                    cursor: "pointer",
+                  }}
+                  onFocus={(e) => {
+                    e.target.style.borderColor = "var(--primary)";
+                    e.target.style.boxShadow = "0 0 0 3px rgba(0, 123, 255, 0.1)";
+                  }}
+                  onBlur={(e) => {
+                    e.target.style.borderColor = "var(--border-color)";
+                    e.target.style.boxShadow = "none";
+                  }}
+                >
+                  <option value="">Sin plantilla</option>
+                  <option value="Software">Software</option>
+                  <option value="Operaciones">Operaciones</option>
+                  <option value="Soporte">Soporte</option>
+                </select>
+              </div>
+              <ImageUpload
+                currentImageUrl={imageUrl || undefined}
+                onImageChange={(url) => setImageUrl(url)}
+                label="Imagen del Proyecto"
+                maxSizeMB={5}
+              />
+              <div>
+                <label
+                  style={{
+                    display: "block",
+                    marginBottom: "8px",
+                    fontSize: "15px",
+                    fontWeight: 600,
+                    color: "var(--text-primary)",
+                  }}
+                >
+                  O pega una URL de imagen
+                </label>
+                <input
+                  type="url"
+                  placeholder="https://ejemplo.com/imagen.jpg"
+                  value={imageUrl}
+                  onChange={(e) => setImageUrl(e.target.value)}
+                  disabled={creating}
+                  className="input"
+                  style={{
+                    padding: "12px 16px",
+                    borderRadius: "10px",
+                    border: "2px solid var(--border-color)",
+                    fontSize: "15px",
+                    transition: "all 0.2s",
+                  }}
+                  onFocus={(e) => {
+                    e.target.style.borderColor = "var(--primary)";
+                    e.target.style.boxShadow = "0 0 0 3px rgba(0, 123, 255, 0.1)";
+                  }}
+                  onBlur={(e) => {
+                    e.target.style.borderColor = "var(--border-color)";
+                    e.target.style.boxShadow = "none";
+                  }}
+                />
+              </div>
+              <div style={{ 
+                borderTop: "2px solid var(--border-color)", 
+                paddingTop: "20px", 
+                marginTop: "12px",
+                borderRadius: "12px",
+                backgroundColor: "rgba(0, 123, 255, 0.02)",
+                padding: "20px",
+              }}>
+                <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "16px" }}>
+                  <span style={{ fontSize: "20px" }}>⏱️</span>
+                  <h3 style={{ fontSize: "18px", fontWeight: 700, margin: 0, color: "var(--text-primary)" }}>
+                    Configuración de SLA (Opcional)
+                  </h3>
+                </div>
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px" }}>
+                  <div>
+                    <label
+                      style={{
+                        display: "block",
+                        marginBottom: "8px",
+                        fontSize: "14px",
+                        fontWeight: 600,
+                        color: "var(--text-primary)",
+                      }}
+                    >
+                      SLA en horas
+                    </label>
+                    <input
+                      type="number"
+                      placeholder="Ej: 48"
+                      value={slaHours}
+                      onChange={(e) => setSlaHours(e.target.value)}
+                      disabled={creating}
+                      min="1"
+                      className="input"
+                      style={{
+                        padding: "12px 16px",
+                        borderRadius: "10px",
+                        border: "2px solid var(--border-color)",
+                        fontSize: "15px",
+                        transition: "all 0.2s",
+                      }}
+                      onFocus={(e) => {
+                        e.target.style.borderColor = "var(--primary)";
+                        e.target.style.boxShadow = "0 0 0 3px rgba(0, 123, 255, 0.1)";
+                      }}
+                      onBlur={(e) => {
+                        e.target.style.borderColor = "var(--border-color)";
+                        e.target.style.boxShadow = "none";
+                      }}
+                    />
+                    <div style={{ fontSize: "13px", color: "var(--text-secondary)", marginTop: "6px" }}>
+                      Tiempo máximo para completar tareas
+                    </div>
+                  </div>
+                  <div>
+                    <label
+                      style={{
+                        display: "block",
+                        marginBottom: "8px",
+                        fontSize: "14px",
+                        fontWeight: 600,
+                        color: "var(--text-primary)",
+                      }}
+                    >
+                      Umbral de advertencia (horas)
+                    </label>
+                    <input
+                      type="number"
+                      placeholder="Ej: 38"
+                      value={slaWarningThreshold}
+                      onChange={(e) => setSlaWarningThreshold(e.target.value)}
+                      disabled={creating}
+                      min="1"
+                      className="input"
+                      style={{
+                        padding: "12px 16px",
+                        borderRadius: "10px",
+                        border: "2px solid var(--border-color)",
+                        fontSize: "15px",
+                        transition: "all 0.2s",
+                      }}
+                      onFocus={(e) => {
+                        e.target.style.borderColor = "var(--primary)";
+                        e.target.style.boxShadow = "0 0 0 3px rgba(0, 123, 255, 0.1)";
+                      }}
+                      onBlur={(e) => {
+                        e.target.style.borderColor = "var(--border-color)";
+                        e.target.style.boxShadow = "none";
+                      }}
+                    />
+                    <div style={{ fontSize: "13px", color: "var(--text-secondary)", marginTop: "6px" }}>
+                      Avisar cuando queden estas horas
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <Button
+                type="submit"
+                variant="primary"
+                disabled={!name.trim() || creating}
+                loading={creating}
+                style={{
+                  padding: "14px 24px",
+                  fontSize: "16px",
+                  fontWeight: 600,
+                  borderRadius: "10px",
+                  boxShadow: "0 4px 12px rgba(0, 123, 255, 0.3)",
+                  transition: "all 0.2s",
+                }}
+              >
+                {creating ? "Creando..." : "✨ Crear Proyecto"}
+              </Button>
+            </form>
+          </Card>
         </div>
       </div>
 
