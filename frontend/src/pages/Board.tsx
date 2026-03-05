@@ -120,10 +120,84 @@ export default function Board() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [projectId, organizationId, isPersonalMode, isPersonalRoute]); // Solo dependemos de los IDs para evitar loops
 
+  const [isMobile, setIsMobile] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return window.innerWidth <= 768;
+    }
+    return false;
+  });
+
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
   const handleDragStart = useCallback((e: React.DragEvent, task: Task) => {
     setDraggedTask(task);
     e.dataTransfer.effectAllowed = "move";
   }, []);
+
+  // Manejo de touch para móvil
+  const [touchStart, setTouchStart] = useState<{ task: Task; startX: number; startY: number } | null>(null);
+  const [touchTarget, setTouchTarget] = useState<string | null>(null);
+
+  const handleTouchStart = useCallback((e: React.TouchEvent, task: Task) => {
+    if (!isMobile) return;
+    e.preventDefault();
+    setTouchStart({
+      task,
+      startX: e.touches[0].clientX,
+      startY: e.touches[0].clientY,
+    });
+  }, [isMobile]);
+
+  const handleTouchMove = useCallback((e: React.TouchEvent) => {
+    if (!isMobile || !touchStart) return;
+    e.preventDefault();
+    const touch = e.touches[0];
+    const elementBelow = document.elementFromPoint(touch.clientX, touch.clientY);
+    if (elementBelow) {
+      const statusColumn = elementBelow.closest('[data-status]');
+      if (statusColumn) {
+        const status = (statusColumn as HTMLElement).dataset.status;
+        if (status) setTouchTarget(status);
+      }
+    }
+  }, [isMobile, touchStart]);
+
+  const handleStatusChange = useCallback(async (taskId: string, newStatus: string) => {
+    try {
+      await http.patch(`/api/projects/${projectId}/tasks/${taskId}/status`, newStatus);
+      await loadTasks();
+      showToast("Estado actualizado", "success");
+    } catch (ex: any) {
+      showToast(ex?.response?.data?.message ?? "Error actualizando estado", "error");
+    }
+  }, [projectId, loadTasks, showToast]);
+
+  const handleTouchEnd = useCallback(async (e: React.TouchEvent) => {
+    if (!isMobile || !touchStart) return;
+    e.preventDefault();
+    const touch = e.changedTouches[0];
+    const elementBelow = document.elementFromPoint(touch.clientX, touch.clientY);
+    
+    if (elementBelow) {
+      const statusColumn = elementBelow.closest('[data-status]');
+      if (statusColumn) {
+        const newStatus = (statusColumn as HTMLElement).dataset.status;
+        if (newStatus && newStatus !== touchStart.task.status) {
+          await handleStatusChange(touchStart.task.id, newStatus);
+        }
+      }
+    }
+    
+    setTouchStart(null);
+    setTouchTarget(null);
+  }, [isMobile, touchStart, handleStatusChange]);
 
   const handleDragOver = useCallback((e: React.DragEvent) => {
     e.preventDefault();
@@ -270,37 +344,63 @@ export default function Board() {
                 ]
           }
           actions={
-            <div style={{ display: "flex", gap: "8px", flexWrap: "wrap", width: "100%" }}>
-              <Button variant="secondary" onClick={() => setShowCommentsPanel(true)}>
-                💬 Comentarios
-              </Button>
-              <Button variant="secondary" onClick={() => setShowMemberModal(true)}>
-                👥 Miembros
-              </Button>
-              <Button
-                variant="secondary"
-                onClick={() => {
-                  window.location.href = `/org/${organizationId}/project/${projectId}/notes`;
+            <div style={{ 
+              display: "flex", 
+              gap: isMobile ? "6px" : "8px", 
+              flexWrap: "wrap", 
+              width: "100%",
+              justifyContent: isMobile ? "center" : "flex-start",
+            }}>
+              {!isMobile && (
+                <>
+                  <Button variant="secondary" onClick={() => setShowCommentsPanel(true)}>
+                    💬 Comentarios
+                  </Button>
+                  {!isPersonalMode && !isPersonalRoute && organizationId && (
+                    <Button variant="secondary" onClick={() => setShowMemberModal(true)}>
+                      👥 Miembros
+                    </Button>
+                  )}
+                  <Button
+                    variant="secondary"
+                    onClick={() => {
+                      const basePath = isPersonalMode || isPersonalRoute 
+                        ? `/personal/project/${projectId}` 
+                        : `/org/${organizationId}/project/${projectId}`;
+                      window.location.href = `${basePath}/notes`;
+                    }}
+                  >
+                    📝 Notas
+                  </Button>
+                  <Button
+                    variant="secondary"
+                    onClick={() => {
+                      const basePath = isPersonalMode || isPersonalRoute 
+                        ? `/personal/project/${projectId}` 
+                        : `/org/${organizationId}/project/${projectId}`;
+                      window.location.href = `${basePath}/timeline`;
+                    }}
+                  >
+                    📅 Cronograma
+                  </Button>
+                </>
+              )}
+              <Button 
+                variant="primary" 
+                onClick={() => setShowCreateModal(true)}
+                style={{
+                  minWidth: isMobile ? "120px" : "auto",
+                  fontSize: isMobile ? "14px" : "15px",
+                  padding: isMobile ? "10px 16px" : "12px 20px",
                 }}
               >
-                📝 Notas
-              </Button>
-              <Button
-                variant="secondary"
-                onClick={() => {
-                  window.location.href = `/org/${organizationId}/project/${projectId}/timeline`;
-                }}
-              >
-                📅 Cronograma
-              </Button>
-              <Button variant="primary" onClick={() => setShowCreateModal(true)}>
-                + Nueva Tarea
+                {isMobile ? "+ Tarea" : "+ Nueva Tarea"}
               </Button>
             </div>
           }
         />
 
-        <div style={{ padding: "24px" }}>
+        <div style={{ padding: isMobile ? "12px" : "24px" }}>
           {err && <div className="alert alert-error">{err}</div>}
 
           {/* Quick Stats */}
@@ -308,9 +408,9 @@ export default function Board() {
             <div
               style={{
                 display: "grid",
-                gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))",
-                gap: "16px",
-                marginBottom: "24px",
+                gridTemplateColumns: isMobile ? "repeat(2, 1fr)" : "repeat(auto-fit, minmax(150px, 1fr))",
+                gap: isMobile ? "10px" : "16px",
+                marginBottom: isMobile ? "16px" : "24px",
               }}
             >
               <Card style={{ textAlign: "center", padding: "16px" }}>
@@ -369,26 +469,29 @@ export default function Board() {
                 return (
                   <div
                     key={status}
+                    data-status={status}
                     className="fade-in"
                     style={{
                       backgroundColor: "var(--bg-primary)",
                       borderRadius: "12px",
-                      padding: "16px",
-                      minHeight: "600px",
+                      padding: isMobile ? "12px" : "16px",
+                      minHeight: isMobile ? "400px" : "600px",
+                      minWidth: isMobile ? "280px" : "auto",
                       boxShadow: "0 2px 8px 0 rgba(0, 0, 0, 0.08)",
-                      border: "1px solid var(--border-color)",
+                      border: touchTarget === status ? `2px solid ${statusColor}` : "1px solid var(--border-color)",
                       transition: "all 0.2s ease",
+                      flexShrink: 0,
                     }}
-                    onDragOver={handleDragOver}
-                    onDrop={(e) => handleDrop(e, status)}
-                    onDragEnter={(e) => {
+                    onDragOver={!isMobile ? handleDragOver : undefined}
+                    onDrop={!isMobile ? (e) => handleDrop(e, status) : undefined}
+                    onDragEnter={!isMobile ? (e) => {
                       e.currentTarget.style.backgroundColor = "var(--bg-secondary)";
                       e.currentTarget.style.borderColor = statusColor;
-                    }}
-                    onDragLeave={(e) => {
+                    } : undefined}
+                    onDragLeave={!isMobile ? (e) => {
                       e.currentTarget.style.backgroundColor = "var(--bg-primary)";
                       e.currentTarget.style.borderColor = "var(--border-color)";
-                    }}
+                    } : undefined}
                   >
                     {/* Column Header */}
                     <div
@@ -440,34 +543,39 @@ export default function Board() {
                       {statusTasks.map((task) => (
                         <div
                           key={task.id}
-                          draggable
-                          onDragStart={(e) => {
+                          draggable={!isMobile}
+                          onDragStart={!isMobile ? (e) => {
                             e.currentTarget.style.opacity = "0.5";
                             handleDragStart(e, task);
-                          }}
+                          } : undefined}
+                          onTouchStart={(e) => handleTouchStart(e, task)}
+                          onTouchMove={handleTouchMove}
+                          onTouchEnd={handleTouchEnd}
                           className="hover-lift fade-in"
                           style={{
-                            padding: "14px",
+                            padding: isMobile ? "12px" : "14px",
                             borderLeft: `4px solid ${STATUS_COLORS[task.status] || "#6c757d"}`,
-                            cursor: "grab",
+                            cursor: isMobile ? "pointer" : "grab",
                             backgroundColor: "var(--bg-primary)",
                             borderRadius: "10px",
                             boxShadow: "0 2px 4px 0 rgba(0, 0, 0, 0.08)",
                             transition: "all 0.2s ease",
                             marginBottom: "10px",
                             border: "1px solid var(--border-color)",
+                            touchAction: isMobile ? "pan-y" : "none",
+                            userSelect: "none",
                           }}
-                          onMouseEnter={(e) => {
+                          onMouseEnter={!isMobile ? (e) => {
                             e.currentTarget.style.borderColor = STATUS_COLORS[task.status] || "#6c757d";
                             e.currentTarget.style.cursor = "grab";
-                          }}
-                          onMouseLeave={(e) => {
+                          } : undefined}
+                          onMouseLeave={!isMobile ? (e) => {
                             e.currentTarget.style.borderColor = "var(--border-color)";
                             e.currentTarget.style.cursor = "grab";
-                          }}
-                          onDragEnd={(e) => {
+                          } : undefined}
+                          onDragEnd={!isMobile ? (e) => {
                             e.currentTarget.style.opacity = "1";
-                          }}
+                          } : undefined}
                           onClick={() => setSelectedTask(task)}
                         >
                           <div style={{ marginBottom: "12px" }}>
@@ -502,10 +610,12 @@ export default function Board() {
                             <h4
                               style={{
                                 margin: "0 0 6px 0",
-                                fontSize: "15px",
+                                fontSize: isMobile ? "14px" : "15px",
                                 fontWeight: 700,
                                 color: "var(--text-primary)",
                                 lineHeight: 1.4,
+                                wordBreak: "break-word",
+                                overflowWrap: "break-word",
                               }}
                             >
                               {task.title}

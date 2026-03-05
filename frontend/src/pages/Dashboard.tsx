@@ -42,6 +42,21 @@ export default function Dashboard() {
   const [showInvitationsModal, setShowInvitationsModal] = useState(false);
   const [showMembersModal, setShowMembersModal] = useState(false);
   const { showToast } = useToast();
+  const [isMobile, setIsMobile] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return window.innerWidth <= 768;
+    }
+    return false;
+  });
+
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   const loadOrganizationInfo = useCallback(async () => {
     if (!organizationId || isPersonalMode || isPersonalRoute) return;
@@ -248,16 +263,16 @@ export default function Dashboard() {
           }
         />
 
-        <div style={{ padding: "24px" }}>
+        <div style={{ padding: isMobile ? "12px" : "24px" }}>
           {err && <div className="alert alert-error">{err}</div>}
 
           {/* Metrics Cards */}
           <div
             style={{
               display: "grid",
-              gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))",
-              gap: "20px",
-              marginBottom: "32px",
+              gridTemplateColumns: isMobile ? "repeat(2, 1fr)" : "repeat(auto-fit, minmax(240px, 1fr))",
+              gap: isMobile ? "12px" : "20px",
+              marginBottom: isMobile ? "20px" : "32px",
             }}
           >
             <StatsCard
@@ -586,8 +601,8 @@ export default function Dashboard() {
               <div
                 style={{
                   display: "grid",
-                  gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))",
-                  gap: "16px",
+                  gridTemplateColumns: isMobile ? "1fr" : "repeat(auto-fill, minmax(280px, 1fr))",
+                  gap: isMobile ? "12px" : "16px",
                 }}
               >
                 {filteredProjects.map((project) => {

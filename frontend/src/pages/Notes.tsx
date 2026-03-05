@@ -54,17 +54,19 @@ const isLightColor = (color: string): boolean => {
   return luminance > 0.5;
 };
 
-// Función para obtener el color de texto apropiado según el fondo y el tema
+// Función para obtener el color de texto apropiado según el fondo
 const getTextColor = (backgroundColor: string): string => {
-  // Obtener el tema actual del documento
-  const isDarkMode = document.documentElement.getAttribute('data-theme') === 'dark';
+  if (!backgroundColor) {
+    // Si no hay color, usar el color de texto primario del tema
+    return "var(--text-primary)";
+  }
   
   if (isLightColor(backgroundColor)) {
-    // Para fondos claros, usar texto oscuro (siempre negro/oscuro)
-    return isDarkMode ? "#ffffff" : "#212529"; // En modo oscuro, si el fondo es claro, usar blanco; en modo claro, usar negro
+    // Para fondos claros, siempre usar texto oscuro (negro) para buen contraste
+    return "#212529"; // Negro oscuro que se ve bien en fondos claros
   } else {
-    // Para fondos oscuros, usar texto claro (siempre blanco)
-    return "#ffffff";
+    // Para fondos oscuros, siempre usar texto claro (blanco) para buen contraste
+    return "#ffffff"; // Blanco que se ve bien en fondos oscuros
   }
 };
 
@@ -288,6 +290,58 @@ export default function Notes() {
     }
   };
 
+  // Manejo de touch para móvil
+  const [touchStart, setTouchStart] = useState<{ noteId: string; startX: number; startY: number; offsetX: number; offsetY: number } | null>(null);
+
+  const handleTouchStart = (e: React.TouchEvent, note: Note) => {
+    if (!isMobile) return;
+    if ((e.target as HTMLElement).classList.contains("resize-handle")) return;
+    if ((e.target as HTMLElement).tagName === "INPUT") return;
+    if ((e.target as HTMLElement).tagName === "TEXTAREA") return;
+    if ((e.target as HTMLElement).tagName === "CANVAS") return;
+    if ((e.target as HTMLElement).closest(".note-controls")) return;
+    if ((e.target as HTMLElement).closest(".note-content")) return;
+    
+    e.preventDefault();
+    const touch = e.touches[0];
+    const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
+    setTouchStart({
+      noteId: note.id,
+      startX: touch.clientX,
+      startY: touch.clientY,
+      offsetX: touch.clientX - rect.left,
+      offsetY: touch.clientY - rect.top,
+    });
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    if (!isMobile || !touchStart || !containerRef.current) return;
+    e.preventDefault();
+    const touch = e.touches[0];
+    const containerRect = containerRef.current.getBoundingClientRect();
+    const newX = touch.clientX - containerRect.left - touchStart.offsetX;
+    const newY = touch.clientY - containerRect.top - touchStart.offsetY;
+
+    const note = notes.find((n) => n.id === touchStart.noteId);
+    if (note) {
+      const updatedNote = {
+        ...note,
+        positionX: Math.max(0, Math.min(newX, containerRect.width - (note.width || 280))),
+        positionY: Math.max(0, Math.min(newY, containerRect.height - (note.height || 200))),
+      };
+      setNotes(notes.map((n) => (n.id === note.id ? updatedNote : n)));
+    }
+  };
+
+  const handleTouchEnd = () => {
+    if (!isMobile || !touchStart) return;
+    const note = notes.find((n) => n.id === touchStart.noteId);
+    if (note) {
+      updateNote(note);
+    }
+    setTouchStart(null);
+  };
+
   const handleMouseDown = (e: React.MouseEvent, note: Note) => {
     if (isMobile) return;
     if ((e.target as HTMLElement).classList.contains("resize-handle")) return;
@@ -374,6 +428,46 @@ export default function Notes() {
       };
     }
   }, [draggedNote, resizingNote, notes]);
+
+  // Manejar touch events para móvil
+  useEffect(() => {
+    if (touchStart && isMobile) {
+      const handleTouchMoveGlobal = (e: TouchEvent) => {
+        e.preventDefault();
+        if (containerRef.current) {
+          const touch = e.touches[0];
+          const containerRect = containerRef.current.getBoundingClientRect();
+          const newX = touch.clientX - containerRect.left - touchStart.offsetX;
+          const newY = touch.clientY - containerRect.top - touchStart.offsetY;
+
+          const note = notes.find((n) => n.id === touchStart.noteId);
+          if (note) {
+            const updatedNote = {
+              ...note,
+              positionX: Math.max(0, Math.min(newX, containerRect.width - (note.width || 280))),
+              positionY: Math.max(0, Math.min(newY, containerRect.height - (note.height || 200))),
+            };
+            setNotes(notes.map((n) => (n.id === note.id ? updatedNote : n)));
+          }
+        }
+      };
+
+      const handleTouchEndGlobal = () => {
+        const note = notes.find((n) => n.id === touchStart.noteId);
+        if (note) {
+          updateNote(note);
+        }
+        setTouchStart(null);
+      };
+
+      document.addEventListener("touchmove", handleTouchMoveGlobal, { passive: false });
+      document.addEventListener("touchend", handleTouchEndGlobal);
+      return () => {
+        document.removeEventListener("touchmove", handleTouchMoveGlobal);
+        document.removeEventListener("touchend", handleTouchEndGlobal);
+      };
+    }
+  }, [touchStart, isMobile, notes]);
 
   // Inicializar eventos de dibujo en canvas
   useEffect(() => {

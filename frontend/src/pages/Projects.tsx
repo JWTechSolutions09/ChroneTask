@@ -31,6 +31,21 @@ export default function Projects() {
   const [projects, setProjects] = useState<Project[]>([]);
   const t = useTerminology();
   const [filteredProjects, setFilteredProjects] = useState<Project[]>([]);
+  const [isMobile, setIsMobile] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return window.innerWidth <= 768;
+    }
+    return false;
+  });
+
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [template, setTemplate] = useState("");
@@ -211,7 +226,12 @@ export default function Projects() {
           }
         />
 
-        <div style={{ padding: "24px", maxWidth: "1400px", margin: "0 auto" }}>
+        <div style={{ 
+          padding: isMobile ? "12px" : "24px", 
+          maxWidth: "1400px", 
+          margin: "0 auto",
+          boxSizing: "border-box",
+        }}>
           {/* Search Bar - Arriba */}
           {projects.length > 0 && (
             <Card style={{ marginBottom: "24px", borderRadius: "12px", boxShadow: "0 2px 8px rgba(0, 0, 0, 0.08)" }}>
@@ -307,9 +327,9 @@ export default function Projects() {
             <div
               style={{
                 display: "grid",
-                gridTemplateColumns: "repeat(auto-fill, minmax(320px, 1fr))",
-                gap: "20px",
-                marginBottom: "32px",
+                gridTemplateColumns: isMobile ? "1fr" : "repeat(auto-fill, minmax(320px, 1fr))",
+                gap: isMobile ? "16px" : "20px",
+                marginBottom: isMobile ? "24px" : "32px",
               }}
             >
               {filteredProjects.map((project) => {

@@ -295,25 +295,38 @@ export default function Layout({ children, organizationId, usageType: propUsageT
         }}
         style={{
           position: "fixed",
-          top: "16px",
-          left: "16px",
+          top: "12px",
+          left: "12px",
           zIndex: 1001,
           background: "var(--bg-primary)",
-          border: "1px solid var(--border-color)",
-          borderRadius: "8px",
-          padding: "10px 12px",
+          border: "2px solid var(--border-color)",
+          borderRadius: "12px",
+          padding: "12px",
           cursor: "pointer",
           display: "none",
           alignItems: "center",
           justifyContent: "center",
-          boxShadow: "0 2px 8px rgba(0, 0, 0, 0.15)",
-          fontSize: "20px",
+          boxShadow: "0 4px 12px rgba(0, 0, 0, 0.15)",
+          fontSize: "24px",
           color: "var(--text-primary)",
-          minWidth: "44px",
-          minHeight: "44px",
+          minWidth: "48px",
+          minHeight: "48px",
+          width: "48px",
+          height: "48px",
+          touchAction: "manipulation",
+          WebkitTapHighlightColor: "transparent",
+          transition: "all 0.2s ease",
         }}
         className="mobile-menu-btn"
         aria-label="Toggle menu"
+        onTouchStart={(e) => {
+          e.currentTarget.style.transform = "scale(0.95)";
+          e.currentTarget.style.boxShadow = "0 2px 6px rgba(0, 0, 0, 0.2)";
+        }}
+        onTouchEnd={(e) => {
+          e.currentTarget.style.transform = "scale(1)";
+          e.currentTarget.style.boxShadow = "0 4px 12px rgba(0, 0, 0, 0.15)";
+        }}
       >
         {sidebarOpen ? "✕" : "☰"}
       </button>
@@ -391,7 +404,17 @@ export default function Layout({ children, organizationId, usageType: propUsageT
                   }}
                 />
               </div>
-              <span style={{ fontWeight: 700, fontSize: "18px", color: "var(--text-primary)", letterSpacing: "-0.5px", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+              <span style={{ 
+                fontWeight: 700, 
+                fontSize: isMobile ? "20px" : "18px", 
+                color: "var(--text-primary)", 
+                letterSpacing: "-0.5px", 
+                whiteSpace: "nowrap", 
+                overflow: "hidden", 
+                textOverflow: "ellipsis",
+                flex: 1,
+                minWidth: 0,
+              }}>
                 ChroneTask
               </span>
             </div>
@@ -432,22 +455,32 @@ export default function Layout({ children, organizationId, usageType: propUsageT
             className="mobile-close-btn"
             style={{
               background: "var(--hover-bg)",
-              border: "1px solid var(--border-color)",
+              border: "2px solid var(--border-color)",
               cursor: "pointer",
-              padding: "8px",
-              borderRadius: "8px",
-              color: "var(--text-secondary)",
+              padding: "10px",
+              borderRadius: "10px",
+              color: "var(--text-primary)",
               display: "none",
               alignItems: "center",
               justifyContent: "center",
               transition: "all 0.2s",
-              width: "36px",
-              height: "36px",
+              width: "44px",
+              height: "44px",
               flexShrink: 0,
-              minWidth: "36px",
-              minHeight: "36px",
+              minWidth: "44px",
+              minHeight: "44px",
+              fontSize: "20px",
+              fontWeight: 600,
+              touchAction: "manipulation",
+              WebkitTapHighlightColor: "transparent",
             }}
             aria-label="Cerrar menú"
+            onTouchStart={(e) => {
+              e.currentTarget.style.transform = "scale(0.95)";
+            }}
+            onTouchEnd={(e) => {
+              e.currentTarget.style.transform = "scale(1)";
+            }}
           >
             ✕
           </button>
@@ -493,12 +526,13 @@ export default function Layout({ children, organizationId, usageType: propUsageT
         <nav 
           style={{ 
             flex: 1, 
-            padding: "12px", 
+            padding: isMobile ? "16px 12px" : "12px", 
             overflowY: "auto", 
             overflowX: "hidden", 
             display: "flex", 
             flexDirection: "column", 
             WebkitOverflowScrolling: "touch",
+            gap: isMobile ? "8px" : "0",
             // En móvil cuando está abierto, forzar visibilidad
             ...(isMobile && sidebarOpen ? {
               opacity: 1,
@@ -1044,22 +1078,25 @@ function NavItem({ icon, label, to, active, collapsed, indent, onClick, onNaviga
       style={{
         display: "flex",
         alignItems: "center",
-        gap: "12px",
-        padding: "10px 12px",
-        marginBottom: "6px",
-        borderRadius: "8px",
+        gap: forceShowLabel ? "14px" : "12px",
+        padding: forceShowLabel ? "14px 16px" : "10px 12px",
+        marginBottom: forceShowLabel ? "4px" : "6px",
+        borderRadius: "10px",
         textDecoration: "none",
         color: active ? "var(--primary)" : "var(--text-primary)",
         backgroundColor: active ? "rgba(0, 123, 255, 0.1)" : "transparent",
         fontWeight: active ? 600 : 500,
-        fontSize: "14px",
+        fontSize: forceShowLabel ? "16px" : "14px",
         transition: "all 0.2s",
-        paddingLeft: indent ? "36px" : "12px",
+        paddingLeft: indent ? (forceShowLabel ? "44px" : "36px") : (forceShowLabel ? "16px" : "12px"),
         justifyContent: collapsed && !forceShowLabel ? "center" : "flex-start",
-        border: active ? "1px solid rgba(0, 123, 255, 0.2)" : "1px solid transparent",
+        border: active ? "2px solid rgba(0, 123, 255, 0.3)" : "2px solid transparent",
         touchAction: "manipulation",
-        WebkitTapHighlightColor: "rgba(0, 0, 0, 0.1)",
+        WebkitTapHighlightColor: "transparent",
         userSelect: "none",
+        minHeight: forceShowLabel ? "52px" : "44px",
+        wordBreak: "break-word",
+        overflowWrap: "break-word",
       }}
       onMouseEnter={(e) => {
         if (!active && window.innerWidth > 768) {
@@ -1076,8 +1113,25 @@ function NavItem({ icon, label, to, active, collapsed, indent, onClick, onNaviga
       title={collapsed && !forceShowLabel ? label : undefined}
       className={forceShowLabel ? "mobile-nav-item-open" : ""}
     >
-      <span style={{ fontSize: "20px", minWidth: "24px", textAlign: "center", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>{icon}</span>
-      {shouldShowLabel && <span style={{ whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{label}</span>}
+      <span style={{ 
+        fontSize: forceShowLabel ? "22px" : "20px", 
+        minWidth: forceShowLabel ? "28px" : "24px", 
+        textAlign: "center", 
+        display: "flex", 
+        alignItems: "center", 
+        justifyContent: "center", 
+        flexShrink: 0 
+      }}>{icon}</span>
+      {shouldShowLabel && (
+        <span style={{ 
+          whiteSpace: "normal", 
+          overflow: "visible", 
+          textOverflow: "clip",
+          lineHeight: "1.4",
+          wordBreak: "break-word",
+          overflowWrap: "break-word",
+        }}>{label}</span>
+      )}
     </Link>
   );
 }

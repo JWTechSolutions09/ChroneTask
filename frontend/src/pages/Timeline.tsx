@@ -36,6 +36,21 @@ export default function Timeline() {
   const [view, setView] = useState<TimelineView>("week");
   const [currentDate, setCurrentDate] = useState(new Date());
   const { showToast } = useToast();
+  const [isMobile, setIsMobile] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return window.innerWidth <= 768;
+    }
+    return false;
+  });
+
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   const loadProjects = useCallback(async () => {
     if (isPersonalMode || isPersonalRoute) {
@@ -379,7 +394,10 @@ export default function Timeline() {
           }
         />
 
-        <div style={{ padding: "24px" }} className="timeline-container">
+        <div style={{ 
+          padding: isMobile ? "12px" : "24px",
+          boxSizing: "border-box",
+        }} className="timeline-container">
           {loading ? (
             <div className="loading">Cargando cronograma...</div>
           ) : (

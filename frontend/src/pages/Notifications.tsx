@@ -73,6 +73,21 @@ export default function Notifications() {
   const [filter, setFilter] = useState<"all" | "unread">("all");
   const { showToast } = useToast();
   const t = useTerminology();
+  const [isMobile, setIsMobile] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return window.innerWidth <= 768;
+    }
+    return false;
+  });
+
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   const loadNotifications = useCallback(async () => {
     setLoading(true);
@@ -226,7 +241,10 @@ export default function Notifications() {
           }
         />
 
-        <div style={{ padding: "24px" }}>
+        <div style={{ 
+          padding: isMobile ? "12px" : "24px",
+          boxSizing: "border-box",
+        }}>
           {loading ? (
             <div className="loading">Cargando notificaciones...</div>
           ) : notifications.length === 0 ? (

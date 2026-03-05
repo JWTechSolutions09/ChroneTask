@@ -71,6 +71,21 @@ export default function Analytics() {
   const [projects, setProjects] = useState<any[]>([]);
   const { showToast } = useToast();
   const t = useTerminology();
+  const [isMobile, setIsMobile] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return window.innerWidth <= 768;
+    }
+    return false;
+  });
+
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   const loadAnalytics = useCallback(async () => {
     if (!organizationId && !isPersonalMode && !isPersonalRoute) return;
@@ -299,7 +314,10 @@ export default function Analytics() {
           }
         />
 
-        <div style={{ padding: "24px" }}>
+        <div style={{ 
+          padding: isMobile ? "12px" : "24px",
+          boxSizing: "border-box",
+        }}>
           {loading ? (
             <div className="loading">Cargando analíticas...</div>
           ) : analytics === null ? (
@@ -460,7 +478,11 @@ export default function Analytics() {
                 )}
               </div>
 
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(400px, 1fr))", gap: "24px" }}>
+              <div style={{ 
+                display: "grid", 
+                gridTemplateColumns: isMobile ? "1fr" : "repeat(auto-fit, minmax(400px, 1fr))", 
+                gap: isMobile ? "16px" : "24px",
+              }}>
                 {/* Member Activities - Mejorado */}
                 <Card style={{ padding: "24px" }}>
                   <h3 style={{ margin: "0 0 20px 0", fontSize: "18px", fontWeight: 600, color: "var(--text-primary)", display: "flex", alignItems: "center", gap: "8px" }}>

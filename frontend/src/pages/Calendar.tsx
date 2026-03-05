@@ -48,6 +48,21 @@ export default function Calendar() {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [loading, setLoading] = useState(false);
   const [showEventModal, setShowEventModal] = useState(false);
+  const [isMobile, setIsMobile] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return window.innerWidth <= 768;
+    }
+    return false;
+  });
+
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
   const [selectedEvent, setSelectedEvent] = useState<CalendarEvent | null>(null);
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [viewMode, setViewMode] = useState<"month" | "week" | "day">("month");
@@ -394,7 +409,11 @@ export default function Calendar() {
         }
       />
 
-      <div style={{ padding: "24px", backgroundColor: "var(--bg-secondary)" }}>
+      <div style={{ 
+        padding: isMobile ? "12px" : "24px", 
+        backgroundColor: "var(--bg-secondary)",
+        boxSizing: "border-box",
+      }}>
         <Card>
           {loading ? (
             <div className="loading">Cargando calendario...</div>
