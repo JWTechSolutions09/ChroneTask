@@ -546,73 +546,75 @@ export default function Board() {
                                 marginBottom: "10px",
                               }}
                             >
-                              <div style={{ display: "flex", alignItems: "center", gap: "6px", position: "relative" }}>
-                                {assigningTaskId === task.id ? (
-                                  <select
-                                    value={task.assignedToId || ""}
-                                    onChange={(e) => {
-                                      const userId = e.target.value || null;
-                                      assignTask(task.id, userId);
-                                    }}
-                                    onBlur={() => setAssigningTaskId(null)}
-                                    autoFocus
-                                    style={{
-                                      padding: "4px 8px",
-                                      fontSize: "11px",
-                                      border: "1px solid #007bff",
-                                      borderRadius: "6px",
-                                      backgroundColor: "var(--bg-primary)",
-                                      cursor: "pointer",
-                                      minWidth: "120px",
-                                    }}
-                                    onClick={(e) => e.stopPropagation()}
-                                  >
-                                    <option value="">Sin asignar</option>
-                                    {projectMembers.map((member) => (
-                                      <option key={member.userId} value={member.userId}>
-                                        {member.userName}
-                                      </option>
-                                    ))}
-                                  </select>
-                                ) : (
-                                  <div
-                                    onClick={(e) => {
-                                      e.stopPropagation();
-                                      setAssigningTaskId(task.id);
-                                    }}
-                                    style={{
-                                      cursor: "pointer",
-                                      display: "flex",
-                                      alignItems: "center",
-                                      gap: "6px",
-                                      padding: "4px 8px",
-                                      borderRadius: "6px",
-                                      transition: "background-color 0.2s",
-                                    }}
-                                    onMouseEnter={(e) => {
-                                      e.currentTarget.style.backgroundColor = "var(--hover-bg)";
-                                    }}
-                                    onMouseLeave={(e) => {
-                                      e.currentTarget.style.backgroundColor = "transparent";
-                                    }}
-                                    title="Click para asignar usuario"
-                                  >
-                                    {task.assignedToName ? (
-                                      <>
-                                        <span style={{ fontSize: "14px" }}>👤</span>
-                                        <span style={{ fontWeight: 600, color: "var(--text-primary)" }}>
-                                          {task.assignedToName}
-                                        </span>
-                                      </>
-                                    ) : (
-                                      <>
-                                        <span style={{ fontSize: "12px" }}>➕</span>
-                                        <span style={{ opacity: 0.6, fontSize: "11px" }}>Asignar</span>
-                                      </>
-                                    )}
-                                  </div>
-                                )}
-                              </div>
+                              {!isPersonalMode && !isPersonalRoute && (
+                                <div style={{ display: "flex", alignItems: "center", gap: "6px", position: "relative" }}>
+                                  {assigningTaskId === task.id ? (
+                                    <select
+                                      value={task.assignedToId || ""}
+                                      onChange={(e) => {
+                                        const userId = e.target.value || null;
+                                        assignTask(task.id, userId);
+                                      }}
+                                      onBlur={() => setAssigningTaskId(null)}
+                                      autoFocus
+                                      style={{
+                                        padding: "4px 8px",
+                                        fontSize: "11px",
+                                        border: "1px solid #007bff",
+                                        borderRadius: "6px",
+                                        backgroundColor: "var(--bg-primary)",
+                                        cursor: "pointer",
+                                        minWidth: "120px",
+                                      }}
+                                      onClick={(e) => e.stopPropagation()}
+                                    >
+                                      <option value="">Sin asignar</option>
+                                      {projectMembers.map((member) => (
+                                        <option key={member.userId} value={member.userId}>
+                                          {member.userName}
+                                        </option>
+                                      ))}
+                                    </select>
+                                  ) : (
+                                    <div
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        setAssigningTaskId(task.id);
+                                      }}
+                                      style={{
+                                        cursor: "pointer",
+                                        display: "flex",
+                                        alignItems: "center",
+                                        gap: "6px",
+                                        padding: "4px 8px",
+                                        borderRadius: "6px",
+                                        transition: "background-color 0.2s",
+                                      }}
+                                      onMouseEnter={(e) => {
+                                        e.currentTarget.style.backgroundColor = "var(--hover-bg)";
+                                      }}
+                                      onMouseLeave={(e) => {
+                                        e.currentTarget.style.backgroundColor = "transparent";
+                                      }}
+                                      title="Click para asignar usuario"
+                                    >
+                                      {task.assignedToName ? (
+                                        <>
+                                          <span style={{ fontSize: "14px" }}>👤</span>
+                                          <span style={{ fontWeight: 600, color: "var(--text-primary)" }}>
+                                            {task.assignedToName}
+                                          </span>
+                                        </>
+                                      ) : (
+                                        <>
+                                          <span style={{ fontSize: "12px" }}>➕</span>
+                                          <span style={{ opacity: 0.6, fontSize: "11px" }}>Asignar</span>
+                                        </>
+                                      )}
+                                    </div>
+                                  )}
+                                </div>
+                              )}
                               {task.estimatedMinutes && (
                                 <div
                                   style={{

@@ -61,21 +61,26 @@ export default function CreateTaskModal({
         left: 0,
         right: 0,
         bottom: 0,
-        backgroundColor: "rgba(0, 0, 0, 0.5)",
+        backgroundColor: "rgba(0, 0, 0, 0.6)",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
         zIndex: 1000,
+        backdropFilter: "blur(4px)",
       }}
       onClick={onClose}
     >
       <div
         className="card"
         style={{
-          maxWidth: "500px",
-          width: "90%",
-          maxHeight: "90vh",
+          maxWidth: "700px",
+          width: "95%",
+          maxHeight: "95vh",
           overflowY: "auto",
+          borderRadius: "16px",
+          boxShadow: "0 20px 60px rgba(0, 0, 0, 0.3)",
+          border: "1px solid rgba(0, 0, 0, 0.1)",
+          padding: "32px",
         }}
         onClick={(e) => e.stopPropagation()}
       >
@@ -84,36 +89,62 @@ export default function CreateTaskModal({
             display: "flex",
             justifyContent: "space-between",
             alignItems: "center",
-            marginBottom: "24px",
+            marginBottom: "28px",
+            paddingBottom: "20px",
+            borderBottom: "2px solid var(--border-color)",
           }}
         >
-          <h2 style={{ margin: 0, fontSize: "24px", color: "#212529" }}>Nueva Tarea</h2>
+          <div>
+            <h2 style={{ margin: 0, fontSize: "28px", fontWeight: 700, color: "var(--text-primary)", marginBottom: "4px" }}>
+              Nueva Tarea
+            </h2>
+            <p style={{ margin: 0, fontSize: "14px", color: "var(--text-secondary)" }}>
+              Completa los detalles de la nueva tarea
+            </p>
+          </div>
           <button
             onClick={onClose}
             style={{
-              background: "none",
-              border: "none",
+              background: "var(--hover-bg)",
+              border: "1px solid var(--border-color)",
               fontSize: "24px",
               cursor: "pointer",
-              color: "#6c757d",
+              color: "var(--text-secondary)",
+              width: "40px",
+              height: "40px",
+              borderRadius: "10px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              transition: "all 0.2s",
+              flexShrink: 0,
             }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = "var(--bg-tertiary)";
+              e.currentTarget.style.color = "var(--text-primary)";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = "var(--hover-bg)";
+              e.currentTarget.style.color = "var(--text-secondary)";
+            }}
+            title="Cerrar"
           >
             ×
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} style={{ display: "grid", gap: "16px" }}>
+        <form onSubmit={handleSubmit} style={{ display: "grid", gap: "20px" }}>
           <div>
             <label
               style={{
                 display: "block",
-                marginBottom: "6px",
-                fontSize: "14px",
-                fontWeight: 500,
-                color: "#495057",
+                marginBottom: "10px",
+                fontSize: "15px",
+                fontWeight: 600,
+                color: "var(--text-primary)",
               }}
             >
-              Título *
+              Título <span style={{ color: "#dc3545" }}>*</span>
             </label>
             <input
               type="text"
@@ -121,7 +152,23 @@ export default function CreateTaskModal({
               onChange={(e) => setTitle(e.target.value)}
               required
               className="input"
-              placeholder="Ej: Implementar login"
+              placeholder="Ej: Implementar sistema de login"
+              style={{
+                padding: "14px 16px",
+                fontSize: "15px",
+                borderRadius: "10px",
+                border: "2px solid var(--border-color)",
+                transition: "all 0.2s",
+                width: "100%",
+              }}
+              onFocus={(e) => {
+                e.target.style.borderColor = "var(--primary)";
+                e.target.style.boxShadow = "0 0 0 3px rgba(0, 123, 255, 0.1)";
+              }}
+              onBlur={(e) => {
+                e.target.style.borderColor = "var(--border-color)";
+                e.target.style.boxShadow = "none";
+              }}
             />
           </div>
 
@@ -129,10 +176,10 @@ export default function CreateTaskModal({
             <label
               style={{
                 display: "block",
-                marginBottom: "6px",
-                fontSize: "14px",
-                fontWeight: 500,
-                color: "#495057",
+                marginBottom: "10px",
+                fontSize: "15px",
+                fontWeight: 600,
+                color: "var(--text-primary)",
               }}
             >
               Descripción
@@ -141,29 +188,71 @@ export default function CreateTaskModal({
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               className="textarea"
-              rows={4}
-              placeholder="Descripción detallada de la tarea..."
+              rows={5}
+              placeholder="Describe detalladamente la tarea, requisitos, pasos a seguir, etc..."
+              style={{
+                padding: "14px 16px",
+                fontSize: "15px",
+                borderRadius: "10px",
+                border: "2px solid var(--border-color)",
+                transition: "all 0.2s",
+                resize: "vertical",
+                minHeight: "120px",
+                fontFamily: "inherit",
+                lineHeight: "1.6",
+                width: "100%",
+              }}
+              onFocus={(e) => {
+                e.target.style.borderColor = "var(--primary)";
+                e.target.style.boxShadow = "0 0 0 3px rgba(0, 123, 255, 0.1)";
+              }}
+              onBlur={(e) => {
+                e.target.style.borderColor = "var(--border-color)";
+                e.target.style.boxShadow = "none";
+              }}
             />
           </div>
 
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px" }}>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px" }}>
             <div>
               <label
                 style={{
                   display: "block",
-                  marginBottom: "6px",
-                  fontSize: "14px",
-                  fontWeight: 500,
-                  color: "#495057",
+                  marginBottom: "10px",
+                  fontSize: "15px",
+                  fontWeight: 600,
+                  color: "var(--text-primary)",
                 }}
               >
                 Tipo
               </label>
-              <select value={type} onChange={(e) => setType(e.target.value)} className="select">
-                <option value="Task">Task</option>
-                <option value="Bug">Bug</option>
-                <option value="Story">Story</option>
-                <option value="Epic">Epic</option>
+              <select 
+                value={type} 
+                onChange={(e) => setType(e.target.value)} 
+                className="select"
+                style={{
+                  padding: "14px 16px",
+                  fontSize: "15px",
+                  borderRadius: "10px",
+                  border: "2px solid var(--border-color)",
+                  transition: "all 0.2s",
+                  backgroundColor: "white",
+                  cursor: "pointer",
+                  width: "100%",
+                }}
+                onFocus={(e) => {
+                  e.target.style.borderColor = "var(--primary)";
+                  e.target.style.boxShadow = "0 0 0 3px rgba(0, 123, 255, 0.1)";
+                }}
+                onBlur={(e) => {
+                  e.target.style.borderColor = "var(--border-color)";
+                  e.target.style.boxShadow = "none";
+                }}
+              >
+                <option value="Task">📋 Tarea</option>
+                <option value="Bug">🐛 Bug</option>
+                <option value="Story">📖 Historia</option>
+                <option value="Epic">🎯 Épica</option>
               </select>
             </div>
 
@@ -171,10 +260,10 @@ export default function CreateTaskModal({
               <label
                 style={{
                   display: "block",
-                  marginBottom: "6px",
-                  fontSize: "14px",
-                  fontWeight: 500,
-                  color: "#495057",
+                  marginBottom: "10px",
+                  fontSize: "15px",
+                  fontWeight: 600,
+                  color: "var(--text-primary)",
                 }}
               >
                 Prioridad
@@ -183,12 +272,30 @@ export default function CreateTaskModal({
                 value={priority}
                 onChange={(e) => setPriority(e.target.value)}
                 className="select"
+                style={{
+                  padding: "14px 16px",
+                  fontSize: "15px",
+                  borderRadius: "10px",
+                  border: "2px solid var(--border-color)",
+                  transition: "all 0.2s",
+                  backgroundColor: "white",
+                  cursor: "pointer",
+                  width: "100%",
+                }}
+                onFocus={(e) => {
+                  e.target.style.borderColor = "var(--primary)";
+                  e.target.style.boxShadow = "0 0 0 3px rgba(0, 123, 255, 0.1)";
+                }}
+                onBlur={(e) => {
+                  e.target.style.borderColor = "var(--border-color)";
+                  e.target.style.boxShadow = "none";
+                }}
               >
                 <option value="">Sin prioridad</option>
-                <option value="Low">Low</option>
-                <option value="Medium">Medium</option>
-                <option value="High">High</option>
-                <option value="Critical">Critical</option>
+                <option value="Low">🟢 Baja</option>
+                <option value="Medium">🟡 Media</option>
+                <option value="High">🟠 Alta</option>
+                <option value="Critical">🔴 Crítica</option>
               </select>
             </div>
           </div>
@@ -197,10 +304,10 @@ export default function CreateTaskModal({
             <label
               style={{
                 display: "block",
-                marginBottom: "6px",
-                fontSize: "14px",
-                fontWeight: 500,
-                color: "#495057",
+                marginBottom: "10px",
+                fontSize: "15px",
+                fontWeight: 600,
+                color: "var(--text-primary)",
               }}
             >
               Tiempo estimado (minutos)
@@ -210,20 +317,39 @@ export default function CreateTaskModal({
               value={estimatedMinutes}
               onChange={(e) => setEstimatedMinutes(e.target.value)}
               className="input"
-              placeholder="Ej: 120"
+              placeholder="Ej: 120 (2 horas)"
               min="0"
+              style={{
+                padding: "14px 16px",
+                fontSize: "15px",
+                borderRadius: "10px",
+                border: "2px solid var(--border-color)",
+                transition: "all 0.2s",
+                width: "100%",
+              }}
+              onFocus={(e) => {
+                e.target.style.borderColor = "var(--primary)";
+                e.target.style.boxShadow = "0 0 0 3px rgba(0, 123, 255, 0.1)";
+              }}
+              onBlur={(e) => {
+                e.target.style.borderColor = "var(--border-color)";
+                e.target.style.boxShadow = "none";
+              }}
             />
+            <div style={{ fontSize: "13px", color: "var(--text-secondary)", marginTop: "6px" }}>
+              Tiempo aproximado que tomará completar esta tarea
+            </div>
           </div>
 
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px" }}>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px" }}>
             <div>
               <label
                 style={{
                   display: "block",
-                  marginBottom: "6px",
-                  fontSize: "14px",
-                  fontWeight: 500,
-                  color: "#495057",
+                  marginBottom: "10px",
+                  fontSize: "15px",
+                  fontWeight: 600,
+                  color: "var(--text-primary)",
                 }}
               >
                 Fecha de inicio
@@ -233,6 +359,22 @@ export default function CreateTaskModal({
                 value={startDate}
                 onChange={(e) => setStartDate(e.target.value)}
                 className="input"
+                style={{
+                  padding: "14px 16px",
+                  fontSize: "15px",
+                  borderRadius: "10px",
+                  border: "2px solid var(--border-color)",
+                  transition: "all 0.2s",
+                  width: "100%",
+                }}
+                onFocus={(e) => {
+                  e.target.style.borderColor = "var(--primary)";
+                  e.target.style.boxShadow = "0 0 0 3px rgba(0, 123, 255, 0.1)";
+                }}
+                onBlur={(e) => {
+                  e.target.style.borderColor = "var(--border-color)";
+                  e.target.style.boxShadow = "none";
+                }}
               />
             </div>
 
@@ -240,10 +382,10 @@ export default function CreateTaskModal({
               <label
                 style={{
                   display: "block",
-                  marginBottom: "6px",
-                  fontSize: "14px",
-                  fontWeight: 500,
-                  color: "#495057",
+                  marginBottom: "10px",
+                  fontSize: "15px",
+                  fontWeight: 600,
+                  color: "var(--text-primary)",
                 }}
               >
                 Fecha límite
@@ -253,18 +395,61 @@ export default function CreateTaskModal({
                 value={dueDate}
                 onChange={(e) => setDueDate(e.target.value)}
                 className="input"
+                style={{
+                  padding: "14px 16px",
+                  fontSize: "15px",
+                  borderRadius: "10px",
+                  border: "2px solid var(--border-color)",
+                  transition: "all 0.2s",
+                  width: "100%",
+                }}
+                onFocus={(e) => {
+                  e.target.style.borderColor = "var(--primary)";
+                  e.target.style.boxShadow = "0 0 0 3px rgba(0, 123, 255, 0.1)";
+                }}
+                onBlur={(e) => {
+                  e.target.style.borderColor = "var(--border-color)";
+                  e.target.style.boxShadow = "none";
+                }}
               />
             </div>
           </div>
 
-          {error && <div className="alert alert-error">{error}</div>}
+          {error && (
+            <div 
+              className="alert alert-error" 
+              style={{ 
+                padding: "14px 16px", 
+                borderRadius: "10px",
+                fontSize: "14px",
+                marginTop: "8px",
+              }}
+            >
+              {error}
+            </div>
+          )}
 
-          <div style={{ display: "flex", gap: "12px", justifyContent: "flex-end" }}>
+          <div style={{ 
+            display: "flex", 
+            gap: "12px", 
+            justifyContent: "flex-end", 
+            marginTop: "8px",
+            paddingTop: "20px",
+            borderTop: "2px solid var(--border-color)",
+          }}>
             <button
               type="button"
               onClick={onClose}
               className="btn btn-secondary"
               disabled={loading}
+              style={{
+                padding: "12px 24px",
+                fontSize: "15px",
+                fontWeight: 600,
+                borderRadius: "10px",
+                border: "2px solid var(--border-color)",
+                transition: "all 0.2s",
+              }}
             >
               Cancelar
             </button>
@@ -272,8 +457,16 @@ export default function CreateTaskModal({
               type="submit"
               className="btn btn-primary"
               disabled={loading || !title.trim()}
+              style={{
+                padding: "12px 24px",
+                fontSize: "15px",
+                fontWeight: 600,
+                borderRadius: "10px",
+                boxShadow: "0 4px 12px rgba(0, 123, 255, 0.3)",
+                transition: "all 0.2s",
+              }}
             >
-              {loading ? "Creando..." : "Crear Tarea"}
+              {loading ? "Creando..." : "✨ Crear Tarea"}
             </button>
           </div>
         </form>
