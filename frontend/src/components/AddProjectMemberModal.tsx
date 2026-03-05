@@ -171,7 +171,7 @@ export default function AddProjectMemberModal({
       >
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "24px" }}>
           <div>
-            <h2 style={{ fontSize: "24px", fontWeight: 700, margin: 0, color: "#212529" }}>
+            <h2 style={{ fontSize: "24px", fontWeight: 700, margin: 0, color: "var(--text-primary)" }}>
               Gestionar Miembros del Proyecto
             </h2>
             <p style={{ fontSize: "14px", color: "#6c757d", margin: "4px 0 0 0" }}>
@@ -185,18 +185,18 @@ export default function AddProjectMemberModal({
               border: "none",
               fontSize: "24px",
               cursor: "pointer",
-              color: "#6c757d",
+              color: "var(--text-secondary)",
               padding: "4px 8px",
               borderRadius: "6px",
               transition: "all 0.2s",
             }}
             onMouseEnter={(e) => {
               e.currentTarget.style.backgroundColor = "#f0f0f0";
-              e.currentTarget.style.color = "#212529";
+              e.currentTarget.style.color = "var(--text-primary)";
             }}
             onMouseLeave={(e) => {
               e.currentTarget.style.backgroundColor = "transparent";
-              e.currentTarget.style.color = "#6c757d";
+              e.currentTarget.style.color = "var(--text-secondary)";
             }}
           >
             ✕
@@ -209,13 +209,13 @@ export default function AddProjectMemberModal({
           <>
             {/* Formulario para agregar miembro - Solo para proyectos organizacionales */}
             {!isPersonalProject && (
-              <Card style={{ marginBottom: "24px", backgroundColor: "#f8f9fa" }}>
-                <h3 style={{ fontSize: "16px", fontWeight: 600, marginBottom: "16px", color: "#212529" }}>
+              <Card style={{ marginBottom: "24px", backgroundColor: "var(--bg-secondary)" }}>
+                <h3 style={{ fontSize: "16px", fontWeight: 600, marginBottom: "16px", color: "var(--text-primary)" }}>
                   Agregar Miembro al Proyecto
                 </h3>
                 <form onSubmit={handleAddMember} style={{ display: "grid", gap: "12px" }}>
                   <div>
-                    <label style={{ display: "block", marginBottom: "6px", fontSize: "14px", fontWeight: 500, color: "#495057" }}>
+                    <label style={{ display: "block", marginBottom: "6px", fontSize: "14px", fontWeight: 500, color: "var(--text-primary)" }}>
                       Miembro del {t.organization}
                     </label>
                     <select
@@ -233,13 +233,13 @@ export default function AddProjectMemberModal({
                       ))}
                     </select>
                     {availableMembers.length === 0 && (
-                      <p style={{ fontSize: "12px", color: "#6c757d", marginTop: "4px" }}>
+                      <p style={{ fontSize: "12px", color: "var(--text-secondary)", marginTop: "4px" }}>
                         Todos los miembros del {t.organizationLower} ya están en el proyecto
                       </p>
                     )}
                   </div>
                   <div>
-                    <label style={{ display: "block", marginBottom: "6px", fontSize: "14px", fontWeight: 500, color: "#495057" }}>
+                    <label style={{ display: "block", marginBottom: "6px", fontSize: "14px", fontWeight: 500, color: "var(--text-primary)" }}>
                       Rol en el Proyecto
                     </label>
                     <select
@@ -269,7 +269,7 @@ export default function AddProjectMemberModal({
 
             {/* Lista de miembros del proyecto */}
             <div>
-              <h3 style={{ fontSize: "16px", fontWeight: 600, marginBottom: "16px", color: "#212529" }}>
+              <h3 style={{ fontSize: "16px", fontWeight: 600, marginBottom: "16px", color: "var(--text-primary)" }}>
                 Miembros del Proyecto ({projectMembers.length})
               </h3>
               {projectMembers.length === 0 ? (
@@ -291,10 +291,10 @@ export default function AddProjectMemberModal({
                       }}
                     >
                       <div>
-                        <h4 style={{ fontSize: "16px", fontWeight: 600, margin: 0, color: "#212529" }}>
+                        <h4 style={{ fontSize: "16px", fontWeight: 600, margin: 0, color: "var(--text-primary)" }}>
                           {member.userName}
                         </h4>
-                        <p style={{ fontSize: "14px", color: "#6c757d", margin: "4px 0 0 0" }}>
+                        <p style={{ fontSize: "14px", color: "var(--text-secondary)", margin: "4px 0 0 0" }}>
                           {member.userEmail}
                         </p>
                         <span

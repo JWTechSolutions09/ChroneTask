@@ -465,7 +465,7 @@ export default function Dashboard() {
                             cursor: "pointer",
                           }}
                           onMouseEnter={(e) => {
-                            e.currentTarget.style.backgroundColor = "#f8f9fa";
+                            e.currentTarget.style.backgroundColor = "var(--hover-bg)";
                           }}
                           onMouseLeave={(e) => {
                             e.currentTarget.style.backgroundColor = "transparent";

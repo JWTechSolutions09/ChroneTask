@@ -129,7 +129,7 @@ export default function Settings() {
 
   return (
     <Layout>
-      <div style={{ flex: 1, overflowY: "auto", backgroundColor: "#f8f9fa" }}>
+      <div style={{ flex: 1, overflowY: "auto", backgroundColor: "var(--bg-secondary)" }}>
         <PageHeader
           title="Configuración"
           subtitle="Gestiona tu perfil y preferencias"

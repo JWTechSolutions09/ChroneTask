@@ -43,16 +43,20 @@
 }
 
 [data-theme="dark"] {
-  --bg-primary: #1a1a1a;
-  --bg-secondary: #242424;
-  --bg-tertiary: #2d2d2d;
+  /* Fondos mejorados con mejor contraste */
+  --bg-primary: #1e1e1e;
+  --bg-secondary: #2a2a2a;
+  --bg-tertiary: #353535;
+  /* Textos mejorados para máxima legibilidad */
   --text-primary: #ffffff;
-  --text-secondary: #b0b0b0;
-  --text-tertiary: #808080;
-  --border-color: #3a3a3a;
-  --hover-bg: #2d2d2d;
-  --gray-100: #2d2d2d;
-  --gray-200: #3a3a3a;
+  --text-secondary: #d0d0d0;
+  --text-tertiary: #a0a0a0;
+  /* Bordes más visibles */
+  --border-color: #404040;
+  --hover-bg: #353535;
+  /* Escala de grises ajustada para modo oscuro */
+  --gray-100: #353535;
+  --gray-200: #404040;
   --gray-300: #4a4a4a;
   --gray-400: #5a5a5a;
   --gray-500: #6a6a6a;
@@ -60,10 +64,12 @@
   --gray-700: #aaaaaa;
   --gray-800: #cccccc;
   --gray-900: #ffffff;
-  --white: #1a1a1a;
-  --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.3), 0 1px 2px 0 rgba(0, 0, 0, 0.2);
-  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4), 0 2px 4px -1px rgba(0, 0, 0, 0.3);
-  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.5), 0 4px 6px -2px rgba(0, 0, 0, 0.4);
+  /* White se convierte en el fondo primario en modo oscuro */
+  --white: #ffffff;
+  /* Sombras más pronunciadas en modo oscuro */
+  --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.4), 0 1px 2px 0 rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.5), 0 2px 4px -1px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.6), 0 4px 6px -2px rgba(0, 0, 0, 0.5);
 }
 
 html {
@@ -228,7 +234,9 @@ code {
 
 .input:disabled {
   background-color: var(--gray-200);
+  color: var(--text-tertiary);
   cursor: not-allowed;
+  opacity: 0.6;
 }
 
 .textarea {
@@ -262,6 +270,11 @@ code {
   transition: var(--transition);
 }
 
+.select option {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+}
+
 .select:focus {
   outline: none;
   border-color: var(--primary);
@@ -280,10 +293,22 @@ code {
   color: #c33;
 }
 
+[data-theme="dark"] .alert-error {
+  background-color: rgba(220, 53, 69, 0.15);
+  border: 1px solid rgba(220, 53, 69, 0.4);
+  color: #ff6b7a;
+}
+
 .alert-success {
   background-color: #efe;
   border: 1px solid #cfc;
   color: #3c3;
+}
+
+[data-theme="dark"] .alert-success {
+  background-color: rgba(40, 167, 69, 0.15);
+  border: 1px solid rgba(40, 167, 69, 0.4);
+  color: #6fcf97;
 }
 
 .loading {
@@ -394,6 +419,16 @@ a:hover {
   border-radius: 4px;
 }
 
+[data-theme="dark"] .skeleton {
+  background: linear-gradient(
+    90deg,
+    #353535 25%,
+    #404040 50%,
+    #353535 75%
+  );
+  background-size: 200% 100%;
+}
+
 /* Mejoras en scrollbar */
 ::-webkit-scrollbar {
   width: 10px;
@@ -425,6 +460,101 @@ a:hover {
 
 [data-theme="dark"] ::-webkit-scrollbar-thumb:hover {
   background: var(--gray-500);
+}
+
+/* Mejoras adicionales para modo oscuro - Mejor contraste y legibilidad */
+[data-theme="dark"] .btn-primary {
+  background-color: var(--primary);
+  color: var(--white);
+}
+
+[data-theme="dark"] .btn-primary:hover:not(:disabled) {
+  background-color: #0056b3;
+  color: var(--white);
+}
+
+[data-theme="dark"] .btn-secondary {
+  background-color: var(--secondary);
+  color: var(--white);
+}
+
+[data-theme="dark"] .btn-success {
+  background-color: var(--success);
+  color: var(--white);
+}
+
+[data-theme="dark"] .btn-danger {
+  background-color: var(--danger);
+  color: var(--white);
+}
+
+/* Mejorar contraste de inputs en modo oscuro */
+[data-theme="dark"] .input:focus,
+[data-theme="dark"] .textarea:focus,
+[data-theme="dark"] .select:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.2);
+}
+
+/* Mejorar visibilidad de placeholders en modo oscuro */
+[data-theme="dark"] .input::placeholder,
+[data-theme="dark"] .textarea::placeholder {
+  color: var(--text-tertiary);
+  opacity: 0.8;
+}
+
+/* Mejorar contraste de links en modo oscuro */
+[data-theme="dark"] a {
+  color: #4da6ff;
+}
+
+[data-theme="dark"] a:hover {
+  color: #66b3ff;
+}
+
+/* Mejorar visibilidad de código en modo oscuro */
+[data-theme="dark"] code {
+  background-color: var(--bg-tertiary);
+  color: var(--text-primary);
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+/* Mejorar loading y empty states en modo oscuro */
+[data-theme="dark"] .loading {
+  color: var(--text-secondary);
+}
+
+[data-theme="dark"] .empty-state {
+  color: var(--text-secondary);
+}
+
+/* Asegurar que los textos en cards sean legibles */
+[data-theme="dark"] .card {
+  color: var(--text-primary);
+}
+
+[data-theme="dark"] .card h1,
+[data-theme="dark"] .card h2,
+[data-theme="dark"] .card h3,
+[data-theme="dark"] .card h4,
+[data-theme="dark"] .card h5,
+[data-theme="dark"] .card h6 {
+  color: var(--text-primary);
+}
+
+[data-theme="dark"] .card p {
+  color: var(--text-primary);
+}
+
+/* Mejorar visibilidad de bordes en modo oscuro */
+[data-theme="dark"] .card {
+  border-color: var(--border-color);
+}
+
+/* Mejorar hover states en modo oscuro */
+[data-theme="dark"] .card:hover {
+  border-color: var(--gray-400);
 }
 
 /* ============================================

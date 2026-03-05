@@ -189,7 +189,7 @@ export default function Projects() {
 
   return (
     <Layout organizationId={isPersonalMode || isPersonalRoute ? undefined : organizationId}>
-      <div style={{ flex: 1, overflowY: "auto", backgroundColor: "#f8f9fa" }}>
+      <div style={{ flex: 1, overflowY: "auto", backgroundColor: "var(--bg-secondary)" }}>
         <PageHeader
           title="Proyectos"
           subtitle={`${projects.length} ${projects.length === 1 ? "proyecto" : "proyectos"} en total`}
@@ -569,7 +569,7 @@ export default function Projects() {
                     color: "var(--text-primary)",
                   }}
                 >
-                  Nombre del proyecto <span style={{ color: "#dc3545" }}>*</span>
+                  Nombre del proyecto <span style={{ color: "var(--danger)" }}>*</span>
                 </label>
                 <input
                   placeholder="Ej: Sistema de gestión"
@@ -655,7 +655,8 @@ export default function Projects() {
                     border: "2px solid var(--border-color)",
                     fontSize: "15px",
                     transition: "all 0.2s",
-                    backgroundColor: "white",
+                    backgroundColor: "var(--bg-primary)",
+                    color: "var(--text-primary)",
                     cursor: "pointer",
                   }}
                   onFocus={(e) => {

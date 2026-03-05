@@ -12,14 +12,11 @@ const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
   const [theme, setThemeState] = useState<Theme>(() => {
-    // Cargar tema desde localStorage o usar preferencia del sistema
+    // Cargar tema desde localStorage o usar modo claro por defecto
     const savedTheme = localStorage.getItem("theme") as Theme;
     if (savedTheme) return savedTheme;
     
-    // Detectar preferencia del sistema
-    if (window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches) {
-      return "dark";
-    }
+    // Por defecto, usar modo claro
     return "light";
   });
 

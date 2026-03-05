@@ -421,7 +421,7 @@ export default function Board() {
                       <span
                         style={{
                           backgroundColor: statusColor,
-                          color: "white",
+                          color: "var(--white)",
                           padding: "6px 12px",
                           borderRadius: "16px",
                           fontSize: "13px",
@@ -692,7 +692,7 @@ export default function Board() {
                                     border: "none",
                                     borderRadius: "6px",
                                     backgroundColor: STATUS_COLORS[getNextStatus(task.status)!] || "#007bff",
-                                    color: "white",
+                                    color: "var(--white)",
                                     cursor: "pointer",
                                     transition: "all 0.2s",
                                     display: "flex",
@@ -729,7 +729,7 @@ export default function Board() {
                                     border: "none",
                                     borderRadius: "6px",
                                     backgroundColor: "#28a745",
-                                    color: "white",
+                                    color: "var(--white)",
                                     cursor: "pointer",
                                     transition: "all 0.2s",
                                     display: "flex",

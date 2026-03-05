@@ -37,7 +37,7 @@ export class ErrorBoundary extends Component<Props, State> {
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            backgroundColor: "#f8f9fa",
+            backgroundColor: "var(--bg-secondary)",
             padding: "20px",
           }}
         >
@@ -51,10 +51,10 @@ export class ErrorBoundary extends Component<Props, State> {
             }}
           >
             <div style={{ fontSize: "64px", marginBottom: "20px" }}>⚠️</div>
-            <h1 style={{ fontSize: "24px", fontWeight: 700, marginBottom: "12px", color: "#212529" }}>
+            <h1 style={{ fontSize: "24px", fontWeight: 700, marginBottom: "12px", color: "var(--text-primary)" }}>
               Algo salió mal
             </h1>
-            <p style={{ color: "#6c757d", marginBottom: "24px" }}>
+            <p style={{ color: "var(--text-secondary)", marginBottom: "24px" }}>
               {this.state.error?.message || "Ocurrió un error inesperado"}
             </p>
             <button

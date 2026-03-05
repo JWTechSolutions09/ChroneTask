@@ -112,7 +112,7 @@ export default function Register() {
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        backgroundColor: "#f8f9fa",
+        backgroundColor: "var(--bg-secondary)",
         padding: "20px",
       }}
     >

@@ -142,10 +142,10 @@ export default function InvitationsModal({
       >
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "24px" }}>
           <div>
-            <h2 style={{ fontSize: "24px", fontWeight: 700, margin: 0, color: "#212529" }}>
+            <h2 style={{ fontSize: "24px", fontWeight: 700, margin: 0, color: "var(--text-primary)" }}>
               Invitar Miembros
             </h2>
-            <p style={{ fontSize: "14px", color: "#6c757d", margin: "4px 0 0 0" }}>
+            <p style={{ fontSize: "14px", color: "var(--text-secondary)", margin: "4px 0 0 0" }}>
               {organizationName}
             </p>
           </div>
@@ -175,7 +175,7 @@ export default function InvitationsModal({
         </div>
 
         {/* Formulario para crear invitación */}
-        <Card style={{ marginBottom: "24px", backgroundColor: "#f8f9fa" }}>
+        <Card style={{ marginBottom: "24px", backgroundColor: "var(--bg-secondary)" }}>
           <h3 style={{ fontSize: "16px", fontWeight: 600, marginBottom: "16px", color: "#212529" }}>
             Crear Nueva Invitación
           </h3>
@@ -251,7 +251,7 @@ export default function InvitationsModal({
                   key={inv.id}
                   style={{
                     padding: "16px",
-                    backgroundColor: inv.isUsed ? "#f8f9fa" : "#fff",
+                    backgroundColor: inv.isUsed ? "var(--bg-tertiary)" : "var(--bg-primary)",
                     border: isExpired(inv.expiresAt) ? "2px solid #ffc107" : "1px solid #dee2e6",
                   }}
                 >
@@ -301,7 +301,7 @@ export default function InvitationsModal({
                           style={{
                             fontSize: "12px",
                             color: "#6c757d",
-                            backgroundColor: "#f8f9fa",
+                            backgroundColor: "var(--bg-secondary)",
                             padding: "8px",
                             borderRadius: "6px",
                             marginBottom: "8px",

@@ -61,7 +61,7 @@ export default function ConfirmDialog({
     >
       <div
         style={{
-          backgroundColor: "white",
+          backgroundColor: "var(--bg-primary)",
           borderRadius: "8px",
           padding: "24px",
           maxWidth: "400px",
@@ -75,7 +75,7 @@ export default function ConfirmDialog({
             margin: "0 0 12px 0",
             fontSize: "20px",
             fontWeight: 600,
-            color: "#212529",
+            color: "var(--text-primary)",
           }}
         >
           {title}
@@ -84,7 +84,7 @@ export default function ConfirmDialog({
           style={{
             margin: "0 0 24px 0",
             fontSize: "14px",
-            color: "#6c757d",
+            color: "var(--text-secondary)",
             lineHeight: "1.5",
           }}
         >
@@ -103,8 +103,8 @@ export default function ConfirmDialog({
               padding: "8px 16px",
               borderRadius: "6px",
               border: "1px solid #dee2e6",
-              backgroundColor: "white",
-              color: "#495057",
+              backgroundColor: "var(--bg-primary)",
+              color: "var(--text-secondary)",
               cursor: "pointer",
               fontSize: "14px",
               fontWeight: 500,

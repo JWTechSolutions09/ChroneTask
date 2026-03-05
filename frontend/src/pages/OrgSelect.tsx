@@ -79,7 +79,7 @@ export default function OrgSelect() {
 
   return (
     <Layout>
-      <div style={{ flex: 1, overflowY: "auto", backgroundColor: "#f8f9fa" }}>
+      <div style={{ flex: 1, overflowY: "auto", backgroundColor: "var(--bg-secondary)" }}>
         <PageHeader
           title={t.selectAnOrganization}
           subtitle={
@@ -98,10 +98,10 @@ export default function OrgSelect() {
               <div className="empty-state-icon" style={{ fontSize: "64px", marginBottom: "20px" }}>
                 🏢
               </div>
-              <h3 style={{ fontSize: "24px", fontWeight: 700, color: "#212529", marginBottom: "12px" }}>
+              <h3 style={{ fontSize: "24px", fontWeight: 700, color: "var(--text-primary)", marginBottom: "12px" }}>
                 {t.noOrganizations}
               </h3>
-              <p style={{ fontSize: "16px", color: "#6c757d", marginBottom: "24px" }}>
+              <p style={{ fontSize: "16px", color: "var(--text-secondary)", marginBottom: "24px" }}>
                 {t.noOrganizationsMessage}
               </p>
               <a
@@ -109,8 +109,8 @@ export default function OrgSelect() {
                 style={{
                   display: "inline-block",
                   padding: "12px 24px",
-                  backgroundColor: "#007bff",
-                  color: "white",
+                  backgroundColor: "var(--primary)",
+                  color: "var(--white)",
                   borderRadius: "8px",
                   textDecoration: "none",
                   fontWeight: 600,

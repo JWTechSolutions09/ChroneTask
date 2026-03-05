@@ -144,7 +144,7 @@ export default function CreateTaskModal({
                 color: "var(--text-primary)",
               }}
             >
-              Título <span style={{ color: "#dc3545" }}>*</span>
+              Título <span style={{ color: "var(--danger)" }}>*</span>
             </label>
             <input
               type="text"
@@ -236,7 +236,8 @@ export default function CreateTaskModal({
                   borderRadius: "10px",
                   border: "2px solid var(--border-color)",
                   transition: "all 0.2s",
-                  backgroundColor: "white",
+                  backgroundColor: "var(--bg-primary)",
+                  color: "var(--text-primary)",
                   cursor: "pointer",
                   width: "100%",
                 }}
@@ -278,7 +279,8 @@ export default function CreateTaskModal({
                   borderRadius: "10px",
                   border: "2px solid var(--border-color)",
                   transition: "all 0.2s",
-                  backgroundColor: "white",
+                  backgroundColor: "var(--bg-primary)",
+                  color: "var(--text-primary)",
                   cursor: "pointer",
                   width: "100%",
                 }}

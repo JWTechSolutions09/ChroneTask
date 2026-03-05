@@ -681,16 +681,16 @@ export default function Notes() {
                                 position: "absolute",
                                 top: "40px",
                                 right: "0",
-                                backgroundColor: "white",
+                                backgroundColor: "var(--bg-primary)",
                                 borderRadius: "12px",
                                 padding: "12px",
-                                boxShadow: "0 8px 32px rgba(0, 0, 0, 0.2)",
+                                boxShadow: "var(--shadow-lg)",
                                 zIndex: 1001,
                                 display: "grid",
                                 gridTemplateColumns: "repeat(6, 1fr)",
                                 gap: "8px",
                                 minWidth: "200px",
-                                border: "1px solid rgba(0, 0, 0, 0.1)",
+                                border: "1px solid var(--border-color)",
                               }}
                               onClick={(e) => e.stopPropagation()}
                             >
@@ -886,7 +886,7 @@ export default function Notes() {
 
                     {/* Canvas de dibujo */}
                     {drawingMode.noteId === note.id && (
-                      <div style={{ marginBottom: "12px", borderRadius: "8px", overflow: "hidden", border: "2px solid rgba(0, 123, 255, 0.3)", backgroundColor: "#fff" }}>
+                      <div style={{ marginBottom: "12px", borderRadius: "8px", overflow: "hidden", border: "2px solid rgba(0, 123, 255, 0.3)", backgroundColor: "var(--bg-primary)" }}>
                         <canvas
                           ref={(el) => {
                             canvasRefs.current[note.id] = el;

@@ -121,7 +121,7 @@ export default function TimeTracker({
         flexDirection: "column",
         gap: "8px",
         padding: "8px",
-        backgroundColor: isRunning ? "#e7f3ff" : "#f8f9fa",
+        backgroundColor: isRunning ? "rgba(0, 123, 255, 0.1)" : "var(--bg-secondary)",
         borderRadius: "6px",
         border: isRunning ? "1px solid #007bff" : "1px solid #dee2e6",
       }}
@@ -182,7 +182,7 @@ export default function TimeTracker({
           </>
         ) : (
           <>
-            <span style={{ fontSize: "11px", color: "#6c757d" }}>
+            <span style={{ fontSize: "11px", color: "var(--text-secondary)" }}>
               ⏱️ {formatTotalTime(totalMinutes)}
             </span>
             <button
