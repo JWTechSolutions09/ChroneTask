@@ -78,18 +78,20 @@ export default function CreateTaskModal({
         bottom: 0,
         backgroundColor: "rgba(0, 0, 0, 0.6)",
         display: "flex",
-        alignItems: "center",
+        alignItems: isMobile ? "flex-start" : "center",
         justifyContent: "center",
         zIndex: 1000,
         backdropFilter: "blur(4px)",
+        overflowY: isMobile ? "auto" : "hidden",
+        WebkitOverflowScrolling: "touch",
       }}
       onClick={onClose}
     >
       <div
-        className="card"
         style={{
-          maxWidth: isMobile ? "100%" : "700px",
-          width: isMobile ? "100%" : "95%",
+          maxWidth: isMobile ? "100vw" : "700px",
+          width: isMobile ? "100vw" : "95%",
+          minHeight: isMobile ? "100vh" : "auto",
           maxHeight: isMobile ? "100vh" : "95vh",
           height: isMobile ? "100vh" : "auto",
           overflowY: "auto",
@@ -98,6 +100,11 @@ export default function CreateTaskModal({
           border: isMobile ? "none" : "1px solid rgba(0, 0, 0, 0.1)",
           padding: isMobile ? "20px 16px" : "32px",
           margin: isMobile ? "0" : "auto",
+          backgroundColor: "var(--bg-primary)",
+          position: "relative",
+          display: "flex",
+          flexDirection: "column",
+          boxSizing: "border-box",
         }}
         onClick={(e) => e.stopPropagation()}
       >
