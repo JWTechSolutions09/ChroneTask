@@ -106,7 +106,7 @@ export default function CreateTaskModal({
           borderRadius: isMobile ? "0" : "16px",
           boxShadow: isMobile ? "none" : "0 20px 60px rgba(0, 0, 0, 0.3)",
           border: isMobile ? "none" : "1px solid rgba(0, 0, 0, 0.1)",
-          padding: isMobile ? "20px 16px" : "32px",
+          padding: isMobile ? "16px" : "32px",
           margin: isMobile ? "0" : "auto",
           backgroundColor: "var(--bg-primary)",
           position: "relative",
@@ -125,50 +125,93 @@ export default function CreateTaskModal({
             marginBottom: isMobile ? "20px" : "28px",
             paddingBottom: isMobile ? "16px" : "20px",
             borderBottom: "2px solid var(--border-color)",
+            width: "100%",
+            position: "relative",
           }}
         >
-          <div>
-            <h2 style={{ margin: 0, fontSize: isMobile ? "22px" : "28px", fontWeight: 700, color: "var(--text-primary)", marginBottom: isMobile ? "2px" : "4px" }}>
-              Nueva Tarea
-            </h2>
-            {!isMobile && (
-              <p style={{ margin: 0, fontSize: "14px", color: "var(--text-secondary)" }}>
-                Completa los detalles de la nueva tarea
-              </p>
-            )}
-          </div>
-          <button
-            onClick={onClose}
-            style={{
-              background: "var(--hover-bg)",
-              border: "1px solid var(--border-color)",
-              fontSize: isMobile ? "28px" : "24px",
-              cursor: "pointer",
-              color: "var(--text-secondary)",
-              width: isMobile ? "36px" : "40px",
-              height: isMobile ? "36px" : "40px",
-              borderRadius: "10px",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              transition: "all 0.2s",
-              flexShrink: 0,
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = "var(--bg-tertiary)";
-              e.currentTarget.style.color = "var(--text-primary)";
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.backgroundColor = "var(--hover-bg)";
-              e.currentTarget.style.color = "var(--text-secondary)";
-            }}
-            title="Cerrar"
-          >
-            ×
-          </button>
+          {isMobile ? (
+            <>
+              <div style={{ flex: 1, textAlign: "center" }}>
+                <h2 style={{ margin: 0, fontSize: "22px", fontWeight: 700, color: "var(--text-primary)" }}>
+                  Nueva Tarea
+                </h2>
+              </div>
+              <button
+                onClick={onClose}
+                style={{
+                  background: "var(--hover-bg)",
+                  border: "1px solid var(--border-color)",
+                  fontSize: "28px",
+                  cursor: "pointer",
+                  color: "var(--text-secondary)",
+                  width: "36px",
+                  height: "36px",
+                  borderRadius: "10px",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  transition: "all 0.2s",
+                  flexShrink: 0,
+                  position: "absolute",
+                  right: 0,
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = "var(--bg-tertiary)";
+                  e.currentTarget.style.color = "var(--text-primary)";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = "var(--hover-bg)";
+                  e.currentTarget.style.color = "var(--text-secondary)";
+                }}
+                title="Cerrar"
+              >
+                ×
+              </button>
+            </>
+          ) : (
+            <>
+              <div>
+                <h2 style={{ margin: 0, fontSize: "28px", fontWeight: 700, color: "var(--text-primary)", marginBottom: "4px" }}>
+                  Nueva Tarea
+                </h2>
+                <p style={{ margin: 0, fontSize: "14px", color: "var(--text-secondary)" }}>
+                  Completa los detalles de la nueva tarea
+                </p>
+              </div>
+              <button
+                onClick={onClose}
+                style={{
+                  background: "var(--hover-bg)",
+                  border: "1px solid var(--border-color)",
+                  fontSize: "24px",
+                  cursor: "pointer",
+                  color: "var(--text-secondary)",
+                  width: "40px",
+                  height: "40px",
+                  borderRadius: "10px",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  transition: "all 0.2s",
+                  flexShrink: 0,
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = "var(--bg-tertiary)";
+                  e.currentTarget.style.color = "var(--text-primary)";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = "var(--hover-bg)";
+                  e.currentTarget.style.color = "var(--text-secondary)";
+                }}
+                title="Cerrar"
+              >
+                ×
+              </button>
+            </>
+          )}
         </div>
 
-        <form onSubmit={handleSubmit} style={{ display: "grid", gap: isMobile ? "16px" : "20px", width: "100%", maxWidth: "100%", boxSizing: "border-box", overflowX: "hidden" }}>
+        <form onSubmit={handleSubmit} style={{ display: "grid", gap: isMobile ? "16px" : "20px", width: "100%", maxWidth: "100%", boxSizing: "border-box", overflowX: "hidden", margin: 0, padding: 0 }}>
           <div style={{ width: "100%", maxWidth: "100%", boxSizing: "border-box" }}>
             <label
               style={{
@@ -195,6 +238,8 @@ export default function CreateTaskModal({
                 border: "2px solid var(--border-color)",
                 transition: "all 0.2s",
                 width: "100%",
+                maxWidth: "100%",
+                boxSizing: "border-box",
               }}
               onFocus={(e) => {
                 e.target.style.borderColor = "var(--primary)";
@@ -236,6 +281,8 @@ export default function CreateTaskModal({
                 fontFamily: "inherit",
                 lineHeight: "1.6",
                 width: "100%",
+                maxWidth: "100%",
+                boxSizing: "border-box",
               }}
               onFocus={(e) => {
                 e.target.style.borderColor = "var(--primary)";
@@ -275,6 +322,8 @@ export default function CreateTaskModal({
                   color: "var(--text-primary)",
                   cursor: "pointer",
                   width: "100%",
+                  maxWidth: "100%",
+                  boxSizing: "border-box",
                 }}
                 onFocus={(e) => {
                   e.target.style.borderColor = "var(--primary)";
@@ -318,6 +367,8 @@ export default function CreateTaskModal({
                   color: "var(--text-primary)",
                   cursor: "pointer",
                   width: "100%",
+                  maxWidth: "100%",
+                  boxSizing: "border-box",
                 }}
                 onFocus={(e) => {
                   e.target.style.borderColor = "var(--primary)";
@@ -363,6 +414,8 @@ export default function CreateTaskModal({
                 border: "2px solid var(--border-color)",
                 transition: "all 0.2s",
                 width: "100%",
+                maxWidth: "100%",
+                boxSizing: "border-box",
               }}
               onFocus={(e) => {
                 e.target.style.borderColor = "var(--primary)";
