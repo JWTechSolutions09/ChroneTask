@@ -1623,4 +1623,18 @@ input, textarea, select {
   button span[style*="fontSize: 20px"] {
     font-size: clamp(16px, 4vw, 20px) !important;
   }
+
+  /* Modal de crear tarea - ancho completo en móvil */
+  .create-task-modal-overlay {
+    width: 100vw !important;
+    max-width: 100vw !important;
+  }
+
+  .create-task-modal-content {
+    max-width: 100vw !important;
+    width: 100vw !important;
+    min-width: 100vw !important;
+    margin: 0 !important;
+    padding: 20px 16px !important;
+  }
 }

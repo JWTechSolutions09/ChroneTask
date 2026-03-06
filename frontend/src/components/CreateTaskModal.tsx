@@ -70,12 +70,15 @@ export default function CreateTaskModal({
 
   return (
     <div
+      className="create-task-modal-overlay"
       style={{
         position: "fixed",
         top: 0,
         left: 0,
         right: 0,
         bottom: 0,
+        width: "100vw",
+        height: "100vh",
         backgroundColor: "rgba(0, 0, 0, 0.6)",
         display: "flex",
         alignItems: isMobile ? "flex-start" : "center",
@@ -88,9 +91,11 @@ export default function CreateTaskModal({
       onClick={onClose}
     >
       <div
+        className="create-task-modal-content"
         style={{
           maxWidth: isMobile ? "100vw" : "700px",
           width: isMobile ? "100vw" : "95%",
+          minWidth: isMobile ? "100vw" : "auto",
           minHeight: isMobile ? "100vh" : "auto",
           maxHeight: isMobile ? "100vh" : "95vh",
           height: isMobile ? "100vh" : "auto",
@@ -105,6 +110,7 @@ export default function CreateTaskModal({
           display: "flex",
           flexDirection: "column",
           boxSizing: "border-box",
+          flex: isMobile ? "1 1 100%" : "0 1 auto",
         }}
         onClick={(e) => e.stopPropagation()}
       >
