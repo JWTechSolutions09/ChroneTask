@@ -69,37 +69,40 @@ export default function CreateTaskModal({
   };
 
   return (
-    <div
-      className="create-task-modal-overlay"
-      style={{
-        position: "fixed",
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        width: "100vw",
-        height: "100vh",
-        backgroundColor: "rgba(0, 0, 0, 0.6)",
-        display: "flex",
-        alignItems: isMobile ? "flex-start" : "center",
-        justifyContent: "center",
-        zIndex: 1000,
-        backdropFilter: "blur(4px)",
-        overflowY: isMobile ? "auto" : "hidden",
-        WebkitOverflowScrolling: "touch",
-      }}
-      onClick={onClose}
-    >
+      <div
+        className="create-task-modal-overlay"
+        style={{
+          position: "fixed",
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          width: "100vw",
+          height: "100vh",
+          maxWidth: "100vw",
+          backgroundColor: "rgba(0, 0, 0, 0.6)",
+          display: "flex",
+          alignItems: isMobile ? "flex-start" : "center",
+          justifyContent: "center",
+          zIndex: 1000,
+          backdropFilter: "blur(4px)",
+          overflowY: isMobile ? "auto" : "hidden",
+          overflowX: "hidden",
+          WebkitOverflowScrolling: "touch",
+        }}
+        onClick={onClose}
+      >
       <div
         className="create-task-modal-content"
         style={{
           maxWidth: isMobile ? "100vw" : "700px",
-          width: isMobile ? "100vw" : "95%",
-          minWidth: isMobile ? "100vw" : "auto",
+          width: isMobile ? "100%" : "95%",
+          minWidth: 0,
           minHeight: isMobile ? "100vh" : "auto",
           maxHeight: isMobile ? "100vh" : "95vh",
           height: isMobile ? "100vh" : "auto",
           overflowY: "auto",
+          overflowX: "hidden",
           borderRadius: isMobile ? "0" : "16px",
           boxShadow: isMobile ? "none" : "0 20px 60px rgba(0, 0, 0, 0.3)",
           border: isMobile ? "none" : "1px solid rgba(0, 0, 0, 0.1)",
@@ -165,8 +168,8 @@ export default function CreateTaskModal({
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} style={{ display: "grid", gap: isMobile ? "16px" : "20px" }}>
-          <div>
+        <form onSubmit={handleSubmit} style={{ display: "grid", gap: isMobile ? "16px" : "20px", width: "100%", maxWidth: "100%", boxSizing: "border-box", overflowX: "hidden" }}>
+          <div style={{ width: "100%", maxWidth: "100%", boxSizing: "border-box" }}>
             <label
               style={{
                 display: "block",
@@ -204,7 +207,7 @@ export default function CreateTaskModal({
             />
           </div>
 
-          <div>
+          <div style={{ width: "100%", maxWidth: "100%", boxSizing: "border-box" }}>
             <label
               style={{
                 display: "block",
@@ -245,8 +248,8 @@ export default function CreateTaskModal({
             />
           </div>
 
-          <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: isMobile ? "16px" : "16px" }}>
-            <div>
+          <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: isMobile ? "16px" : "16px", width: "100%", maxWidth: "100%", boxSizing: "border-box" }}>
+            <div style={{ width: "100%", maxWidth: "100%", boxSizing: "border-box" }}>
               <label
                 style={{
                   display: "block",
@@ -289,7 +292,7 @@ export default function CreateTaskModal({
               </select>
             </div>
 
-            <div>
+            <div style={{ width: "100%", maxWidth: "100%", boxSizing: "border-box" }}>
               <label
                 style={{
                   display: "block",
@@ -334,7 +337,7 @@ export default function CreateTaskModal({
             </div>
           </div>
 
-          <div>
+          <div style={{ width: "100%", maxWidth: "100%", boxSizing: "border-box" }}>
             <label
               style={{
                 display: "block",
@@ -375,8 +378,8 @@ export default function CreateTaskModal({
             </div>
           </div>
 
-          <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: isMobile ? "16px" : "16px" }}>
-            <div>
+          <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: isMobile ? "16px" : "16px", width: "100%", maxWidth: "100%", boxSizing: "border-box" }}>
+            <div style={{ width: "100%", maxWidth: "100%", boxSizing: "border-box" }}>
               <label
                 style={{
                   display: "block",
@@ -412,7 +415,7 @@ export default function CreateTaskModal({
               />
             </div>
 
-            <div>
+            <div style={{ width: "100%", maxWidth: "100%", boxSizing: "border-box" }}>
               <label
                 style={{
                   display: "block",

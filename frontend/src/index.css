@@ -1628,13 +1628,35 @@ input, textarea, select {
   .create-task-modal-overlay {
     width: 100vw !important;
     max-width: 100vw !important;
+    overflow-x: hidden !important;
   }
 
   .create-task-modal-content {
-    max-width: 100vw !important;
-    width: 100vw !important;
-    min-width: 100vw !important;
+    max-width: 100% !important;
+    width: 100% !important;
+    min-width: 0 !important;
     margin: 0 !important;
     padding: 20px 16px !important;
+    overflow-x: hidden !important;
+    box-sizing: border-box !important;
+  }
+
+  .create-task-modal-content * {
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  .create-task-modal-content form {
+    width: 100% !important;
+    max-width: 100% !important;
+    overflow-x: hidden !important;
+  }
+
+  .create-task-modal-content input,
+  .create-task-modal-content textarea,
+  .create-task-modal-content select {
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
   }
 }
