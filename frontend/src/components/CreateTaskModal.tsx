@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { http } from "../api/http";
 import { useToast } from "../contexts/ToastContext";
 
@@ -22,7 +22,22 @@ export default function CreateTaskModal({
   const [dueDate, setDueDate] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [isMobile, setIsMobile] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return window.innerWidth <= 768;
+    }
+    return false;
+  });
   const { showToast } = useToast();
+
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -73,14 +88,16 @@ export default function CreateTaskModal({
       <div
         className="card"
         style={{
-          maxWidth: "700px",
-          width: "95%",
-          maxHeight: "95vh",
+          maxWidth: isMobile ? "100%" : "700px",
+          width: isMobile ? "100%" : "95%",
+          maxHeight: isMobile ? "100vh" : "95vh",
+          height: isMobile ? "100vh" : "auto",
           overflowY: "auto",
-          borderRadius: "16px",
-          boxShadow: "0 20px 60px rgba(0, 0, 0, 0.3)",
-          border: "1px solid rgba(0, 0, 0, 0.1)",
-          padding: "32px",
+          borderRadius: isMobile ? "0" : "16px",
+          boxShadow: isMobile ? "none" : "0 20px 60px rgba(0, 0, 0, 0.3)",
+          border: isMobile ? "none" : "1px solid rgba(0, 0, 0, 0.1)",
+          padding: isMobile ? "20px 16px" : "32px",
+          margin: isMobile ? "0" : "auto",
         }}
         onClick={(e) => e.stopPropagation()}
       >
@@ -89,29 +106,31 @@ export default function CreateTaskModal({
             display: "flex",
             justifyContent: "space-between",
             alignItems: "center",
-            marginBottom: "28px",
-            paddingBottom: "20px",
+            marginBottom: isMobile ? "20px" : "28px",
+            paddingBottom: isMobile ? "16px" : "20px",
             borderBottom: "2px solid var(--border-color)",
           }}
         >
           <div>
-            <h2 style={{ margin: 0, fontSize: "28px", fontWeight: 700, color: "var(--text-primary)", marginBottom: "4px" }}>
+            <h2 style={{ margin: 0, fontSize: isMobile ? "22px" : "28px", fontWeight: 700, color: "var(--text-primary)", marginBottom: isMobile ? "2px" : "4px" }}>
               Nueva Tarea
             </h2>
-            <p style={{ margin: 0, fontSize: "14px", color: "var(--text-secondary)" }}>
-              Completa los detalles de la nueva tarea
-            </p>
+            {!isMobile && (
+              <p style={{ margin: 0, fontSize: "14px", color: "var(--text-secondary)" }}>
+                Completa los detalles de la nueva tarea
+              </p>
+            )}
           </div>
           <button
             onClick={onClose}
             style={{
               background: "var(--hover-bg)",
               border: "1px solid var(--border-color)",
-              fontSize: "24px",
+              fontSize: isMobile ? "28px" : "24px",
               cursor: "pointer",
               color: "var(--text-secondary)",
-              width: "40px",
-              height: "40px",
+              width: isMobile ? "36px" : "40px",
+              height: isMobile ? "36px" : "40px",
               borderRadius: "10px",
               display: "flex",
               alignItems: "center",
@@ -133,13 +152,13 @@ export default function CreateTaskModal({
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} style={{ display: "grid", gap: "20px" }}>
+        <form onSubmit={handleSubmit} style={{ display: "grid", gap: isMobile ? "16px" : "20px" }}>
           <div>
             <label
               style={{
                 display: "block",
-                marginBottom: "10px",
-                fontSize: "15px",
+                marginBottom: isMobile ? "8px" : "10px",
+                fontSize: isMobile ? "14px" : "15px",
                 fontWeight: 600,
                 color: "var(--text-primary)",
               }}
@@ -154,8 +173,8 @@ export default function CreateTaskModal({
               className="input"
               placeholder="Ej: Implementar sistema de login"
               style={{
-                padding: "14px 16px",
-                fontSize: "15px",
+                padding: isMobile ? "12px 14px" : "14px 16px",
+                fontSize: isMobile ? "16px" : "15px",
                 borderRadius: "10px",
                 border: "2px solid var(--border-color)",
                 transition: "all 0.2s",
@@ -176,8 +195,8 @@ export default function CreateTaskModal({
             <label
               style={{
                 display: "block",
-                marginBottom: "10px",
-                fontSize: "15px",
+                marginBottom: isMobile ? "8px" : "10px",
+                fontSize: isMobile ? "14px" : "15px",
                 fontWeight: 600,
                 color: "var(--text-primary)",
               }}
@@ -188,16 +207,16 @@ export default function CreateTaskModal({
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               className="textarea"
-              rows={5}
+              rows={isMobile ? 4 : 5}
               placeholder="Describe detalladamente la tarea, requisitos, pasos a seguir, etc..."
               style={{
-                padding: "14px 16px",
-                fontSize: "15px",
+                padding: isMobile ? "12px 14px" : "14px 16px",
+                fontSize: isMobile ? "16px" : "15px",
                 borderRadius: "10px",
                 border: "2px solid var(--border-color)",
                 transition: "all 0.2s",
                 resize: "vertical",
-                minHeight: "120px",
+                minHeight: isMobile ? "100px" : "120px",
                 fontFamily: "inherit",
                 lineHeight: "1.6",
                 width: "100%",
@@ -213,13 +232,13 @@ export default function CreateTaskModal({
             />
           </div>
 
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px" }}>
+          <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: isMobile ? "16px" : "16px" }}>
             <div>
               <label
                 style={{
                   display: "block",
-                  marginBottom: "10px",
-                  fontSize: "15px",
+                  marginBottom: isMobile ? "8px" : "10px",
+                  fontSize: isMobile ? "14px" : "15px",
                   fontWeight: 600,
                   color: "var(--text-primary)",
                 }}
@@ -231,8 +250,8 @@ export default function CreateTaskModal({
                 onChange={(e) => setType(e.target.value)} 
                 className="select"
                 style={{
-                  padding: "14px 16px",
-                  fontSize: "15px",
+                  padding: isMobile ? "12px 14px" : "14px 16px",
+                  fontSize: isMobile ? "16px" : "15px",
                   borderRadius: "10px",
                   border: "2px solid var(--border-color)",
                   transition: "all 0.2s",
@@ -261,8 +280,8 @@ export default function CreateTaskModal({
               <label
                 style={{
                   display: "block",
-                  marginBottom: "10px",
-                  fontSize: "15px",
+                  marginBottom: isMobile ? "8px" : "10px",
+                  fontSize: isMobile ? "14px" : "15px",
                   fontWeight: 600,
                   color: "var(--text-primary)",
                 }}
@@ -274,8 +293,8 @@ export default function CreateTaskModal({
                 onChange={(e) => setPriority(e.target.value)}
                 className="select"
                 style={{
-                  padding: "14px 16px",
-                  fontSize: "15px",
+                  padding: isMobile ? "12px 14px" : "14px 16px",
+                  fontSize: isMobile ? "16px" : "15px",
                   borderRadius: "10px",
                   border: "2px solid var(--border-color)",
                   transition: "all 0.2s",
@@ -306,8 +325,8 @@ export default function CreateTaskModal({
             <label
               style={{
                 display: "block",
-                marginBottom: "10px",
-                fontSize: "15px",
+                marginBottom: isMobile ? "8px" : "10px",
+                fontSize: isMobile ? "14px" : "15px",
                 fontWeight: 600,
                 color: "var(--text-primary)",
               }}
@@ -322,8 +341,8 @@ export default function CreateTaskModal({
               placeholder="Ej: 120 (2 horas)"
               min="0"
               style={{
-                padding: "14px 16px",
-                fontSize: "15px",
+                padding: isMobile ? "12px 14px" : "14px 16px",
+                fontSize: isMobile ? "16px" : "15px",
                 borderRadius: "10px",
                 border: "2px solid var(--border-color)",
                 transition: "all 0.2s",
@@ -338,18 +357,18 @@ export default function CreateTaskModal({
                 e.target.style.boxShadow = "none";
               }}
             />
-            <div style={{ fontSize: "13px", color: "var(--text-secondary)", marginTop: "6px" }}>
+            <div style={{ fontSize: isMobile ? "12px" : "13px", color: "var(--text-secondary)", marginTop: "6px" }}>
               Tiempo aproximado que tomará completar esta tarea
             </div>
           </div>
 
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px" }}>
+          <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: isMobile ? "16px" : "16px" }}>
             <div>
               <label
                 style={{
                   display: "block",
-                  marginBottom: "10px",
-                  fontSize: "15px",
+                  marginBottom: isMobile ? "8px" : "10px",
+                  fontSize: isMobile ? "14px" : "15px",
                   fontWeight: 600,
                   color: "var(--text-primary)",
                 }}
@@ -362,8 +381,8 @@ export default function CreateTaskModal({
                 onChange={(e) => setStartDate(e.target.value)}
                 className="input"
                 style={{
-                  padding: "14px 16px",
-                  fontSize: "15px",
+                  padding: isMobile ? "12px 14px" : "14px 16px",
+                  fontSize: isMobile ? "16px" : "15px",
                   borderRadius: "10px",
                   border: "2px solid var(--border-color)",
                   transition: "all 0.2s",
@@ -384,8 +403,8 @@ export default function CreateTaskModal({
               <label
                 style={{
                   display: "block",
-                  marginBottom: "10px",
-                  fontSize: "15px",
+                  marginBottom: isMobile ? "8px" : "10px",
+                  fontSize: isMobile ? "14px" : "15px",
                   fontWeight: 600,
                   color: "var(--text-primary)",
                 }}
@@ -398,8 +417,8 @@ export default function CreateTaskModal({
                 onChange={(e) => setDueDate(e.target.value)}
                 className="input"
                 style={{
-                  padding: "14px 16px",
-                  fontSize: "15px",
+                  padding: isMobile ? "12px 14px" : "14px 16px",
+                  fontSize: isMobile ? "16px" : "15px",
                   borderRadius: "10px",
                   border: "2px solid var(--border-color)",
                   transition: "all 0.2s",
@@ -421,9 +440,9 @@ export default function CreateTaskModal({
             <div 
               className="alert alert-error" 
               style={{ 
-                padding: "14px 16px", 
+                padding: isMobile ? "12px 14px" : "14px 16px", 
                 borderRadius: "10px",
-                fontSize: "14px",
+                fontSize: isMobile ? "13px" : "14px",
                 marginTop: "8px",
               }}
             >
@@ -433,10 +452,11 @@ export default function CreateTaskModal({
 
           <div style={{ 
             display: "flex", 
-            gap: "12px", 
+            flexDirection: isMobile ? "column-reverse" : "row",
+            gap: isMobile ? "12px" : "12px", 
             justifyContent: "flex-end", 
             marginTop: "8px",
-            paddingTop: "20px",
+            paddingTop: isMobile ? "16px" : "20px",
             borderTop: "2px solid var(--border-color)",
           }}>
             <button
@@ -445,12 +465,13 @@ export default function CreateTaskModal({
               className="btn btn-secondary"
               disabled={loading}
               style={{
-                padding: "12px 24px",
-                fontSize: "15px",
+                padding: isMobile ? "14px 20px" : "12px 24px",
+                fontSize: isMobile ? "15px" : "15px",
                 fontWeight: 600,
                 borderRadius: "10px",
                 border: "2px solid var(--border-color)",
                 transition: "all 0.2s",
+                width: isMobile ? "100%" : "auto",
               }}
             >
               Cancelar
@@ -460,12 +481,13 @@ export default function CreateTaskModal({
               className="btn btn-primary"
               disabled={loading || !title.trim()}
               style={{
-                padding: "12px 24px",
-                fontSize: "15px",
+                padding: isMobile ? "14px 20px" : "12px 24px",
+                fontSize: isMobile ? "15px" : "15px",
                 fontWeight: 600,
                 borderRadius: "10px",
                 boxShadow: "0 4px 12px rgba(0, 123, 255, 0.3)",
                 transition: "all 0.2s",
+                width: isMobile ? "100%" : "auto",
               }}
             >
               {loading ? "Creando..." : "✨ Crear Tarea"}
