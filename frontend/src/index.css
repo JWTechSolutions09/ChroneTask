@@ -1039,14 +1039,14 @@ input, textarea, select {
 
 /* Responsive para modales y paneles */
 @media (max-width: 767.98px) {
-  [style*="maxWidth"] {
+  [style*="maxWidth"]:not(.create-task-modal-content):not(.create-task-modal-overlay) {
     max-width: min(95vw, 500px) !important;
     width: min(95vw, 500px) !important;
   }
 
-  [style*="width: 500px"],
-  [style*="width: 700px"],
-  [style*="width: 800px"] {
+  [style*="width: 500px"]:not(.create-task-modal-content):not(.create-task-modal-overlay),
+  [style*="width: 700px"]:not(.create-task-modal-content):not(.create-task-modal-overlay),
+  [style*="width: 800px"]:not(.create-task-modal-content):not(.create-task-modal-overlay) {
     width: min(95vw, 500px) !important;
     max-width: min(95vw, 500px) !important;
   }
@@ -1628,19 +1628,38 @@ input, textarea, select {
   .create-task-modal-overlay {
     width: 100vw !important;
     max-width: 100vw !important;
+    min-width: 100vw !important;
     overflow-x: hidden !important;
     overflow-y: auto !important;
   }
 
   .create-task-modal-content {
-    max-width: 100% !important;
-    width: 100% !important;
-    min-width: 0 !important;
+    max-width: 100vw !important;
+    width: 100vw !important;
+    min-width: 100vw !important;
     margin: 0 !important;
     padding: 20px 16px !important;
     overflow-x: hidden !important;
     overflow-y: auto !important;
     box-sizing: border-box !important;
+  }
+
+  /* Sobrescribir cualquier estilo global que limite el ancho - MÁXIMA PRIORIDAD */
+  .create-task-modal-content[style*="maxWidth"],
+  .create-task-modal-content[style*="width"],
+  .create-task-modal-overlay[style*="maxWidth"],
+  .create-task-modal-overlay[style*="width"] {
+    max-width: 100vw !important;
+    width: 100vw !important;
+    min-width: 100vw !important;
+  }
+
+  /* Asegurar que el modal no sea afectado por estilos de width específicos */
+  .create-task-modal-content[style*="width: 100vw"],
+  .create-task-modal-content[style*="width: 100%"] {
+    width: 100vw !important;
+    max-width: 100vw !important;
+    min-width: 100vw !important;
   }
 
   .create-task-modal-content * {

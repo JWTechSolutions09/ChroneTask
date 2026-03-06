@@ -120,11 +120,12 @@ export default function CreateTaskModal({
       <div
         className="create-task-modal-content"
         style={{
-          width: isMobile ? "100%" : "95%",
-          maxWidth: isMobile ? "100%" : "700px",
+          width: isMobile ? "100vw" : "95%",
+          maxWidth: isMobile ? "100vw" : "700px",
+          minWidth: isMobile ? "100vw" : "auto",
           minHeight: isMobile ? "100vh" : "auto",
-          maxHeight: isMobile ? "none" : "95vh",
-          height: isMobile ? "auto" : "auto",
+          maxHeight: isMobile ? "100vh" : "95vh",
+          height: isMobile ? "100vh" : "auto",
           overflowY: "auto",
           overflowX: "hidden",
           borderRadius: isMobile ? "0" : "16px",
@@ -137,6 +138,12 @@ export default function CreateTaskModal({
           display: "flex",
           flexDirection: "column",
           boxSizing: "border-box" as const,
+          // Forzar ancho completo en móvil
+          ...(isMobile && {
+            width: "100vw",
+            maxWidth: "100vw",
+            minWidth: "100vw",
+          }),
         }}
         onClick={(e) => e.stopPropagation()}
       >
