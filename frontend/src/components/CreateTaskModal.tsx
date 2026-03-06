@@ -68,160 +68,154 @@ export default function CreateTaskModal({
     }
   };
 
+  // Estilos base para inputs
+  const inputStyle = {
+    padding: isMobile ? "14px" : "14px 16px",
+    fontSize: isMobile ? "16px" : "15px",
+    borderRadius: "10px",
+    border: "2px solid var(--border-color)",
+    transition: "all 0.2s",
+    width: "100%",
+    maxWidth: "100%",
+    boxSizing: "border-box" as const,
+    backgroundColor: "var(--bg-primary)",
+    color: "var(--text-primary)",
+  };
+
+  const labelStyle = {
+    display: "block",
+    marginBottom: isMobile ? "10px" : "10px",
+    fontSize: isMobile ? "15px" : "15px",
+    fontWeight: 600,
+    color: "var(--text-primary)",
+    width: "100%",
+    maxWidth: "100%",
+    boxSizing: "border-box" as const,
+  };
+
   return (
-      <div
-        className="create-task-modal-overlay"
-        style={{
-          position: "fixed",
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          width: "100vw",
-          height: "100vh",
-          maxWidth: "100vw",
-          backgroundColor: "rgba(0, 0, 0, 0.6)",
-          display: "flex",
-          alignItems: isMobile ? "flex-start" : "center",
-          justifyContent: "center",
-          zIndex: 1000,
-          backdropFilter: "blur(4px)",
-          overflowY: isMobile ? "auto" : "hidden",
-          overflowX: "hidden",
-          WebkitOverflowScrolling: "touch",
-        }}
-        onClick={onClose}
-      >
+    <div
+      className="create-task-modal-overlay"
+      style={{
+        position: "fixed",
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        width: "100vw",
+        height: "100vh",
+        maxWidth: "100vw",
+        backgroundColor: "rgba(0, 0, 0, 0.6)",
+        display: "flex",
+        alignItems: isMobile ? "flex-start" : "center",
+        justifyContent: "center",
+        zIndex: 1000,
+        backdropFilter: "blur(4px)",
+        overflowY: isMobile ? "auto" : "hidden",
+        overflowX: "hidden",
+        WebkitOverflowScrolling: "touch",
+      }}
+      onClick={onClose}
+    >
       <div
         className="create-task-modal-content"
         style={{
-          maxWidth: isMobile ? "100vw" : "700px",
           width: isMobile ? "100%" : "95%",
-          minWidth: 0,
+          maxWidth: isMobile ? "100%" : "700px",
           minHeight: isMobile ? "100vh" : "auto",
-          maxHeight: isMobile ? "100vh" : "95vh",
-          height: isMobile ? "100vh" : "auto",
+          maxHeight: isMobile ? "none" : "95vh",
+          height: isMobile ? "auto" : "auto",
           overflowY: "auto",
           overflowX: "hidden",
           borderRadius: isMobile ? "0" : "16px",
           boxShadow: isMobile ? "none" : "0 20px 60px rgba(0, 0, 0, 0.3)",
           border: isMobile ? "none" : "1px solid rgba(0, 0, 0, 0.1)",
-          padding: isMobile ? "16px" : "32px",
-          margin: isMobile ? "0" : "auto",
+          padding: isMobile ? "20px 16px" : "32px",
+          margin: 0,
           backgroundColor: "var(--bg-primary)",
           position: "relative",
           display: "flex",
           flexDirection: "column",
-          boxSizing: "border-box",
-          flex: isMobile ? "1 1 100%" : "0 1 auto",
+          boxSizing: "border-box" as const,
         }}
         onClick={(e) => e.stopPropagation()}
       >
+        {/* Header */}
         <div
           style={{
+            width: "100%",
+            maxWidth: "100%",
             display: "flex",
-            justifyContent: "space-between",
+            justifyContent: "center",
             alignItems: "center",
-            marginBottom: isMobile ? "20px" : "28px",
+            marginBottom: isMobile ? "24px" : "28px",
             paddingBottom: isMobile ? "16px" : "20px",
             borderBottom: "2px solid var(--border-color)",
-            width: "100%",
             position: "relative",
+            boxSizing: "border-box" as const,
           }}
         >
-          {isMobile ? (
-            <>
-              <div style={{ flex: 1, textAlign: "center" }}>
-                <h2 style={{ margin: 0, fontSize: "22px", fontWeight: 700, color: "var(--text-primary)" }}>
-                  Nueva Tarea
-                </h2>
-              </div>
-              <button
-                onClick={onClose}
-                style={{
-                  background: "var(--hover-bg)",
-                  border: "1px solid var(--border-color)",
-                  fontSize: "28px",
-                  cursor: "pointer",
-                  color: "var(--text-secondary)",
-                  width: "36px",
-                  height: "36px",
-                  borderRadius: "10px",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  transition: "all 0.2s",
-                  flexShrink: 0,
-                  position: "absolute",
-                  right: 0,
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor = "var(--bg-tertiary)";
-                  e.currentTarget.style.color = "var(--text-primary)";
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor = "var(--hover-bg)";
-                  e.currentTarget.style.color = "var(--text-secondary)";
-                }}
-                title="Cerrar"
-              >
-                ×
-              </button>
-            </>
-          ) : (
-            <>
-              <div>
-                <h2 style={{ margin: 0, fontSize: "28px", fontWeight: 700, color: "var(--text-primary)", marginBottom: "4px" }}>
-                  Nueva Tarea
-                </h2>
-                <p style={{ margin: 0, fontSize: "14px", color: "var(--text-secondary)" }}>
-                  Completa los detalles de la nueva tarea
-                </p>
-              </div>
-              <button
-                onClick={onClose}
-                style={{
-                  background: "var(--hover-bg)",
-                  border: "1px solid var(--border-color)",
-                  fontSize: "24px",
-                  cursor: "pointer",
-                  color: "var(--text-secondary)",
-                  width: "40px",
-                  height: "40px",
-                  borderRadius: "10px",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  transition: "all 0.2s",
-                  flexShrink: 0,
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor = "var(--bg-tertiary)";
-                  e.currentTarget.style.color = "var(--text-primary)";
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor = "var(--hover-bg)";
-                  e.currentTarget.style.color = "var(--text-secondary)";
-                }}
-                title="Cerrar"
-              >
-                ×
-              </button>
-            </>
-          )}
+          <h2 style={{ 
+            margin: 0, 
+            fontSize: isMobile ? "24px" : "28px", 
+            fontWeight: 700, 
+            color: "var(--text-primary)",
+            textAlign: "center",
+            width: "100%",
+          }}>
+            Nueva Tarea
+          </h2>
+          <button
+            onClick={onClose}
+            style={{
+              background: "var(--hover-bg)",
+              border: "1px solid var(--border-color)",
+              fontSize: "24px",
+              cursor: "pointer",
+              color: "var(--text-secondary)",
+              width: isMobile ? "36px" : "40px",
+              height: isMobile ? "36px" : "40px",
+              borderRadius: "10px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              transition: "all 0.2s",
+              flexShrink: 0,
+              position: "absolute",
+              right: 0,
+              top: 0,
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = "var(--bg-tertiary)";
+              e.currentTarget.style.color = "var(--text-primary)";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = "var(--hover-bg)";
+              e.currentTarget.style.color = "var(--text-secondary)";
+            }}
+            title="Cerrar"
+          >
+            ×
+          </button>
         </div>
 
-        <form onSubmit={handleSubmit} style={{ display: "grid", gap: isMobile ? "16px" : "20px", width: "100%", maxWidth: "100%", boxSizing: "border-box", overflowX: "hidden", margin: 0, padding: 0 }}>
-          <div style={{ width: "100%", maxWidth: "100%", boxSizing: "border-box" }}>
-            <label
-              style={{
-                display: "block",
-                marginBottom: isMobile ? "8px" : "10px",
-                fontSize: isMobile ? "14px" : "15px",
-                fontWeight: 600,
-                color: "var(--text-primary)",
-              }}
-            >
+        {/* Form */}
+        <form 
+          onSubmit={handleSubmit} 
+          style={{ 
+            width: "100%", 
+            maxWidth: "100%", 
+            boxSizing: "border-box" as const,
+            display: "flex",
+            flexDirection: "column",
+            gap: isMobile ? "20px" : "20px",
+            margin: 0,
+            padding: 0,
+          }}
+        >
+          {/* Título */}
+          <div style={{ width: "100%", maxWidth: "100%", boxSizing: "border-box" as const }}>
+            <label style={labelStyle}>
               Título <span style={{ color: "var(--danger)" }}>*</span>
             </label>
             <input
@@ -229,18 +223,8 @@ export default function CreateTaskModal({
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               required
-              className="input"
               placeholder="Ej: Implementar sistema de login"
-              style={{
-                padding: isMobile ? "12px 14px" : "14px 16px",
-                fontSize: isMobile ? "16px" : "15px",
-                borderRadius: "10px",
-                border: "2px solid var(--border-color)",
-                transition: "all 0.2s",
-                width: "100%",
-                maxWidth: "100%",
-                boxSizing: "border-box",
-              }}
+              style={inputStyle}
               onFocus={(e) => {
                 e.target.style.borderColor = "var(--primary)";
                 e.target.style.boxShadow = "0 0 0 3px rgba(0, 123, 255, 0.1)";
@@ -252,37 +236,20 @@ export default function CreateTaskModal({
             />
           </div>
 
-          <div style={{ width: "100%", maxWidth: "100%", boxSizing: "border-box" }}>
-            <label
-              style={{
-                display: "block",
-                marginBottom: isMobile ? "8px" : "10px",
-                fontSize: isMobile ? "14px" : "15px",
-                fontWeight: 600,
-                color: "var(--text-primary)",
-              }}
-            >
-              Descripción
-            </label>
+          {/* Descripción */}
+          <div style={{ width: "100%", maxWidth: "100%", boxSizing: "border-box" as const }}>
+            <label style={labelStyle}>Descripción</label>
             <textarea
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              className="textarea"
               rows={isMobile ? 4 : 5}
               placeholder="Describe detalladamente la tarea, requisitos, pasos a seguir, etc..."
               style={{
-                padding: isMobile ? "12px 14px" : "14px 16px",
-                fontSize: isMobile ? "16px" : "15px",
-                borderRadius: "10px",
-                border: "2px solid var(--border-color)",
-                transition: "all 0.2s",
+                ...inputStyle,
                 resize: "vertical",
                 minHeight: isMobile ? "100px" : "120px",
                 fontFamily: "inherit",
                 lineHeight: "1.6",
-                width: "100%",
-                maxWidth: "100%",
-                boxSizing: "border-box",
               }}
               onFocus={(e) => {
                 e.target.style.borderColor = "var(--primary)";
@@ -295,35 +262,23 @@ export default function CreateTaskModal({
             />
           </div>
 
-          <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: isMobile ? "16px" : "16px", width: "100%", maxWidth: "100%", boxSizing: "border-box" }}>
-            <div style={{ width: "100%", maxWidth: "100%", boxSizing: "border-box" }}>
-              <label
-                style={{
-                  display: "block",
-                  marginBottom: isMobile ? "8px" : "10px",
-                  fontSize: isMobile ? "14px" : "15px",
-                  fontWeight: 600,
-                  color: "var(--text-primary)",
-                }}
-              >
-                Tipo
-              </label>
+          {/* Tipo y Prioridad */}
+          <div style={{ 
+            display: "grid", 
+            gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", 
+            gap: isMobile ? "20px" : "16px",
+            width: "100%",
+            maxWidth: "100%",
+            boxSizing: "border-box" as const,
+          }}>
+            <div style={{ width: "100%", maxWidth: "100%", boxSizing: "border-box" as const }}>
+              <label style={labelStyle}>Tipo</label>
               <select 
                 value={type} 
                 onChange={(e) => setType(e.target.value)} 
-                className="select"
                 style={{
-                  padding: isMobile ? "12px 14px" : "14px 16px",
-                  fontSize: isMobile ? "16px" : "15px",
-                  borderRadius: "10px",
-                  border: "2px solid var(--border-color)",
-                  transition: "all 0.2s",
-                  backgroundColor: "var(--bg-primary)",
-                  color: "var(--text-primary)",
+                  ...inputStyle,
                   cursor: "pointer",
-                  width: "100%",
-                  maxWidth: "100%",
-                  boxSizing: "border-box",
                 }}
                 onFocus={(e) => {
                   e.target.style.borderColor = "var(--primary)";
@@ -341,34 +296,14 @@ export default function CreateTaskModal({
               </select>
             </div>
 
-            <div style={{ width: "100%", maxWidth: "100%", boxSizing: "border-box" }}>
-              <label
-                style={{
-                  display: "block",
-                  marginBottom: isMobile ? "8px" : "10px",
-                  fontSize: isMobile ? "14px" : "15px",
-                  fontWeight: 600,
-                  color: "var(--text-primary)",
-                }}
-              >
-                Prioridad
-              </label>
+            <div style={{ width: "100%", maxWidth: "100%", boxSizing: "border-box" as const }}>
+              <label style={labelStyle}>Prioridad</label>
               <select
                 value={priority}
                 onChange={(e) => setPriority(e.target.value)}
-                className="select"
                 style={{
-                  padding: isMobile ? "12px 14px" : "14px 16px",
-                  fontSize: isMobile ? "16px" : "15px",
-                  borderRadius: "10px",
-                  border: "2px solid var(--border-color)",
-                  transition: "all 0.2s",
-                  backgroundColor: "var(--bg-primary)",
-                  color: "var(--text-primary)",
+                  ...inputStyle,
                   cursor: "pointer",
-                  width: "100%",
-                  maxWidth: "100%",
-                  boxSizing: "border-box",
                 }}
                 onFocus={(e) => {
                   e.target.style.borderColor = "var(--primary)";
@@ -388,35 +323,16 @@ export default function CreateTaskModal({
             </div>
           </div>
 
-          <div style={{ width: "100%", maxWidth: "100%", boxSizing: "border-box" }}>
-            <label
-              style={{
-                display: "block",
-                marginBottom: isMobile ? "8px" : "10px",
-                fontSize: isMobile ? "14px" : "15px",
-                fontWeight: 600,
-                color: "var(--text-primary)",
-              }}
-            >
-              Tiempo estimado (minutos)
-            </label>
+          {/* Tiempo estimado */}
+          <div style={{ width: "100%", maxWidth: "100%", boxSizing: "border-box" as const }}>
+            <label style={labelStyle}>Tiempo estimado (minutos)</label>
             <input
               type="number"
               value={estimatedMinutes}
               onChange={(e) => setEstimatedMinutes(e.target.value)}
-              className="input"
               placeholder="Ej: 120 (2 horas)"
               min="0"
-              style={{
-                padding: isMobile ? "12px 14px" : "14px 16px",
-                fontSize: isMobile ? "16px" : "15px",
-                borderRadius: "10px",
-                border: "2px solid var(--border-color)",
-                transition: "all 0.2s",
-                width: "100%",
-                maxWidth: "100%",
-                boxSizing: "border-box",
-              }}
+              style={inputStyle}
               onFocus={(e) => {
                 e.target.style.borderColor = "var(--primary)";
                 e.target.style.boxShadow = "0 0 0 3px rgba(0, 123, 255, 0.1)";
@@ -426,37 +342,27 @@ export default function CreateTaskModal({
                 e.target.style.boxShadow = "none";
               }}
             />
-            <div style={{ fontSize: isMobile ? "12px" : "13px", color: "var(--text-secondary)", marginTop: "6px" }}>
+            <div style={{ fontSize: "13px", color: "var(--text-secondary)", marginTop: "8px" }}>
               Tiempo aproximado que tomará completar esta tarea
             </div>
           </div>
 
-          <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: isMobile ? "16px" : "16px", width: "100%", maxWidth: "100%", boxSizing: "border-box" }}>
-            <div style={{ width: "100%", maxWidth: "100%", boxSizing: "border-box" }}>
-              <label
-                style={{
-                  display: "block",
-                  marginBottom: isMobile ? "8px" : "10px",
-                  fontSize: isMobile ? "14px" : "15px",
-                  fontWeight: 600,
-                  color: "var(--text-primary)",
-                }}
-              >
-                Fecha de inicio
-              </label>
+          {/* Fechas */}
+          <div style={{ 
+            display: "grid", 
+            gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", 
+            gap: isMobile ? "20px" : "16px",
+            width: "100%",
+            maxWidth: "100%",
+            boxSizing: "border-box" as const,
+          }}>
+            <div style={{ width: "100%", maxWidth: "100%", boxSizing: "border-box" as const }}>
+              <label style={labelStyle}>Fecha de inicio</label>
               <input
                 type="datetime-local"
                 value={startDate}
                 onChange={(e) => setStartDate(e.target.value)}
-                className="input"
-                style={{
-                  padding: isMobile ? "12px 14px" : "14px 16px",
-                  fontSize: isMobile ? "16px" : "15px",
-                  borderRadius: "10px",
-                  border: "2px solid var(--border-color)",
-                  transition: "all 0.2s",
-                  width: "100%",
-                }}
+                style={inputStyle}
                 onFocus={(e) => {
                   e.target.style.borderColor = "var(--primary)";
                   e.target.style.boxShadow = "0 0 0 3px rgba(0, 123, 255, 0.1)";
@@ -468,31 +374,13 @@ export default function CreateTaskModal({
               />
             </div>
 
-            <div style={{ width: "100%", maxWidth: "100%", boxSizing: "border-box" }}>
-              <label
-                style={{
-                  display: "block",
-                  marginBottom: isMobile ? "8px" : "10px",
-                  fontSize: isMobile ? "14px" : "15px",
-                  fontWeight: 600,
-                  color: "var(--text-primary)",
-                }}
-              >
-                Fecha límite
-              </label>
+            <div style={{ width: "100%", maxWidth: "100%", boxSizing: "border-box" as const }}>
+              <label style={labelStyle}>Fecha límite</label>
               <input
                 type="datetime-local"
                 value={dueDate}
                 onChange={(e) => setDueDate(e.target.value)}
-                className="input"
-                style={{
-                  padding: isMobile ? "12px 14px" : "14px 16px",
-                  fontSize: isMobile ? "16px" : "15px",
-                  borderRadius: "10px",
-                  border: "2px solid var(--border-color)",
-                  transition: "all 0.2s",
-                  width: "100%",
-                }}
+                style={inputStyle}
                 onFocus={(e) => {
                   e.target.style.borderColor = "var(--primary)";
                   e.target.style.boxShadow = "0 0 0 3px rgba(0, 123, 255, 0.1)";
@@ -505,58 +393,73 @@ export default function CreateTaskModal({
             </div>
           </div>
 
+          {/* Error */}
           {error && (
             <div 
               className="alert alert-error" 
               style={{ 
-                padding: isMobile ? "12px 14px" : "14px 16px", 
+                padding: "14px", 
                 borderRadius: "10px",
-                fontSize: isMobile ? "13px" : "14px",
-                marginTop: "8px",
+                fontSize: "14px",
+                width: "100%",
+                maxWidth: "100%",
+                boxSizing: "border-box" as const,
               }}
             >
               {error}
             </div>
           )}
 
+          {/* Botones */}
           <div style={{ 
             display: "flex", 
             flexDirection: isMobile ? "column-reverse" : "row",
-            gap: isMobile ? "12px" : "12px", 
+            gap: "12px", 
             justifyContent: "flex-end", 
             marginTop: "8px",
-            paddingTop: isMobile ? "16px" : "20px",
+            paddingTop: "20px",
             borderTop: "2px solid var(--border-color)",
+            width: "100%",
+            maxWidth: "100%",
+            boxSizing: "border-box" as const,
           }}>
             <button
               type="button"
               onClick={onClose}
-              className="btn btn-secondary"
               disabled={loading}
               style={{
-                padding: isMobile ? "14px 20px" : "12px 24px",
-                fontSize: isMobile ? "15px" : "15px",
+                padding: isMobile ? "16px" : "12px 24px",
+                fontSize: "15px",
                 fontWeight: 600,
                 borderRadius: "10px",
                 border: "2px solid var(--border-color)",
                 transition: "all 0.2s",
                 width: isMobile ? "100%" : "auto",
+                backgroundColor: "var(--hover-bg)",
+                color: "var(--text-primary)",
+                cursor: "pointer",
+                boxSizing: "border-box" as const,
               }}
             >
               Cancelar
             </button>
             <button
               type="submit"
-              className="btn btn-primary"
               disabled={loading || !title.trim()}
               style={{
-                padding: isMobile ? "14px 20px" : "12px 24px",
-                fontSize: isMobile ? "15px" : "15px",
+                padding: isMobile ? "16px" : "12px 24px",
+                fontSize: "15px",
                 fontWeight: 600,
                 borderRadius: "10px",
                 boxShadow: "0 4px 12px rgba(0, 123, 255, 0.3)",
                 transition: "all 0.2s",
                 width: isMobile ? "100%" : "auto",
+                backgroundColor: "var(--primary)",
+                color: "white",
+                border: "none",
+                cursor: loading || !title.trim() ? "not-allowed" : "pointer",
+                opacity: loading || !title.trim() ? 0.6 : 1,
+                boxSizing: "border-box" as const,
               }}
             >
               {loading ? "Creando..." : "✨ Crear Tarea"}
