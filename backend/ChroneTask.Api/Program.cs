@@ -81,55 +81,102 @@ string? ConvertPostgresUrlToConnectionString(string postgresUrl)
         // También puede venir con dominio completo: postgresql://user:pass@host.oregon-postgres.render.com:port/dbname
         // Convertir a formato Npgsql: Host=host;Port=port;Database=dbname;Username=user;Password=pass
         
-        // Manejar casos donde la URL puede tener caracteres especiales en la contraseña
-        var uriString = postgresUrl;
+        if (string.IsNullOrWhiteSpace(postgresUrl))
+            return null;
         
-        // Si la contraseña tiene caracteres especiales, pueden estar codificados o no
-        // Intentar parsear directamente
-        var uri = new Uri(uriString);
+        // Parsear manualmente para manejar mejor los caracteres especiales
+        var uriString = postgresUrl.Trim();
         
-        // Extraer userInfo manualmente para manejar mejor los caracteres especiales
-        var atIndex = uriString.IndexOf('@');
-        if (atIndex > 0)
+        // Encontrar el inicio de las credenciales (después de ://)
+        var protocolEnd = uriString.IndexOf("://");
+        if (protocolEnd < 0)
+            return null;
+        
+        var startIndex = protocolEnd + 3; // Después de "://"
+        var atIndex = uriString.IndexOf('@', startIndex);
+        
+        if (atIndex <= startIndex)
+            return null;
+        
+        // Extraer userInfo (usuario:contraseña)
+        var userInfoPart = uriString.Substring(startIndex, atIndex - startIndex);
+        var colonIndex = userInfoPart.IndexOf(':');
+        
+        if (colonIndex <= 0)
+            return null;
+        
+        var username = userInfoPart.Substring(0, colonIndex);
+        var password = userInfoPart.Substring(colonIndex + 1);
+        
+        // Decodificar la contraseña (puede estar URL-encoded)
+        password = Uri.UnescapeDataString(password);
+        
+        // Extraer host, puerto y base de datos (después de @)
+        var afterAt = uriString.Substring(atIndex + 1);
+        var pathIndex = afterAt.IndexOf('/');
+        var hostPort = pathIndex > 0 ? afterAt.Substring(0, pathIndex) : afterAt;
+        var database = pathIndex > 0 ? afterAt.Substring(pathIndex + 1) : "postgres";
+        
+        // Separar host y puerto
+        var colonPortIndex = hostPort.LastIndexOf(':');
+        string host;
+        int port;
+        
+        if (colonPortIndex > 0)
         {
-            var userInfoPart = uriString.Substring(uriString.IndexOf("://") + 3, atIndex - uriString.IndexOf("://") - 3);
-            var colonIndex = userInfoPart.IndexOf(':');
-            
-            if (colonIndex > 0)
+            host = hostPort.Substring(0, colonPortIndex);
+            if (int.TryParse(hostPort.Substring(colonPortIndex + 1), out port))
             {
-                var username = userInfoPart.Substring(0, colonIndex);
-                var password = userInfoPart.Substring(colonIndex + 1);
-                
-                // Decodificar la contraseña (puede estar URL-encoded)
-                password = Uri.UnescapeDataString(password);
-                
-                var host = uri.Host;
-                var port = uri.Port > 0 ? uri.Port : 5432;
-                var database = uri.LocalPath.TrimStart('/');
-                
-                Console.WriteLine($"🔍 Parsed connection: Host={host}, Port={port}, Database={database}, Username={username}");
-                
-                return $"Host={host};Port={port};Database={database};Username={username};Password={password};SSL Mode=Require;Trust Server Certificate=true";
+                // Puerto válido
+            }
+            else
+            {
+                port = 5432;
             }
         }
-        
-        // Fallback al método original
-        var userInfo = uri.UserInfo.Split(':');
-        if (userInfo.Length >= 2)
+        else
         {
-            var host = uri.Host;
-            var port = uri.Port > 0 ? uri.Port : 5432;
-            var database = uri.LocalPath.TrimStart('/');
-            var username = userInfo[0];
-            var password = Uri.UnescapeDataString(userInfo[1]);
-            
-            return $"Host={host};Port={port};Database={database};Username={username};Password={password};SSL Mode=Require;Trust Server Certificate=true";
+            host = hostPort;
+            port = 5432;
         }
+        
+        // Limpiar la base de datos (puede tener parámetros de query)
+        if (database.Contains('?'))
+        {
+            database = database.Substring(0, database.IndexOf('?'));
+        }
+        if (database.Contains('#'))
+        {
+            database = database.Substring(0, database.IndexOf('#'));
+        }
+        database = database.Trim();
+        
+        // Si la base de datos está vacía, usar "postgres" por defecto
+        if (string.IsNullOrEmpty(database))
+        {
+            database = "postgres";
+        }
+        
+        Console.WriteLine($"🔍 Parsed connection: Host={host}, Port={port}, Database={database}, Username={username}");
+        Console.WriteLine($"🔍 Password length: {password?.Length ?? 0} characters");
+        
+        var connectionString = $"Host={host};Port={port};Database={database};Username={username};Password={password};SSL Mode=Require;Trust Server Certificate=true";
+        
+        // Log parcial de la connection string (sin mostrar la contraseña completa)
+        var safeLog = connectionString.Replace($"Password={password}", "Password=***");
+        Console.WriteLine($"🔍 Connection string: {safeLog}");
+        
+        return connectionString;
     }
     catch (Exception ex)
     {
         Console.WriteLine($"❌ Error procesando URL de PostgreSQL: {ex.Message}");
-        Console.WriteLine($"   URL recibida: {postgresUrl?.Substring(0, Math.Min(50, postgresUrl?.Length ?? 0))}...");
+        Console.WriteLine($"   Stack trace: {ex.StackTrace}");
+        if (!string.IsNullOrEmpty(postgresUrl))
+        {
+            var preview = postgresUrl.Length > 100 ? postgresUrl.Substring(0, 100) + "..." : postgresUrl;
+            Console.WriteLine($"   URL recibida (preview): {preview}");
+        }
     }
     return null;
 }
