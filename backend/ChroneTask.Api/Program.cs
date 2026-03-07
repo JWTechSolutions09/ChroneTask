@@ -4,6 +4,8 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text;
+using Microsoft.EntityFrameworkCore.Storage;
+using Npgsql;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -248,10 +250,97 @@ try
     using (var scope = app.Services.CreateScope())
     {
         var dbContext = scope.ServiceProvider.GetRequiredService<ChroneTaskDbContext>();
-        Console.WriteLine("🔄 Aplicando migraciones de base de datos...");
-        dbContext.Database.Migrate();
-        Console.WriteLine("✅ Migraciones aplicadas correctamente");
+        Console.WriteLine("🔄 Verificando estado de la base de datos...");
+        
+        // Verificar si las tablas ya existen (caso: se ejecutó el script SQL manualmente)
+        var canConnect = dbContext.Database.CanConnect();
+        if (canConnect)
+        {
+            // Verificar si la tabla Organizations existe
+            var organizationsTableExists = false;
+            try
+            {
+                var connection = dbContext.Database.GetDbConnection();
+                if (connection.State != System.Data.ConnectionState.Open)
+                    connection.Open();
+                using var command = connection.CreateCommand();
+                command.CommandText = "SELECT EXISTS (SELECT FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'Organizations')";
+                var result = command.ExecuteScalar();
+                organizationsTableExists = result != null && Convert.ToBoolean(result);
+                if (connection.State == System.Data.ConnectionState.Open)
+                    connection.Close();
+            }
+            catch
+            {
+                // Si hay error verificando, asumir que no existe
+                organizationsTableExists = false;
+            }
+            
+            if (organizationsTableExists)
+            {
+                // Verificar si __EFMigrationsHistory existe y tiene registros
+                var migrationsHistoryExists = false;
+                var hasMigrations = false;
+                try
+                {
+                    var connection = dbContext.Database.GetDbConnection();
+                    if (connection.State != System.Data.ConnectionState.Open)
+                        connection.Open();
+                    using var command = connection.CreateCommand();
+                    command.CommandText = "SELECT EXISTS (SELECT FROM information_schema.tables WHERE table_schema = 'public' AND table_name = '__EFMigrationsHistory')";
+                    var result = command.ExecuteScalar();
+                    migrationsHistoryExists = result != null && Convert.ToBoolean(result);
+                    
+                    if (migrationsHistoryExists)
+                    {
+                        command.CommandText = "SELECT COUNT(*) FROM \"__EFMigrationsHistory\"";
+                        var count = command.ExecuteScalar();
+                        hasMigrations = count != null && Convert.ToInt32(count) > 0;
+                    }
+                    
+                    if (connection.State == System.Data.ConnectionState.Open)
+                        connection.Close();
+                }
+                catch
+                {
+                    migrationsHistoryExists = false;
+                    hasMigrations = false;
+                }
+                
+                if (!migrationsHistoryExists || !hasMigrations)
+                {
+                    Console.WriteLine("⚠️ Las tablas ya existen pero no hay historial de migraciones.");
+                    Console.WriteLine("⚠️ Se asume que las tablas fueron creadas manualmente. La aplicación continuará sin ejecutar migraciones.");
+                    Console.WriteLine("✅ Base de datos lista para usar");
+                }
+                else
+                {
+                    // Hay historial de migraciones, aplicar solo las faltantes
+                    Console.WriteLine("🔄 Aplicando migraciones faltantes...");
+                    dbContext.Database.Migrate();
+                    Console.WriteLine("✅ Migraciones aplicadas correctamente");
+                }
+            }
+            else
+            {
+                // Las tablas no existen, ejecutar migraciones normalmente
+                Console.WriteLine("🔄 Aplicando migraciones de base de datos...");
+                dbContext.Database.Migrate();
+                Console.WriteLine("✅ Migraciones aplicadas correctamente");
+            }
+        }
+        else
+        {
+            Console.WriteLine("⚠️ No se puede conectar a la base de datos. Las migraciones se omitirán.");
+        }
     }
+}
+catch (PostgresException pgEx) when (pgEx.SqlState == "42P07")
+{
+    // Error: relation already exists
+    Console.WriteLine("⚠️ Las tablas ya existen en la base de datos.");
+    Console.WriteLine("⚠️ Se asume que las tablas fueron creadas manualmente. La aplicación continuará sin ejecutar migraciones.");
+    Console.WriteLine("✅ Base de datos lista para usar");
 }
 catch (Exception ex)
 {
