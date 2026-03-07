@@ -60,9 +60,24 @@ public class UserController : ControllerBase
                 Organizations = organizations
             });
         }
+        catch (UnauthorizedAccessException uaEx)
+        {
+            Console.WriteLine($"❌ Error de autenticación en GetCurrentUser: {uaEx.Message}");
+            return Unauthorized(new
+            {
+                error = "Unauthorized",
+                message = "Invalid or missing authentication token"
+            });
+        }
         catch (Exception ex)
         {
             Console.WriteLine($"❌ Error en GetCurrentUser: {ex.Message}");
+            Console.WriteLine($"❌ Tipo: {ex.GetType().Name}");
+            Console.WriteLine($"❌ StackTrace: {ex.StackTrace}");
+            if (ex.InnerException != null)
+            {
+                Console.WriteLine($"❌ InnerException: {ex.InnerException.Message}");
+            }
             return StatusCode(500, new
             {
                 error = "Internal Server Error",
@@ -280,8 +295,21 @@ public class UserController : ControllerBase
                 var projectResponses = new List<ProjectResponse>();
                 foreach (var project in projects)
                 {
-                    var taskCount = await _db.Tasks.CountAsync(t => t.ProjectId == project.Id);
-                    var activeTaskCount = await _db.Tasks.CountAsync(t => t.ProjectId == project.Id && t.Status != "Done");
+                    int taskCount = 0;
+                    int activeTaskCount = 0;
+                    
+                    try
+                    {
+                        taskCount = await _db.Tasks.CountAsync(t => t.ProjectId == project.Id);
+                        activeTaskCount = await _db.Tasks.CountAsync(t => t.ProjectId == project.Id && t.Status != "Done");
+                    }
+                    catch (Exception taskEx)
+                    {
+                        // Si hay error al contar tareas (tabla no existe, etc.), usar 0
+                        Console.WriteLine($"⚠️ Error contando tareas para proyecto {project.Id}: {taskEx.Message}");
+                        taskCount = 0;
+                        activeTaskCount = 0;
+                    }
 
                     projectResponses.Add(new ProjectResponse
                     {

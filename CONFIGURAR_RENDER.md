@@ -129,4 +129,82 @@ postgresql://postgres.fhbyiujurdnkzfenfilb:chronetaskpass09@aws-0-us-west-2.pool
 
 ---
 
+---
+
+## Configurar JWT_SECRET_KEY (IMPORTANTE)
+
+Para que la autenticación funcione correctamente, necesitas configurar el `JWT_SECRET_KEY` en Render:
+
+### Paso 1: Generar una clave secreta segura
+
+Puedes generar una clave secreta segura usando uno de estos métodos:
+
+**Opción 1: Usar PowerShell (Windows)**
+```powershell
+-join ((65..90) + (97..122) + (48..57) | Get-Random -Count 64 | ForEach-Object {[char]$_})
+```
+
+**Opción 2: Usar un generador online**
+- https://www.grc.com/passwords.htm
+- Genera una contraseña de al menos 32 caracteres
+
+**Opción 3: Usar OpenSSL (si está instalado)**
+```bash
+openssl rand -base64 32
+```
+
+### Paso 2: Configurar en Render
+
+1. **Ve a tu servicio en Render** (https://dashboard.render.com)
+2. Selecciona tu servicio (backend)
+3. Ve a **Environment** en el menú lateral
+4. Busca o crea la variable de entorno `JWT_SECRET_KEY`
+5. Pega la clave secreta generada (debe tener al menos 32 caracteres)
+6. **Guarda los cambios**
+7. **Redeploya el servicio**
+
+### Paso 3: Verificar
+
+Después del redeploy, verifica los logs. Deberías ver:
+```
+🔐 JWT configurado - Issuer: ChroneTask, Audience: ChroneTask, SecretKey length: [número]
+```
+
+**⚠️ IMPORTANTE**: 
+- El `JWT_SECRET_KEY` debe ser el mismo que se usó para generar los tokens
+- Si cambias el `JWT_SECRET_KEY`, todos los usuarios tendrán que iniciar sesión de nuevo
+- Nunca compartas tu `JWT_SECRET_KEY` públicamente
+
+---
+
+## Variables de Entorno Requeridas en Render
+
+Asegúrate de tener estas variables configuradas:
+
+1. **`DATABASE_URL`** (requerida)
+   ```
+   postgresql://postgres.fhbyiujurdnkzfenfilb:chronetaskpass09@aws-0-us-west-2.pooler.supabase.com:5432/postgres
+   ```
+
+2. **`JWT_SECRET_KEY`** (requerida)
+   - Debe tener al menos 32 caracteres
+   - Debe ser una cadena aleatoria segura
+
+3. **`JWT_ISSUER`** (opcional, por defecto: `ChroneTask`)
+   ```
+   ChroneTask
+   ```
+
+4. **`JWT_AUDIENCE`** (opcional, por defecto: `ChroneTask`)
+   ```
+   ChroneTask
+   ```
+
+5. **`JWT_EXPIRATION_MINUTES`** (opcional, por defecto: `1440` = 24 horas)
+   ```
+   1440
+   ```
+
+---
+
 ¡Configura esto en Render y redeploya! 🚀

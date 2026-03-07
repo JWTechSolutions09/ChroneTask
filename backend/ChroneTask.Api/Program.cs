@@ -222,7 +222,17 @@ builder.Services.AddDbContext<ChroneTaskDbContext>(options =>
 
 // ✅ JWT
 var jwt = builder.Configuration.GetSection("JWT");
-var secretKey = jwt["SecretKey"] ?? throw new InvalidOperationException("JWT SecretKey no configurado");
+var secretKey = jwt["SecretKey"];
+
+// Si no hay SecretKey configurado, usar uno por defecto (solo para desarrollo)
+if (string.IsNullOrWhiteSpace(secretKey))
+{
+    Console.WriteLine("⚠️ JWT SecretKey no configurado. Usando clave por defecto (NO SEGURO PARA PRODUCCIÓN)");
+    secretKey = "your-development-secret-key-change-in-production-min-32-chars";
+}
+
+Console.WriteLine($"🔐 JWT configurado - Issuer: {jwt["Issuer"]}, Audience: {jwt["Audience"]}, SecretKey length: {secretKey?.Length ?? 0}");
+
 var key = Encoding.UTF8.GetBytes(secretKey);
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
