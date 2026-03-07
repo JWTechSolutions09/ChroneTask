@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
+using Npgsql;
 
 namespace ChroneTask.Api.Controllers;
 
@@ -297,7 +298,7 @@ public class UserController : ControllerBase
                 {
                     int taskCount = 0;
                     int activeTaskCount = 0;
-                    
+
                     try
                     {
                         taskCount = await _db.Tasks.CountAsync(t => t.ProjectId == project.Id);
@@ -413,6 +414,7 @@ public class UserController : ControllerBase
             // Crear el proyecto - EXACTAMENTE como en ProjectsController
             var project = new Project
             {
+                Id = Guid.NewGuid(), // Asegurar que el ID esté asignado
                 Name = request.Name.Trim(),
                 Description = string.IsNullOrWhiteSpace(request.Description) ? null : request.Description.Trim(),
                 OrganizationId = null, // Proyecto personal, sin organización
@@ -421,32 +423,56 @@ public class UserController : ControllerBase
                 // ImageUrl puede ser base64, no hacer Trim si es muy largo, solo si no está vacío
                 ImageUrl = string.IsNullOrWhiteSpace(request.ImageUrl) ? null : request.ImageUrl,
                 SlaHours = request.SlaHours,
-                SlaWarningThreshold = request.SlaWarningThreshold
+                SlaWarningThreshold = request.SlaWarningThreshold,
+                IsActive = true, // Asegurar que IsActive tenga un valor
+                CreatedAt = DateTime.UtcNow // Asegurar que CreatedAt tenga un valor
             };
 
+            Console.WriteLine($"🔍 Creando proyecto - Name: {project.Name}, UserId: {userId}, OrganizationId: null");
             _db.Projects.Add(project);
 
-            // Agregar al usuario como miembro del proyecto - EXACTAMENTE como en ProjectsController
-            _db.ProjectMembers.Add(new ProjectMember
+            // Esperar a que el proyecto tenga un ID asignado
+            // (aunque Guid.NewGuid() ya lo asigna, es buena práctica asegurarse)
+            var projectId = project.Id;
+            Console.WriteLine($"🔍 Proyecto creado con ID: {projectId}");
+
+            // Agregar al usuario como miembro del proyecto
+            // Usar ProjectId explícitamente para evitar problemas con EF Core
+            var projectMember = new ProjectMember
             {
-                Project = project, // Usar Project (navegación) como en el código original
+                Id = Guid.NewGuid(), // Asegurar que el ID esté asignado
+                ProjectId = projectId,
                 UserId = userId,
-                Role = "pm" // Usar "pm" como en el código original, no "owner"
-            });
+                Role = "pm", // Usar "pm" como en el código original
+                JoinedAt = DateTime.UtcNow // Asegurar que JoinedAt tenga un valor
+            };
+
+            Console.WriteLine($"🔍 Creando ProjectMember - ProjectId: {projectId}, UserId: {userId}, Role: pm");
+            _db.ProjectMembers.Add(projectMember);
 
             // Guardar TODO en un solo SaveChangesAsync - EXACTAMENTE como en ProjectsController
+            Console.WriteLine($"🔍 Guardando cambios en la base de datos...");
             await _db.SaveChangesAsync();
+            Console.WriteLine($"✅ Proyecto y ProjectMember guardados exitosamente");
 
             // Notificar al usuario sobre su nuevo proyecto personal (opcional, pero útil para confirmación)
-            await NotificationHelper.CreateNotificationAsync(
-                _db,
-                userId,
-                "new_project",
-                "Proyecto personal creado",
-                $"Has creado el proyecto '{project.Name}'",
-                project.Id,
-                null,
-                userId);
+            try
+            {
+                await NotificationHelper.CreateNotificationAsync(
+                    _db,
+                    userId,
+                    "new_project",
+                    "Proyecto personal creado",
+                    $"Has creado el proyecto '{project.Name}'",
+                    project.Id,
+                    null,
+                    userId);
+            }
+            catch (Exception notifEx)
+            {
+                // Si falla la notificación, no es crítico, solo loguear el error
+                Console.WriteLine($"⚠️ Error creando notificación (no crítico): {notifEx.Message}");
+            }
 
             return CreatedAtAction(nameof(GetPersonalProjects), new { }, new ProjectResponse
             {
@@ -469,11 +495,33 @@ public class UserController : ControllerBase
         catch (DbUpdateException dbEx)
         {
             Console.WriteLine($"❌ Error de base de datos en CreatePersonalProject: {dbEx.Message}");
+            Console.WriteLine($"❌ Tipo: {dbEx.GetType().Name}");
             if (dbEx.InnerException != null)
             {
                 Console.WriteLine($"❌ InnerException: {dbEx.InnerException.Message}");
+                Console.WriteLine($"❌ InnerException Tipo: {dbEx.InnerException.GetType().Name}");
+
+                // Si es un error de PostgreSQL, mostrar más detalles
+                if (dbEx.InnerException is Npgsql.PostgresException pgEx)
+                {
+                    Console.WriteLine($"❌ PostgreSQL Error Code: {pgEx.SqlState}");
+                    Console.WriteLine($"❌ PostgreSQL Error Detail: {pgEx.Detail}");
+                    Console.WriteLine($"❌ PostgreSQL Error Hint: {pgEx.Hint}");
+                    Console.WriteLine($"❌ PostgreSQL Error Column: {pgEx.ColumnName}");
+                    Console.WriteLine($"❌ PostgreSQL Error Table: {pgEx.TableName}");
+                }
             }
-            return StatusCode(500, new { message = "Database error while creating project", error = dbEx.Message });
+            return StatusCode(500, new
+            {
+                message = "Database error while creating project",
+                error = dbEx.Message,
+                innerError = dbEx.InnerException?.Message
+            });
+        }
+        catch (UnauthorizedAccessException uaEx)
+        {
+            Console.WriteLine($"❌ Error de autenticación en CreatePersonalProject: {uaEx.Message}");
+            return Unauthorized(new { message = "Invalid or missing authentication token" });
         }
         catch (Exception ex)
         {
@@ -483,8 +531,14 @@ public class UserController : ControllerBase
             if (ex.InnerException != null)
             {
                 Console.WriteLine($"❌ InnerException: {ex.InnerException.Message}");
+                Console.WriteLine($"❌ InnerException Tipo: {ex.InnerException.GetType().Name}");
             }
-            return StatusCode(500, new { message = "Error creating project", error = ex.Message });
+            return StatusCode(500, new
+            {
+                message = "Error creating project",
+                error = ex.Message,
+                innerError = ex.InnerException?.Message
+            });
         }
     }
 

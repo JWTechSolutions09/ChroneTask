@@ -82,48 +82,48 @@ string? ConvertPostgresUrlToConnectionString(string postgresUrl)
         // Render proporciona DATABASE_URL en formato: postgresql://user:pass@host:port/dbname
         // También puede venir con dominio completo: postgresql://user:pass@host.oregon-postgres.render.com:port/dbname
         // Convertir a formato Npgsql: Host=host;Port=port;Database=dbname;Username=user;Password=pass
-        
+
         if (string.IsNullOrWhiteSpace(postgresUrl))
             return null;
-        
+
         // Parsear manualmente para manejar mejor los caracteres especiales
         var uriString = postgresUrl.Trim();
-        
+
         // Encontrar el inicio de las credenciales (después de ://)
         var protocolEnd = uriString.IndexOf("://");
         if (protocolEnd < 0)
             return null;
-        
+
         var startIndex = protocolEnd + 3; // Después de "://"
         var atIndex = uriString.IndexOf('@', startIndex);
-        
+
         if (atIndex <= startIndex)
             return null;
-        
+
         // Extraer userInfo (usuario:contraseña)
         var userInfoPart = uriString.Substring(startIndex, atIndex - startIndex);
         var colonIndex = userInfoPart.IndexOf(':');
-        
+
         if (colonIndex <= 0)
             return null;
-        
+
         var username = userInfoPart.Substring(0, colonIndex);
         var password = userInfoPart.Substring(colonIndex + 1);
-        
+
         // Decodificar la contraseña (puede estar URL-encoded)
         password = Uri.UnescapeDataString(password);
-        
+
         // Extraer host, puerto y base de datos (después de @)
         var afterAt = uriString.Substring(atIndex + 1);
         var pathIndex = afterAt.IndexOf('/');
         var hostPort = pathIndex > 0 ? afterAt.Substring(0, pathIndex) : afterAt;
         var database = pathIndex > 0 ? afterAt.Substring(pathIndex + 1) : "postgres";
-        
+
         // Separar host y puerto
         var colonPortIndex = hostPort.LastIndexOf(':');
         string host;
         int port;
-        
+
         if (colonPortIndex > 0)
         {
             host = hostPort.Substring(0, colonPortIndex);
@@ -141,7 +141,7 @@ string? ConvertPostgresUrlToConnectionString(string postgresUrl)
             host = hostPort;
             port = 5432;
         }
-        
+
         // Limpiar la base de datos (puede tener parámetros de query)
         if (database.Contains('?'))
         {
@@ -152,22 +152,22 @@ string? ConvertPostgresUrlToConnectionString(string postgresUrl)
             database = database.Substring(0, database.IndexOf('#'));
         }
         database = database.Trim();
-        
+
         // Si la base de datos está vacía, usar "postgres" por defecto
         if (string.IsNullOrEmpty(database))
         {
             database = "postgres";
         }
-        
+
         Console.WriteLine($"🔍 Parsed connection: Host={host}, Port={port}, Database={database}, Username={username}");
         Console.WriteLine($"🔍 Password length: {password?.Length ?? 0} characters");
-        
+
         var connectionString = $"Host={host};Port={port};Database={database};Username={username};Password={password};SSL Mode=Require;Trust Server Certificate=true";
-        
+
         // Log parcial de la connection string (sin mostrar la contraseña completa)
         var safeLog = connectionString.Replace($"Password={password}", "Password=***");
         Console.WriteLine($"🔍 Connection string: {safeLog}");
-        
+
         return connectionString;
     }
     catch (Exception ex)
@@ -199,7 +199,7 @@ if (string.IsNullOrEmpty(connectionString) || connectionString.Contains("${"))
     }
 }
 // Si la connection string viene en formato URI de PostgreSQL, convertirla automáticamente
-else if (connectionString.StartsWith("postgresql://", StringComparison.OrdinalIgnoreCase) || 
+else if (connectionString.StartsWith("postgresql://", StringComparison.OrdinalIgnoreCase) ||
          connectionString.StartsWith("postgres://", StringComparison.OrdinalIgnoreCase))
 {
     var converted = ConvertPostgresUrlToConnectionString(connectionString);
@@ -233,7 +233,7 @@ if (string.IsNullOrWhiteSpace(secretKey))
 
 Console.WriteLine($"🔐 JWT configurado - Issuer: {jwt["Issuer"]}, Audience: {jwt["Audience"]}, SecretKey length: {secretKey?.Length ?? 0}");
 
-var key = Encoding.UTF8.GetBytes(secretKey);
+var key = Encoding.UTF8.GetBytes(secretKey ?? string.Empty);
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 .AddJwtBearer(options =>
@@ -261,7 +261,7 @@ try
     {
         var dbContext = scope.ServiceProvider.GetRequiredService<ChroneTaskDbContext>();
         Console.WriteLine("🔄 Verificando estado de la base de datos...");
-        
+
         // Verificar si las tablas ya existen (caso: se ejecutó el script SQL manualmente)
         var canConnect = dbContext.Database.CanConnect();
         if (canConnect)
@@ -285,7 +285,7 @@ try
                 // Si hay error verificando, asumir que no existe
                 organizationsTableExists = false;
             }
-            
+
             if (organizationsTableExists)
             {
                 // Verificar si __EFMigrationsHistory existe y tiene registros
@@ -300,14 +300,14 @@ try
                     command.CommandText = "SELECT EXISTS (SELECT FROM information_schema.tables WHERE table_schema = 'public' AND table_name = '__EFMigrationsHistory')";
                     var result = command.ExecuteScalar();
                     migrationsHistoryExists = result != null && Convert.ToBoolean(result);
-                    
+
                     if (migrationsHistoryExists)
                     {
                         command.CommandText = "SELECT COUNT(*) FROM \"__EFMigrationsHistory\"";
                         var count = command.ExecuteScalar();
                         hasMigrations = count != null && Convert.ToInt32(count) > 0;
                     }
-                    
+
                     if (connection.State == System.Data.ConnectionState.Open)
                         connection.Close();
                 }
@@ -316,7 +316,7 @@ try
                     migrationsHistoryExists = false;
                     hasMigrations = false;
                 }
-                
+
                 if (!migrationsHistoryExists || !hasMigrations)
                 {
                     Console.WriteLine("⚠️ Las tablas ya existen pero no hay historial de migraciones.");
@@ -384,7 +384,7 @@ app.Use(async (context, next) =>
         {
             Console.WriteLine($"Inner exception: {ex.InnerException.Message}");
         }
-        
+
         // Solo modificar la respuesta si no ha comenzado
         if (!context.Response.HasStarted)
         {
@@ -392,10 +392,10 @@ app.Use(async (context, next) =>
             context.Response.Headers.Add("Access-Control-Allow-Origin", "*");
             context.Response.Headers.Add("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, PATCH, OPTIONS");
             context.Response.Headers.Add("Access-Control-Allow-Headers", "*");
-            
+
             context.Response.StatusCode = 500;
             context.Response.ContentType = "application/json";
-            
+
             var errorResponse = new
             {
                 error = "Internal Server Error",
@@ -403,7 +403,7 @@ app.Use(async (context, next) =>
                 stackTrace = app.Environment.IsDevelopment() ? ex.StackTrace : null,
                 innerException = app.Environment.IsDevelopment() && ex.InnerException != null ? ex.InnerException.Message : null
             };
-            
+
             await context.Response.WriteAsJsonAsync(errorResponse);
         }
         else
