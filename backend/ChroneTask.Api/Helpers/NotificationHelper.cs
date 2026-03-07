@@ -171,13 +171,6 @@ public static class NotificationHelper
                 triggeredByUserId);
         }
     }
-                "Tarea bloqueada",
-                $"La tarea '{task.Title}' ha sido bloqueada",
-                task.ProjectId,
-                task.Id,
-                triggeredByUserId);
-        }
-    }
 
     public static async SystemTask NotifyTaskOverdueAsync(
         ChroneTaskDbContext db,
@@ -586,7 +579,7 @@ public static class NotificationHelper
         }
     }
 
-    public static async SystemTask NotifyNewPersonalNoteAsync(
+    public static SystemTask NotifyNewPersonalNoteAsync(
         ChroneTaskDbContext db,
         PersonalNote note,
         Guid triggeredByUserId)
@@ -594,5 +587,6 @@ public static class NotificationHelper
         // Para notas personales, solo notificar al usuario mismo (opcional)
         // O podemos no notificar ya que es personal
         // Por ahora, no notificamos para evitar spam
+        return SystemTask.CompletedTask;
     }
 }
