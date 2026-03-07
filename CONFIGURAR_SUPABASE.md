@@ -3,7 +3,7 @@
 ## Tu Connection String de Supabase
 
 ```
-postgresql://postgres.fhbyiujurdnkzfenfilb:[ProjectChronetask]@aws-0-us-west-2.pooler.supabase.com:5432/postgres
+postgresql://postgres.fhbyiujurdnkzfenfilb:chronetaskpass09@aws-0-us-west-2.pooler.supabase.com:5432/postgres
 ```
 
 ## ⚠️ Nota Importante sobre la Contraseña

@@ -80,12 +80,45 @@ string? ConvertPostgresUrlToConnectionString(string postgresUrl)
         // Render proporciona DATABASE_URL en formato: postgresql://user:pass@host:port/dbname
         // También puede venir con dominio completo: postgresql://user:pass@host.oregon-postgres.render.com:port/dbname
         // Convertir a formato Npgsql: Host=host;Port=port;Database=dbname;Username=user;Password=pass
-        var uri = new Uri(postgresUrl);
+        
+        // Manejar casos donde la URL puede tener caracteres especiales en la contraseña
+        var uriString = postgresUrl;
+        
+        // Si la contraseña tiene caracteres especiales, pueden estar codificados o no
+        // Intentar parsear directamente
+        var uri = new Uri(uriString);
+        
+        // Extraer userInfo manualmente para manejar mejor los caracteres especiales
+        var atIndex = uriString.IndexOf('@');
+        if (atIndex > 0)
+        {
+            var userInfoPart = uriString.Substring(uriString.IndexOf("://") + 3, atIndex - uriString.IndexOf("://") - 3);
+            var colonIndex = userInfoPart.IndexOf(':');
+            
+            if (colonIndex > 0)
+            {
+                var username = userInfoPart.Substring(0, colonIndex);
+                var password = userInfoPart.Substring(colonIndex + 1);
+                
+                // Decodificar la contraseña (puede estar URL-encoded)
+                password = Uri.UnescapeDataString(password);
+                
+                var host = uri.Host;
+                var port = uri.Port > 0 ? uri.Port : 5432;
+                var database = uri.LocalPath.TrimStart('/');
+                
+                Console.WriteLine($"🔍 Parsed connection: Host={host}, Port={port}, Database={database}, Username={username}");
+                
+                return $"Host={host};Port={port};Database={database};Username={username};Password={password};SSL Mode=Require;Trust Server Certificate=true";
+            }
+        }
+        
+        // Fallback al método original
         var userInfo = uri.UserInfo.Split(':');
         if (userInfo.Length >= 2)
         {
             var host = uri.Host;
-            var port = uri.Port > 0 ? uri.Port : 5432; // Puerto por defecto de PostgreSQL
+            var port = uri.Port > 0 ? uri.Port : 5432;
             var database = uri.LocalPath.TrimStart('/');
             var username = userInfo[0];
             var password = Uri.UnescapeDataString(userInfo[1]);
@@ -96,6 +129,7 @@ string? ConvertPostgresUrlToConnectionString(string postgresUrl)
     catch (Exception ex)
     {
         Console.WriteLine($"❌ Error procesando URL de PostgreSQL: {ex.Message}");
+        Console.WriteLine($"   URL recibida: {postgresUrl?.Substring(0, Math.Min(50, postgresUrl?.Length ?? 0))}...");
     }
     return null;
 }
