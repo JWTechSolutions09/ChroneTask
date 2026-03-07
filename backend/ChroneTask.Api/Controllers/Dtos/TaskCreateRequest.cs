@@ -16,6 +16,9 @@ public class TaskCreateRequest
     public string Type { get; set; } = "Task"; // "Task", "Bug", "Story", "Epic"
 
     [MaxLength(20)]
+    public string? Status { get; set; } // "To Do", "In Progress", "Blocked", "Review", "Done"
+
+    [MaxLength(20)]
     public string? Priority { get; set; } // "Low", "Medium", "High", "Critical"
 
     public Guid? AssignedToId { get; set; }
