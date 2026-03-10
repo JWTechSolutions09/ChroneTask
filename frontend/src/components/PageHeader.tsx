@@ -71,7 +71,9 @@ export default function PageHeader({ title, subtitle, breadcrumbs, actions }: Pa
               alignItems: "center", 
               flexWrap: "wrap",
               width: "100%",
+              maxWidth: "100%",
               justifyContent: "flex-start",
+              overflowX: "auto",
             }}
             className="page-header-actions"
           >

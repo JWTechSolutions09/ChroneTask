@@ -175,7 +175,12 @@ export default function Dashboard() {
                 ]
           }
           actions={
-            <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
+            <div style={{ 
+              display: "flex", 
+              gap: "8px", 
+              flexWrap: isMobile ? "nowrap" : "wrap",
+              alignItems: "center",
+            }}>
               {!isPersonalMode && !isPersonalRoute && organizationId && (
                 <>
                   <button
@@ -187,12 +192,13 @@ export default function Dashboard() {
                       backgroundColor: "var(--bg-primary)",
                       color: "var(--text-primary)",
                       cursor: "pointer",
-                      fontSize: "14px",
+                      fontSize: isMobile ? "12px" : "14px",
                       display: "flex",
                       alignItems: "center",
                       gap: "6px",
                       fontWeight: 500,
                       transition: "all 0.2s",
+                      whiteSpace: "nowrap",
                     }}
                     onMouseEnter={(e) => {
                       e.currentTarget.style.backgroundColor = "var(--hover-bg)";
@@ -213,12 +219,13 @@ export default function Dashboard() {
                       backgroundColor: "var(--bg-primary)",
                       color: "var(--primary)",
                       cursor: "pointer",
-                      fontSize: "14px",
+                      fontSize: isMobile ? "12px" : "14px",
                       display: "flex",
                       alignItems: "center",
                       gap: "6px",
                       fontWeight: 500,
                       transition: "all 0.2s",
+                      whiteSpace: "nowrap",
                     }}
                     onMouseEnter={(e) => {
                       e.currentTarget.style.backgroundColor = "var(--hover-bg)";
@@ -235,17 +242,19 @@ export default function Dashboard() {
               <button
                 onClick={() => setViewMode(viewMode === "grid" ? "table" : "grid")}
                 style={{
-                  padding: "8px 12px",
+                  padding: isMobile ? "8px 10px" : "8px 12px",
                   borderRadius: "6px",
                   border: "1px solid var(--border-color)",
                   backgroundColor: "var(--bg-primary)",
                   color: "var(--text-primary)",
                   cursor: "pointer",
-                  fontSize: "14px",
+                  fontSize: isMobile ? "12px" : "14px",
                   display: "flex",
                   alignItems: "center",
                   gap: "6px",
                   transition: "all 0.2s",
+                  whiteSpace: "nowrap",
+                  flexShrink: 0,
                 }}
                 onMouseEnter={(e) => {
                   e.currentTarget.style.backgroundColor = "var(--hover-bg)";
@@ -256,8 +265,20 @@ export default function Dashboard() {
               >
                 {viewMode === "grid" ? "📋 Tabla" : "🔲 Grid"}
               </button>
-              <Link to={isPersonalMode || isPersonalRoute ? "/personal/projects" : `/org/${organizationId}/projects`}>
-                <Button variant="primary">+ Nuevo Proyecto</Button>
+              <Link 
+                to={isPersonalMode || isPersonalRoute ? "/personal/projects" : `/org/${organizationId}/projects`}
+                style={{ flexShrink: 0 }}
+              >
+                <Button 
+                  variant="primary"
+                  style={{
+                    fontSize: isMobile ? "12px" : "15px",
+                    padding: isMobile ? "8px 12px" : undefined,
+                    whiteSpace: "nowrap",
+                  }}
+                >
+                  {isMobile ? "+ Nuevo" : "+ Nuevo Proyecto"}
+                </Button>
               </Link>
             </div>
           }

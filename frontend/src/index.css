@@ -1070,14 +1070,21 @@ input, textarea, select {
   }
 
   .page-header-actions {
-    width: 100% !important;
+    width: auto !important;
+    max-width: 100% !important;
     justify-content: flex-start !important;
     margin-top: 12px !important;
+    flex-wrap: nowrap !important;
+    overflow-x: auto !important;
+  }
+
+  .page-header-actions > div {
+    flex-wrap: nowrap !important;
   }
 
   .page-header-actions > * {
-    flex: 1 1 auto !important;
-    min-width: 0 !important;
+    flex-shrink: 0 !important;
+    min-width: auto !important;
   }
 
   /* Ajustar botones en PageHeader */
@@ -1409,15 +1416,24 @@ input, textarea, select {
 
   /* PageHeader buttons en móvil */
   .page-header-actions {
-    flex-wrap: wrap !important;
+    flex-wrap: nowrap !important;
     gap: 8px !important;
+    overflow-x: auto !important;
+    width: auto !important;
+    max-width: 100% !important;
   }
 
-  .page-header-actions button {
-    font-size: 11px !important;
-    padding: 6px 8px !important;
-    flex: 1 1 auto !important;
-    min-width: 80px !important;
+  .page-header-actions > div {
+    flex-wrap: nowrap !important;
+  }
+
+  .page-header-actions button,
+  .page-header-actions a {
+    font-size: 12px !important;
+    padding: 8px 10px !important;
+    flex-shrink: 0 !important;
+    white-space: nowrap !important;
+    min-width: auto !important;
   }
 
   /* Search bar en móvil */
