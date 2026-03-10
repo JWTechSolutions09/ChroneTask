@@ -13,7 +13,7 @@ export default function CreateEventPage() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const { showToast } = useToast();
-  
+
   const [eventTitle, setEventTitle] = useState("");
   const [eventDescription, setEventDescription] = useState("");
   const [eventStartDate, setEventStartDate] = useState("");
@@ -31,7 +31,7 @@ export default function CreateEventPage() {
   useEffect(() => {
     // Scroll al inicio
     window.scrollTo({ top: 0, behavior: 'smooth' });
-    
+
     // Si hay una fecha en los query params, usarla
     const dateParam = searchParams.get('date');
     if (dateParam) {
@@ -73,8 +73,8 @@ export default function CreateEventPage() {
           ? new Date(eventEndDate + "T23:59:59")
           : new Date(eventStartDate + "T23:59:59")
         : eventEndDate && eventEndTime
-        ? new Date(eventEndDate + "T" + eventEndTime)
-        : startDateTime;
+          ? new Date(eventEndDate + "T" + eventEndTime)
+          : startDateTime;
 
       const eventData = {
         title: eventTitle.trim(),
@@ -90,7 +90,7 @@ export default function CreateEventPage() {
 
       await http.post("/api/users/me/calendar-events", eventData);
       showToast("Evento creado exitosamente", "success");
-      
+
       // Redirigir de vuelta al calendario
       navigate("/personal/calendar");
     } catch (ex: any) {
@@ -133,9 +133,9 @@ export default function CreateEventPage() {
 
   return (
     <Layout>
-      <div style={{ 
-        flex: 1, 
-        overflowY: "auto", 
+      <div style={{
+        flex: 1,
+        overflowY: "auto",
         backgroundColor: "var(--bg-secondary)",
         minHeight: "100vh",
       }}>
@@ -160,10 +160,10 @@ export default function CreateEventPage() {
               boxSizing: "border-box" as const,
             }}
           >
-            <h1 style={{ 
-              margin: 0, 
-              fontSize: "24px", 
-              fontWeight: 700, 
+            <h1 style={{
+              margin: 0,
+              fontSize: "24px",
+              fontWeight: 700,
               color: "var(--text-primary)",
               textAlign: "center",
               width: "100%",
@@ -207,11 +207,11 @@ export default function CreateEventPage() {
           </div>
 
           {/* Form */}
-          <form 
-            onSubmit={handleSubmit} 
-            style={{ 
-              width: "100%", 
-              maxWidth: "100%", 
+          <form
+            onSubmit={handleSubmit}
+            style={{
+              width: "100%",
+              maxWidth: "100%",
               boxSizing: "border-box" as const,
               display: "flex",
               flexDirection: "column",
@@ -249,15 +249,9 @@ export default function CreateEventPage() {
               <textarea
                 value={eventDescription}
                 onChange={(e) => setEventDescription(e.target.value)}
-                rows={4}
+                rows={1}
                 placeholder="Descripción del evento..."
-                style={{
-                  ...inputStyle,
-                  resize: "vertical",
-                  minHeight: "100px",
-                  fontFamily: "inherit",
-                  lineHeight: "1.6",
-                }}
+                style={inputStyle}
                 onFocus={(e) => {
                   e.target.style.borderColor = "var(--primary)";
                   e.target.style.boxShadow = "0 0 0 3px rgba(0, 123, 255, 0.1)";
@@ -483,10 +477,10 @@ export default function CreateEventPage() {
 
             {/* Error */}
             {error && (
-              <div 
-                className="alert alert-error" 
-                style={{ 
-                  padding: "14px", 
+              <div
+                className="alert alert-error"
+                style={{
+                  padding: "14px",
                   borderRadius: "10px",
                   fontSize: "14px",
                   width: "100%",
@@ -499,11 +493,11 @@ export default function CreateEventPage() {
             )}
 
             {/* Botones */}
-            <div style={{ 
-              display: "flex", 
+            <div style={{
+              display: "flex",
               flexDirection: "column-reverse",
-              gap: "12px", 
-              justifyContent: "flex-end", 
+              gap: "12px",
+              justifyContent: "flex-end",
               marginTop: "8px",
               paddingTop: "20px",
               borderTop: "2px solid var(--border-color)",
