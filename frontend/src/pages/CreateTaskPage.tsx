@@ -219,20 +219,20 @@ export default function CreateTaskPage() {
             <textarea
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              rows={20}
+              rows={8}
               placeholder="Describe detalladamente la tarea, requisitos, pasos a seguir, etc..."
               className="create-task-textarea"
               style={{
                 ...inputStyle,
                 resize: "vertical",
-                height: "400px",
-                minHeight: "400px",
-                maxHeight: "700px",
+                minHeight: "150px",
+                maxHeight: "400px",
                 fontFamily: "inherit",
-                lineHeight: "1.8",
+                lineHeight: "1.6",
                 fontSize: "16px",
-                padding: "18px",
+                padding: "16px",
                 width: "100%",
+                maxWidth: "100%",
                 boxSizing: "border-box" as const,
                 display: "block",
                 overflowY: "auto",

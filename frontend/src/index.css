@@ -1743,22 +1743,16 @@ input, textarea, select {
   /* Estilos específicos para páginas de creación en móvil */
   .create-task-textarea,
   .create-note-textarea {
-    height: 400px !important;
-    min-height: 400px !important;
-    max-height: 700px !important;
-    padding: 18px !important;
+    min-height: 150px !important;
+    max-height: 400px !important;
+    padding: 16px !important;
     font-size: 16px !important;
-    line-height: 1.8 !important;
+    line-height: 1.6 !important;
     width: 100% !important;
+    max-width: 100% !important;
     box-sizing: border-box !important;
     display: block !important;
     overflow-y: auto !important;
     resize: vertical !important;
-  }
-
-  .create-note-textarea {
-    height: 450px !important;
-    min-height: 450px !important;
-    max-height: 800px !important;
   }
 }
