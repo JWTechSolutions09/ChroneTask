@@ -629,7 +629,7 @@ export default function Notes() {
           style={{
             position: "relative",
             minHeight: isMobile ? "calc(100dvh - 180px)" : "calc(100vh - 200px)",
-            padding: isMobile && isPortrait ? "10px" : isMobile ? "12px" : "24px",
+            padding: isMobile ? "16px" : "24px",
             backgroundColor: "#f5f7fa",
             backgroundImage: isMobile ? "none" : `
               linear-gradient(90deg, rgba(0,0,0,0.02) 1px, transparent 1px),
@@ -639,7 +639,7 @@ export default function Notes() {
             backgroundSize: isMobile ? "auto" : "50px 50px, 50px 50px, 25px 25px",
             display: isMobile ? "flex" : "block",
             flexDirection: isMobile ? "column" : "initial",
-            gap: isMobile && isPortrait ? "10px" : isMobile ? "12px" : "0",
+            gap: isMobile ? "16px" : "0",
             overflow: isMobile ? "auto" : "hidden",
             overflowX: "hidden",
             WebkitOverflowScrolling: "touch",
@@ -671,8 +671,8 @@ export default function Notes() {
                     top: isMobile ? "auto" : note.positionY || 0,
                     width: isMobile ? "100%" : note.width || 300,
                     height: isMobile ? "auto" : note.height || 220,
-            minHeight: isMobile && isPortrait ? "180px" : isMobile ? "200px" : "220px",
-            maxHeight: isMobile && isPortrait ? "none" : isMobile ? "400px" : "none",
+                    minHeight: isMobile ? "auto" : "220px",
+                    maxHeight: isMobile ? "none" : "none",
                     backgroundColor: note.color || "#FFE5E5",
                     padding: "0",
                     cursor: isMobile ? "default" : (draggedNote?.id === note.id ? "grabbing" : "default"),
@@ -681,7 +681,7 @@ export default function Notes() {
                       : "0 8px 24px rgba(0, 0, 0, 0.15), 0 3px 8px rgba(0, 0, 0, 0.1)",
                     display: "flex",
                     flexDirection: "column",
-                    marginBottom: isMobile && isPortrait ? "10px" : isMobile ? "12px" : "0",
+                    marginBottom: isMobile ? "16px" : "0",
                     borderRadius: "16px",
                     border: draggedNote?.id === note.id
                       ? "2px solid rgba(0, 123, 255, 0.5)"
@@ -693,7 +693,7 @@ export default function Notes() {
                       ? "scale(1.02) rotate(1deg)"
                       : "scale(1)",
                     zIndex: draggedNote?.id === note.id ? 1000 : 1,
-                    overflow: "hidden",
+                    overflow: isMobile ? "visible" : "hidden",
                     boxSizing: "border-box" as const,
                   }}
                   onMouseEnter={(e) => {
@@ -761,14 +761,16 @@ export default function Notes() {
                         style={{
                           border: "none",
                           backgroundColor: "transparent",
-                          fontSize: "16px",
+                          fontSize: isMobile ? "18px" : "16px",
                           fontWeight: 600,
                           color: getTextColor(note.color || "#FFE5E5"),
                           flex: 1,
                           outline: editingNoteId === note.id ? "2px solid rgba(0, 123, 255, 0.4)" : "none",
                           borderRadius: "6px",
-                          padding: "4px 8px",
+                          padding: isMobile ? "8px" : "4px 8px",
                           cursor: "text",
+                          width: "100%",
+                          boxSizing: "border-box" as const,
                         }}
                       />
                     </div>
@@ -776,12 +778,14 @@ export default function Notes() {
 
                   {/* Contenido de la nota */}
                   <div className="note-content" style={{ 
-                    padding: isMobile && isPortrait ? "12px" : "16px", 
+                    padding: isMobile ? "16px" : "16px", 
                     flex: 1, 
                     display: "flex", 
                     flexDirection: "column",
-                    overflow: "auto",
-                    minHeight: 0,
+                    overflow: "visible",
+                    minHeight: isMobile ? "auto" : 0,
+                    width: "100%",
+                    boxSizing: "border-box" as const,
                   }}>
                     {/* Header con controles */}
                     <div style={{ display: "flex", justifyContent: "flex-end", alignItems: "center", marginBottom: "12px", gap: "8px" }}>
@@ -800,14 +804,16 @@ export default function Notes() {
                         style={{
                           border: "none",
                           backgroundColor: "transparent",
-                          fontSize: "18px",
+                          fontSize: isMobile ? "20px" : "18px",
                           fontWeight: 600,
                           color: getTextColor(note.color || "#FFE5E5"),
                           flex: 1,
                           outline: editingNoteId === note.id ? "2px solid rgba(0, 123, 255, 0.3)" : "none",
                           borderRadius: "4px",
-                          padding: "4px 8px",
-                          margin: "-4px -8px",
+                          padding: isMobile ? "8px" : "4px 8px",
+                          margin: isMobile ? "0" : "-4px -8px",
+                          width: "100%",
+                          boxSizing: "border-box" as const,
                         }}
                       />
                       <div className="note-controls" style={{ display: "flex", gap: "8px", alignItems: "center", flexShrink: 0 }}>
@@ -1100,20 +1106,24 @@ export default function Notes() {
                       onFocus={() => setEditingNoteId(note.id)}
                       placeholder="Escribe tu nota..."
                       onClick={(e) => e.stopPropagation()}
+                      rows={isMobile ? 8 : 6}
                       style={{
                         flex: 1,
                         border: "none",
                         backgroundColor: "transparent",
-                        fontSize: "14px",
+                        fontSize: isMobile ? "16px" : "14px",
                         color: getTextColor(note.color || "#FFE5E5"),
-                        resize: "none",
+                        resize: isMobile ? "vertical" : "none",
                         outline: editingNoteId === note.id ? "2px solid rgba(0, 123, 255, 0.4)" : "none",
                         borderRadius: "8px",
-                        padding: "8px",
-                        minHeight: "100px",
+                        padding: isMobile ? "12px" : "8px",
+                        minHeight: isMobile ? "150px" : "100px",
                         fontFamily: "inherit",
                         lineHeight: "1.6",
                         cursor: "text",
+                        width: "100%",
+                        boxSizing: "border-box" as const,
+                        overflowY: "auto",
                       }}
                     />
                   </div>
