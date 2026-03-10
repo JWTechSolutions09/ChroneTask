@@ -738,18 +738,21 @@ export default function Calendar() {
                               {event.title}
                             </div>
                           ))}
-                          {dayEvents.length > (dayTasks.length > 0 ? 2 : 3) && (
-                            <div
-                              style={{
-                                fontSize: "10px",
-                                color: "var(--text-secondary)",
-                                fontStyle: "italic",
-                                padding: "2px 6px",
-                              }}
-                            >
-                              +{dayEvents.length - (dayTasks.length > 0 ? 2 : 3)} evento{dayEvents.length - (dayTasks.length > 0 ? 2 : 3) > 1 ? "s" : ""} más
-                            </div>
-                          )}
+                          {dayEvents.length > (dayTasks.length > 0 ? 2 : 3) && (() => {
+                            const remainingEvents = dayEvents.length - (dayTasks.length > 0 ? 2 : 3);
+                            return (
+                              <div
+                                style={{
+                                  fontSize: "10px",
+                                  color: "var(--text-secondary)",
+                                  fontStyle: "italic",
+                                  padding: "2px 6px",
+                                }}
+                              >
+                                +{remainingEvents} evento{remainingEvents > 1 ? "s" : ""} más
+                              </div>
+                            );
+                          })()}
                         </div>
                       )}
 
