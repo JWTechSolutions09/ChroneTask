@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback, useMemo } from "react";
+import { useNavigate } from "react-router-dom";
 import { http } from "../api/http";
 import Layout from "../components/Layout";
 import PageHeader from "../components/PageHeader";
@@ -43,11 +44,27 @@ const EVENT_COLORS = [
 ];
 
 export default function Calendar() {
+  const navigate = useNavigate();
   const [currentDate, setCurrentDate] = useState(new Date());
   const [events, setEvents] = useState<CalendarEvent[]>([]);
   const [tasks, setTasks] = useState<Task[]>([]);
   const [loading, setLoading] = useState(false);
   const [showEventModal, setShowEventModal] = useState(false);
+  const [isMobile, setIsMobile] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return window.innerWidth <= 768;
+    }
+    return false;
+  });
+
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
   const [selectedEvent, setSelectedEvent] = useState<CalendarEvent | null>(null);
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [viewMode, setViewMode] = useState<"month" | "week" | "day">("month");
@@ -387,7 +404,16 @@ export default function Calendar() {
             <Button variant="secondary" onClick={goToNextMonth}>
               →
             </Button>
-            <Button variant="primary" onClick={() => openCreateEventModal()}>
+            <Button 
+              variant="primary" 
+              onClick={() => {
+                if (isMobile) {
+                  navigate("/personal/create-event");
+                } else {
+                  openCreateEventModal();
+                }
+              }}
+            >
               + Nuevo Evento
             </Button>
           </>
@@ -395,14 +421,168 @@ export default function Calendar() {
       />
 
       <div style={{ 
-        padding: "24px", 
+        padding: isMobile ? "12px" : "24px", 
         backgroundColor: "var(--bg-secondary)",
         boxSizing: "border-box",
       }}>
-        <Card>
-          {loading ? (
-            <div className="loading">Cargando calendario...</div>
-          ) : (
+        {loading ? (
+          <div className="loading">Cargando calendario...</div>
+        ) : isMobile ? (
+          // Vista de lista para móvil
+          <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+            {events.length === 0 ? (
+              <Card>
+                <div style={{ textAlign: "center", padding: "60px", color: "var(--text-secondary)" }}>
+                  <div style={{ fontSize: "48px", marginBottom: "16px" }}>📅</div>
+                  <div style={{ fontSize: "18px", fontWeight: 500 }}>No hay eventos programados</div>
+                  <div style={{ fontSize: "14px", marginTop: "8px" }}>
+                    Crea tu primer evento haciendo clic en el botón de arriba
+                  </div>
+                </div>
+              </Card>
+            ) : (
+              events
+                .sort((a, b) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime())
+                .map((event) => {
+                  const startDate = new Date(event.startDate);
+                  const endDate = event.endDate ? new Date(event.endDate) : startDate;
+                  const isAllDay = event.allDay;
+                  
+                  return (
+                    <Card
+                      key={event.id}
+                      style={{
+                        padding: "16px",
+                        borderLeft: `4px solid ${event.color || EVENT_COLORS[0]}`,
+                      }}
+                    >
+                      <div style={{ marginBottom: "12px" }}>
+                        <h3 style={{ 
+                          margin: 0, 
+                          fontSize: "18px", 
+                          fontWeight: 600, 
+                          color: "var(--text-primary)",
+                          marginBottom: "8px",
+                        }}>
+                          {event.title}
+                        </h3>
+                        <div style={{ 
+                          fontSize: "14px", 
+                          color: "var(--text-secondary)",
+                          display: "flex",
+                          flexDirection: "column",
+                          gap: "4px",
+                        }}>
+                          <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                            <span>📅</span>
+                            <span>
+                              {isAllDay 
+                                ? startDate.toLocaleDateString("es-ES", { 
+                                    weekday: "long", 
+                                    year: "numeric", 
+                                    month: "long", 
+                                    day: "numeric" 
+                                  })
+                                : startDate.toLocaleDateString("es-ES", { 
+                                    weekday: "long", 
+                                    year: "numeric", 
+                                    month: "long", 
+                                    day: "numeric" 
+                                  }) + " a las " + startDate.toLocaleTimeString("es-ES", { 
+                                    hour: "2-digit", 
+                                    minute: "2-digit" 
+                                  })
+                              }
+                            </span>
+                          </div>
+                          {!isAllDay && event.endDate && (
+                            <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                              <span>🕐</span>
+                              <span>
+                                Hasta: {endDate.toLocaleDateString("es-ES", { 
+                                  weekday: "long", 
+                                  year: "numeric", 
+                                  month: "long", 
+                                  day: "numeric" 
+                                })} a las {endDate.toLocaleTimeString("es-ES", { 
+                                  hour: "2-digit", 
+                                  minute: "2-digit" 
+                                })}
+                              </span>
+                            </div>
+                          )}
+                          {event.type && (
+                            <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                              <span>
+                                {event.type === "meeting" ? "🤝" : 
+                                 event.type === "reminder" ? "⏰" : 
+                                 event.type === "task" ? "✓" : 
+                                 event.type === "deadline" ? "📌" : "📅"}
+                              </span>
+                              <span style={{ textTransform: "capitalize" }}>{event.type}</span>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                      {event.description && (
+                        <div style={{ 
+                          marginBottom: "12px",
+                          fontSize: "15px",
+                          lineHeight: "1.6",
+                          color: "var(--text-secondary)",
+                          whiteSpace: "pre-wrap",
+                          wordWrap: "break-word",
+                        }}>
+                          {event.description}
+                        </div>
+                      )}
+                      <div style={{ 
+                        display: "flex", 
+                        justifyContent: "flex-end", 
+                        gap: "8px",
+                        paddingTop: "12px",
+                        borderTop: "1px solid var(--border-color)",
+                      }}>
+                        <button
+                          type="button"
+                          onClick={() => openEditEventModal(event)}
+                          style={{
+                            padding: "8px 16px",
+                            borderRadius: "8px",
+                            backgroundColor: "var(--hover-bg)",
+                            border: "1px solid var(--border-color)",
+                            cursor: "pointer",
+                            fontSize: "14px",
+                            color: "var(--text-primary)",
+                            fontWeight: 500,
+                          }}
+                        >
+                          Editar
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => deleteEvent(event.id)}
+                          style={{
+                            padding: "8px 16px",
+                            borderRadius: "8px",
+                            backgroundColor: "var(--hover-bg)",
+                            border: "1px solid var(--border-color)",
+                            cursor: "pointer",
+                            fontSize: "14px",
+                            color: "#dc3545",
+                            fontWeight: 500,
+                          }}
+                        >
+                          Eliminar
+                        </button>
+                      </div>
+                    </Card>
+                  );
+                })
+            )}
+          </div>
+        ) : (
+          <Card>
             <div>
               {/* Grid del calendario - Mejorado */}
               <div
@@ -445,11 +625,24 @@ export default function Calendar() {
                   const dayTasks = getTasksForDay(date);
                   const isTodayDate = isToday(date);
                   const isCurrentMonthDate = isCurrentMonth(date);
+                  
+                  // Calcular valores para evitar expresiones ternarias complejas en JSX
+                  const maxVisibleEvents = dayTasks.length > 0 ? 2 : 3;
+                  const remainingEvents = dayEvents.length - maxVisibleEvents;
+                  const remainingEventsText = remainingEvents > 0 
+                    ? `+${remainingEvents} ${remainingEvents > 1 ? "eventos" : "evento"} más`
+                    : null;
 
                   return (
                     <div
                       key={index}
-                      onClick={() => openCreateEventModal(date)}
+                      onClick={() => {
+                        if (isMobile) {
+                          navigate(`/personal/create-event?date=${date.toISOString()}`);
+                        } else {
+                          openCreateEventModal(date);
+                        }
+                      }}
                       style={{
                         minHeight: "140px",
                         padding: "10px",
@@ -550,7 +743,7 @@ export default function Calendar() {
                               {event.title}
                             </div>
                           ))}
-                          {dayEvents.length > (dayTasks.length > 0 ? 2 : 3) && (
+                          {remainingEventsText && (
                             <div
                               style={{
                                 fontSize: "10px",
@@ -559,7 +752,7 @@ export default function Calendar() {
                                 padding: "2px 6px",
                               }}
                             >
-                              +{dayEvents.length - (dayTasks.length > 0 ? 2 : 3)} evento{dayEvents.length - (dayTasks.length > 0 ? 2 : 3) > 1 ? "s" : ""} más
+                              {remainingEventsText}
                             </div>
                           )}
                         </div>
@@ -644,7 +837,7 @@ export default function Calendar() {
                               </div>
                             );
                           })}
-                          {remainingTasksCount > 0 && (
+                          {dayTasks.length > 3 && (
                             <div
                               style={{
                                 fontSize: "10px",
@@ -654,7 +847,7 @@ export default function Calendar() {
                                 textAlign: "center",
                               }}
                             >
-                              +{dayTasks.length - 3} tarea{dayTasks.length - 3 > 1 ? "s" : ""} más
+                              +{dayTasks.length - 3} {dayTasks.length - 3 > 1 ? "tareas" : "tarea"} más
                             </div>
                           )}
                         </div>
@@ -668,8 +861,8 @@ export default function Calendar() {
         </Card>
       </div>
 
-      {/* Modal de crear/editar evento */}
-      {showEventModal && (
+      {/* Modal de crear/editar evento - Solo en desktop */}
+      {showEventModal && !isMobile && (
         <div
           style={{
             position: "fixed",
