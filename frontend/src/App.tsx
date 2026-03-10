@@ -11,6 +11,7 @@ import Projects from "./pages/Projects";
 import Board from "./pages/Board";
 import CreateTaskPage from "./pages/CreateTaskPage";
 import CreateNotePage from "./pages/CreateNotePage";
+import CreateEventPage from "./pages/CreateEventPage";
 import Settings from "./pages/Settings";
 import Notifications from "./pages/Notifications";
 import Analytics from "./pages/Analytics";
@@ -259,6 +260,14 @@ function AppContent() {
                 element={
                     <PrivateRoute>
                         <Calendar />
+                    </PrivateRoute>
+                }
+            />
+            <Route
+                path="/personal/create-event"
+                element={
+                    <PrivateRoute>
+                        <CreateEventPage />
                     </PrivateRoute>
                 }
             />

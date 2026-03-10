@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback, useMemo } from "react";
+import { useNavigate } from "react-router-dom";
 import { http } from "../api/http";
 import Layout from "../components/Layout";
 import PageHeader from "../components/PageHeader";
@@ -43,6 +44,7 @@ const EVENT_COLORS = [
 ];
 
 export default function Calendar() {
+  const navigate = useNavigate();
   const [currentDate, setCurrentDate] = useState(new Date());
   const [events, setEvents] = useState<CalendarEvent[]>([]);
   const [tasks, setTasks] = useState<Task[]>([]);
@@ -402,7 +404,18 @@ export default function Calendar() {
             <Button variant="secondary" onClick={goToNextMonth}>
               →
             </Button>
-            <Button variant="primary" onClick={() => openCreateEventModal()}>
+            <Button 
+              variant="primary" 
+              onClick={() => {
+                if (isMobile) {
+                  // En móvil, redirigir a la página de crear evento
+                  navigate("/personal/create-event");
+                } else {
+                  // En desktop, abrir modal
+                  openCreateEventModal();
+                }
+              }}
+            >
               + Nuevo Evento
             </Button>
           </>
@@ -414,10 +427,164 @@ export default function Calendar() {
         backgroundColor: "var(--bg-secondary)",
         boxSizing: "border-box",
       }}>
-        <Card>
-          {loading ? (
-            <div className="loading">Cargando calendario...</div>
-          ) : (
+        {loading ? (
+          <div className="loading">Cargando calendario...</div>
+        ) : isMobile ? (
+          // Vista de lista para móvil
+          <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+            {events.length === 0 ? (
+              <Card>
+                <div style={{ textAlign: "center", padding: "60px", color: "var(--text-secondary)" }}>
+                  <div style={{ fontSize: "48px", marginBottom: "16px" }}>📅</div>
+                  <div style={{ fontSize: "18px", fontWeight: 500 }}>No hay eventos programados</div>
+                  <div style={{ fontSize: "14px", marginTop: "8px" }}>
+                    Crea tu primer evento haciendo clic en el botón de arriba
+                  </div>
+                </div>
+              </Card>
+            ) : (
+              events
+                .sort((a, b) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime())
+                .map((event) => {
+                  const startDate = new Date(event.startDate);
+                  const endDate = event.endDate ? new Date(event.endDate) : startDate;
+                  const isAllDay = event.allDay;
+                  
+                  return (
+                    <Card
+                      key={event.id}
+                      style={{
+                        padding: "16px",
+                        borderLeft: `4px solid ${event.color || EVENT_COLORS[0]}`,
+                      }}
+                    >
+                      <div style={{ marginBottom: "12px" }}>
+                        <h3 style={{ 
+                          margin: 0, 
+                          fontSize: "18px", 
+                          fontWeight: 600, 
+                          color: "var(--text-primary)",
+                          marginBottom: "8px",
+                        }}>
+                          {event.title}
+                        </h3>
+                        <div style={{ 
+                          fontSize: "14px", 
+                          color: "var(--text-secondary)",
+                          display: "flex",
+                          flexDirection: "column",
+                          gap: "4px",
+                        }}>
+                          <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                            <span>📅</span>
+                            <span>
+                              {isAllDay 
+                                ? startDate.toLocaleDateString("es-ES", { 
+                                    weekday: "long", 
+                                    year: "numeric", 
+                                    month: "long", 
+                                    day: "numeric" 
+                                  })
+                                : startDate.toLocaleDateString("es-ES", { 
+                                    weekday: "long", 
+                                    year: "numeric", 
+                                    month: "long", 
+                                    day: "numeric" 
+                                  }) + " a las " + startDate.toLocaleTimeString("es-ES", { 
+                                    hour: "2-digit", 
+                                    minute: "2-digit" 
+                                  })
+                              }
+                            </span>
+                          </div>
+                          {!isAllDay && event.endDate && (
+                            <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                              <span>🕐</span>
+                              <span>
+                                Hasta: {endDate.toLocaleDateString("es-ES", { 
+                                  weekday: "long", 
+                                  year: "numeric", 
+                                  month: "long", 
+                                  day: "numeric" 
+                                })} a las {endDate.toLocaleTimeString("es-ES", { 
+                                  hour: "2-digit", 
+                                  minute: "2-digit" 
+                                })}
+                              </span>
+                            </div>
+                          )}
+                          {event.type && (
+                            <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                              <span>
+                                {event.type === "meeting" ? "🤝" : 
+                                 event.type === "reminder" ? "⏰" : 
+                                 event.type === "task" ? "✓" : 
+                                 event.type === "deadline" ? "📌" : "📅"}
+                              </span>
+                              <span style={{ textTransform: "capitalize" }}>{event.type}</span>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                      {event.description && (
+                        <div style={{ 
+                          marginBottom: "12px",
+                          fontSize: "15px",
+                          lineHeight: "1.6",
+                          color: "var(--text-secondary)",
+                          whiteSpace: "pre-wrap",
+                          wordWrap: "break-word",
+                        }}>
+                          {event.description}
+                        </div>
+                      )}
+                      <div style={{ 
+                        display: "flex", 
+                        justifyContent: "flex-end", 
+                        gap: "8px",
+                        paddingTop: "12px",
+                        borderTop: "1px solid var(--border-color)",
+                      }}>
+                        <button
+                          type="button"
+                          onClick={() => openEditEventModal(event)}
+                          style={{
+                            padding: "8px 16px",
+                            borderRadius: "8px",
+                            backgroundColor: "var(--hover-bg)",
+                            border: "1px solid var(--border-color)",
+                            cursor: "pointer",
+                            fontSize: "14px",
+                            color: "var(--text-primary)",
+                            fontWeight: 500,
+                          }}
+                        >
+                          Editar
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => deleteEvent(event.id)}
+                          style={{
+                            padding: "8px 16px",
+                            borderRadius: "8px",
+                            backgroundColor: "var(--hover-bg)",
+                            border: "1px solid var(--border-color)",
+                            cursor: "pointer",
+                            fontSize: "14px",
+                            color: "#dc3545",
+                            fontWeight: 500,
+                          }}
+                        >
+                          Eliminar
+                        </button>
+                      </div>
+                    </Card>
+                  );
+                })
+            )}
+          </div>
+        ) : (
+          <Card>
             <div>
               {/* Grid del calendario - Mejorado */}
               <div
@@ -464,7 +631,13 @@ export default function Calendar() {
                   return (
                     <div
                       key={index}
-                      onClick={() => openCreateEventModal(date)}
+                      onClick={() => {
+                        if (isMobile) {
+                          navigate(`/personal/create-event?date=${date.toISOString()}`);
+                        } else {
+                          openCreateEventModal(date);
+                        }
+                      }}
                       style={{
                         minHeight: "140px",
                         padding: "10px",
@@ -683,8 +856,8 @@ export default function Calendar() {
         </Card>
       </div>
 
-      {/* Modal de crear/editar evento */}
-      {showEventModal && (
+      {/* Modal de crear/editar evento - Solo en desktop */}
+      {showEventModal && !isMobile && (
         <div
           style={{
             position: "fixed",
