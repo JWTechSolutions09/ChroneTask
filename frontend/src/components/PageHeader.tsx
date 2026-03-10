@@ -20,6 +20,7 @@ export default function PageHeader({ title, subtitle, breadcrumbs, actions }: Pa
         zIndex: 100,
         boxShadow: "0 2px 4px rgba(0, 0, 0, 0.05)",
       }}
+      className="page-header"
     >
       {breadcrumbs && breadcrumbs.length > 0 && <Breadcrumbs items={breadcrumbs} />}
       <div
