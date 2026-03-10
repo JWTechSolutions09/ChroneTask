@@ -627,6 +627,11 @@ export default function Calendar() {
                   const dayTasks = getTasksForDay(date);
                   const isTodayDate = isToday(date);
                   const isCurrentMonthDate = isCurrentMonth(date);
+                  
+                  // Calcular valores para eventos visibles
+                  const maxVisibleEvents = dayTasks.length > 0 ? 2 : 3;
+                  const visibleEvents = dayEvents.slice(0, maxVisibleEvents);
+                  const remainingEventsCount = dayEvents.length - maxVisibleEvents;
 
                   return (
                     <div
@@ -701,63 +706,57 @@ export default function Calendar() {
                       </div>
 
                       {/* Eventos del calendario - Mejorados */}
-                      {dayEvents.length > 0 && (() => {
-                        const maxVisible = dayTasks.length > 0 ? 2 : 3;
-                        const visibleEvents = dayEvents.slice(0, maxVisible);
-                        const remainingCount = dayEvents.length - maxVisible;
-                        
-                        return (
-                          <div style={{ display: "flex", flexDirection: "column", gap: "3px", marginBottom: dayTasks.length > 0 ? "4px" : "0" }}>
-                            {visibleEvents.map((event) => (
-                              <div
-                                key={event.id}
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  openEditEventModal(event);
-                                }}
-                                style={{
-                                  fontSize: "11px",
-                                  padding: "3px 7px",
-                                  borderRadius: "5px",
-                                  backgroundColor: event.color || EVENT_COLORS[0],
-                                  color: "white",
-                                  cursor: "pointer",
-                                  overflow: "hidden",
-                                  textOverflow: "ellipsis",
-                                  whiteSpace: "nowrap",
-                                  fontWeight: 500,
-                                  transition: "all 0.2s ease",
-                                  boxShadow: "0 1px 3px rgba(0, 0, 0, 0.1)",
-                                }}
-                                onMouseEnter={(e) => {
-                                  e.currentTarget.style.transform = "translateX(2px)";
-                                  e.currentTarget.style.boxShadow = "0 2px 6px rgba(0, 0, 0, 0.2)";
-                                }}
-                                onMouseLeave={(e) => {
-                                  e.currentTarget.style.transform = "translateX(0)";
-                                  e.currentTarget.style.boxShadow = "0 1px 3px rgba(0, 0, 0, 0.1)";
-                                }}
-                                title={event.title}
-                              >
-                                <span style={{ marginRight: "4px" }}>{event.allDay ? "📅" : "🕐"}</span>
-                                {event.title}
-                              </div>
-                            ))}
-                            {remainingCount > 0 && (
-                              <div
-                                style={{
-                                  fontSize: "10px",
-                                  color: "var(--text-secondary)",
-                                  fontStyle: "italic",
-                                  padding: "2px 6px",
-                                }}
-                              >
-                                +{remainingCount} evento{remainingCount > 1 ? "s" : ""} más
-                              </div>
-                            )}
-                          </div>
-                        );
-                      })()}
+                      {dayEvents.length > 0 && (
+                        <div style={{ display: "flex", flexDirection: "column", gap: "3px", marginBottom: dayTasks.length > 0 ? "4px" : "0" }}>
+                          {visibleEvents.map((event) => (
+                            <div
+                              key={event.id}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                openEditEventModal(event);
+                              }}
+                              style={{
+                                fontSize: "11px",
+                                padding: "3px 7px",
+                                borderRadius: "5px",
+                                backgroundColor: event.color || EVENT_COLORS[0],
+                                color: "white",
+                                cursor: "pointer",
+                                overflow: "hidden",
+                                textOverflow: "ellipsis",
+                                whiteSpace: "nowrap",
+                                fontWeight: 500,
+                                transition: "all 0.2s ease",
+                                boxShadow: "0 1px 3px rgba(0, 0, 0, 0.1)",
+                              }}
+                              onMouseEnter={(e) => {
+                                e.currentTarget.style.transform = "translateX(2px)";
+                                e.currentTarget.style.boxShadow = "0 2px 6px rgba(0, 0, 0, 0.2)";
+                              }}
+                              onMouseLeave={(e) => {
+                                e.currentTarget.style.transform = "translateX(0)";
+                                e.currentTarget.style.boxShadow = "0 1px 3px rgba(0, 0, 0, 0.1)";
+                              }}
+                              title={event.title}
+                            >
+                              <span style={{ marginRight: "4px" }}>{event.allDay ? "📅" : "🕐"}</span>
+                              {event.title}
+                            </div>
+                          ))}
+                          {remainingEventsCount > 0 && (
+                            <div
+                              style={{
+                                fontSize: "10px",
+                                color: "var(--text-secondary)",
+                                fontStyle: "italic",
+                                padding: "2px 6px",
+                              }}
+                            >
+                              +{remainingEventsCount} evento{remainingEventsCount > 1 ? "s" : ""} más
+                            </div>
+                          )}
+                        </div>
+                      )}
 
                       {/* Tareas - Mejoradas y destacadas */}
                       {dayTasks.length > 0 && (
