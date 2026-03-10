@@ -632,10 +632,12 @@ export default function Calendar() {
                   const maxVisibleEvents = dayTasks.length > 0 ? 2 : 3;
                   const visibleEvents = dayEvents.slice(0, maxVisibleEvents);
                   const remainingEventsCount = dayEvents.length - maxVisibleEvents;
+                  const eventosText = remainingEventsCount > 1 ? "eventos" : "evento";
                   
                   // Calcular valores para tareas visibles
                   const visibleTasks = dayTasks.slice(0, 3);
                   const remainingTasksCount = dayTasks.length - 3;
+                  const tareasText = remainingTasksCount > 1 ? "tareas" : "tarea";
 
                   return (
                     <div
@@ -756,7 +758,7 @@ export default function Calendar() {
                                 padding: "2px 6px",
                               }}
                             >
-                              +{remainingEventsCount} {remainingEventsCount > 1 ? "eventos" : "evento"} más
+                              +{remainingEventsCount} {eventosText} más
                             </div>
                           )}
                         </div>
@@ -851,7 +853,7 @@ export default function Calendar() {
                                 textAlign: "center",
                               }}
                             >
-                              +{remainingTasksCount} {remainingTasksCount > 1 ? "tareas" : "tarea"} más
+                              +{remainingTasksCount} {tareasText} más
                             </div>
                           )}
                         </div>
