@@ -98,9 +98,9 @@ export default function CreateNotePage() {
 
   // Estilos optimizados para móvil
   const inputStyle = {
-    padding: "14px",
+    padding: "16px",
     fontSize: "16px",
-    borderRadius: "10px",
+    borderRadius: "12px",
     border: "2px solid var(--border-color)",
     transition: "all 0.2s",
     width: "100%",
@@ -238,14 +238,17 @@ export default function CreateNotePage() {
               <textarea
                 value={content}
                 onChange={(e) => setContent(e.target.value)}
-                rows={12}
+                rows={18}
                 placeholder="Escribe el contenido de tu nota..."
                 style={{
                   ...inputStyle,
                   resize: "vertical",
-                  minHeight: "250px",
+                  minHeight: "350px",
+                  maxHeight: "600px",
                   fontFamily: "inherit",
                   lineHeight: "1.6",
+                  fontSize: "16px",
+                  padding: "16px",
                 }}
                 onFocus={(e) => {
                   e.target.style.borderColor = "var(--primary)";
@@ -263,10 +266,14 @@ export default function CreateNotePage() {
               <label style={labelStyle}>Color</label>
               <div style={{
                 display: "flex",
-                flexWrap: "wrap",
-                gap: "8px",
+                flexDirection: "row",
+                flexWrap: "nowrap",
+                gap: "12px",
                 width: "100%",
                 justifyContent: "flex-start",
+                alignItems: "center",
+                overflowX: "auto",
+                paddingBottom: "4px",
               }}>
                 {NOTE_COLORS.map((noteColor) => (
                   <button
@@ -274,9 +281,9 @@ export default function CreateNotePage() {
                     type="button"
                     onClick={() => setColor(noteColor)}
                     style={{
-                      width: "40px",
-                      height: "40px",
-                      borderRadius: "8px",
+                      width: "48px",
+                      height: "48px",
+                      borderRadius: "10px",
                       border: color === noteColor ? "3px solid var(--primary)" : "2px solid var(--border-color)",
                       backgroundColor: noteColor,
                       cursor: "pointer",

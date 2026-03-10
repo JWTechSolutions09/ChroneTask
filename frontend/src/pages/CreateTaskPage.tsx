@@ -74,9 +74,9 @@ export default function CreateTaskPage() {
 
   // Estilos optimizados para móvil
   const inputStyle = {
-    padding: "14px",
+    padding: "16px",
     fontSize: "16px",
-    borderRadius: "10px",
+    borderRadius: "12px",
     border: "2px solid var(--border-color)",
     transition: "all 0.2s",
     width: "100%",
@@ -219,14 +219,17 @@ export default function CreateTaskPage() {
             <textarea
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              rows={8}
+              rows={15}
               placeholder="Describe detalladamente la tarea, requisitos, pasos a seguir, etc..."
               style={{
                 ...inputStyle,
                 resize: "vertical",
-                minHeight: "200px",
+                minHeight: "300px",
+                maxHeight: "500px",
                 fontFamily: "inherit",
                 lineHeight: "1.6",
+                fontSize: "16px",
+                padding: "16px",
               }}
                 onFocus={(e) => {
                   e.target.style.borderColor = "var(--primary)";
