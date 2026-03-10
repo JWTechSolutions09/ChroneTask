@@ -854,6 +854,7 @@ export default function Calendar() {
             </div>
           )}
         </Card>
+        )}
       </div>
 
       {/* Modal de crear/editar evento - Solo en desktop */}
