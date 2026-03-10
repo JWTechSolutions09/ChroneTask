@@ -745,30 +745,21 @@ input, textarea, select {
     transform: translateY(0) !important;
   }
 
-  /* Header del sidebar */
-  .sidebar.mobile-dropdown-menu > div:first-child {
-    padding: clamp(0.875rem, 3vw, 1rem) clamp(0.75rem, 2.5vw, 0.875rem) !important;
-    min-height: clamp(56px, 10vw, 64px) !important;
-    flex-shrink: 0 !important;
-    background: var(--bg-primary) !important;
-    border-bottom: 1px solid var(--border-color) !important;
-    position: sticky !important;
-    top: 0 !important;
-    z-index: 1 !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: space-between !important;
+  /* Header del sidebar - Oculto en móvil (duplicado con navbar) */
+  .sidebar.mobile-dropdown-menu > div:first-child,
+  .sidebar.mobile-dropdown-menu .sidebar-header {
+    display: none !important;
   }
 
-  /* Nav container */
+  /* Nav container - Ajustar padding superior ya que no hay header */
   .sidebar.mobile-dropdown-menu > nav {
-    padding: clamp(0.75rem, 2vw, 0.875rem) clamp(0.5rem, 1.5vw, 0.625rem) !important;
+    padding: clamp(1rem, 3vw, 1.25rem) clamp(0.75rem, 2vw, 1rem) !important;
     overflow-y: auto !important;
     overflow-x: hidden !important;
     -webkit-overflow-scrolling: touch !important;
     flex: 1 !important;
     min-height: 0 !important;
-    max-height: calc(90vh - 70px) !important;
+    max-height: calc(100vh - 60px) !important;
     display: flex !important;
     flex-direction: column !important;
     width: 100% !important;
@@ -835,7 +826,18 @@ input, textarea, select {
 
   /* Ajustar el contenido principal para que no quede debajo del navbar */
   .main-content {
-    margin-top: 60px !important;
+    margin-top: 0 !important;
+    padding-top: 0 !important;
+  }
+
+  /* Asegurar que no haya overflow horizontal */
+  body, html {
+    overflow-x: hidden !important;
+    max-width: 100vw !important;
+  }
+
+  * {
+    max-width: 100% !important;
   }
 
   .mobile-menu-btn {
@@ -844,7 +846,7 @@ input, textarea, select {
 
   .mobile-overlay {
     position: fixed !important;
-    top: 0 !important;
+    top: 60px !important;
     left: 0 !important;
     right: 0 !important;
     bottom: 0 !important;
@@ -1077,10 +1079,17 @@ input, textarea, select {
   /* PageHeader responsive */
   .page-header {
     padding: 12px 16px !important;
+    top: 60px !important;
+    z-index: 100 !important;
   }
 
   .page-header-content {
     flex-direction: column !important;
+  }
+
+  /* Ocultar header del sidebar en móvil (logo/título duplicado) */
+  .sidebar-header {
+    display: none !important;
   }
 
   .page-header-actions {

@@ -469,8 +469,9 @@ export default function Layout({ children, organizationId, usageType: propUsageT
           e.stopPropagation();
         }}
       >
-        {/* Logo/Header */}
+        {/* Logo/Header - Oculto en móvil cuando navbar está visible */}
         <div
+          className="sidebar-header"
           style={{
             padding: "20px 16px",
             borderBottom: "1px solid var(--border-color)",
@@ -1106,7 +1107,6 @@ export default function Layout({ children, organizationId, usageType: propUsageT
           width: "100%",
           minWidth: 0,
           WebkitOverflowScrolling: "touch",
-          marginTop: isMobile ? "60px" : 0,
         }}
       >
         {children}
