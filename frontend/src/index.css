@@ -1076,10 +1076,15 @@ input, textarea, select {
     margin-top: 12px !important;
     flex-wrap: nowrap !important;
     overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
   }
 
   .page-header-actions > div {
     flex-wrap: nowrap !important;
+    display: flex !important;
+    gap: 8px !important;
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
   }
 
   .page-header-actions > * {
@@ -1088,12 +1093,14 @@ input, textarea, select {
   }
 
   /* Ajustar botones en PageHeader */
-  .page-header-actions button {
+  .page-header-actions button,
+  .page-header-actions .btn,
+  .page-header-actions select {
     font-size: 12px !important;
     padding: 8px 10px !important;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    white-space: nowrap !important;
+    flex-shrink: 0 !important;
+    min-width: auto !important;
   }
 
   /* Grid responsive */
@@ -1246,11 +1253,12 @@ input, textarea, select {
   }
 
   /* Botones de acción en PageHeader */
-  .page-header-actions button,
+  /* Removido: estos estilos causaban que los botones se apilaran verticalmente */
+  /* .page-header-actions button,
   .page-header-actions .btn {
     width: 100% !important;
     margin-bottom: clamp(0.5rem, 1.5vw, 0.75rem) !important;
-  }
+  } */
 
   /* Tabs responsive */
   [role="tablist"],
@@ -1414,26 +1422,41 @@ input, textarea, select {
     font-size: 24px !important;
   }
 
-  /* PageHeader buttons en móvil */
+  /* PageHeader buttons en móvil - Forzar horizontal */
   .page-header-actions {
+    flex-direction: row !important;
     flex-wrap: nowrap !important;
     gap: 8px !important;
     overflow-x: auto !important;
     width: auto !important;
     max-width: 100% !important;
+    -webkit-overflow-scrolling: touch !important;
+    display: flex !important;
   }
 
   .page-header-actions > div {
+    flex-direction: row !important;
     flex-wrap: nowrap !important;
+    display: flex !important;
+    gap: 8px !important;
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    width: auto !important;
+    max-width: none !important;
   }
 
   .page-header-actions button,
-  .page-header-actions a {
+  .page-header-actions a,
+  .page-header-actions select,
+  .page-header-actions .btn {
     font-size: 12px !important;
     padding: 8px 10px !important;
     flex-shrink: 0 !important;
     white-space: nowrap !important;
     min-width: auto !important;
+    width: auto !important;
+    margin-bottom: 0 !important;
+    display: inline-block !important;
   }
 
   /* Search bar en móvil */
