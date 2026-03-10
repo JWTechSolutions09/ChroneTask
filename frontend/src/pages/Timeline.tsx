@@ -400,6 +400,168 @@ export default function Timeline() {
         }} className="timeline-container">
           {loading ? (
             <div className="loading">Cargando cronograma...</div>
+          ) : isMobile ? (
+            /* Vista de lista para móvil */
+            <div style={{ width: "100%" }}>
+              {tasks.filter(t => t.status !== "Done").length === 0 ? (
+                <Card style={{ padding: "40px", textAlign: "center" }}>
+                  <div style={{ color: "var(--text-secondary)", fontSize: "16px" }}>
+                    No hay tareas pendientes
+                  </div>
+                </Card>
+              ) : (
+                tasks
+                  .filter(t => t.status !== "Done")
+                  .sort((a, b) => {
+                    // Ordenar por fecha de vencimiento (las más urgentes primero)
+                    const aDue = a.dueDate ? new Date(a.dueDate).getTime() : Infinity;
+                    const bDue = b.dueDate ? new Date(b.dueDate).getTime() : Infinity;
+                    return aDue - bDue;
+                  })
+                  .map((task) => {
+                    const taskStyle = getTaskStyle(task);
+                    const urgencyStatus = getTaskUrgencyStatus(task);
+                    const taskDue = task.dueDate ? new Date(task.dueDate) : null;
+                    const taskStart = task.startDate ? new Date(task.startDate) : null;
+                    
+                    return (
+                      <Card
+                        key={task.id}
+                        style={{
+                          marginBottom: "16px",
+                          padding: "16px",
+                          borderLeft: `4px solid ${taskStyle.borderLeft?.replace("4px solid ", "") || "#007bff"}`,
+                          backgroundColor: "var(--bg-primary)",
+                          cursor: "pointer",
+                          transition: "all 0.2s",
+                        }}
+                        onClick={() => {
+                          const projectPath = isPersonalMode || isPersonalRoute
+                            ? `/personal/project/${task.projectId}/board`
+                            : `/org/${organizationId}/project/${task.projectId}/board`;
+                          window.location.href = projectPath;
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.transform = "translateY(-2px)";
+                          e.currentTarget.style.boxShadow = "0 4px 12px rgba(0, 0, 0, 0.15)";
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.transform = "translateY(0)";
+                          e.currentTarget.style.boxShadow = "none";
+                        }}
+                      >
+                        <div style={{ display: "flex", alignItems: "flex-start", gap: "12px", marginBottom: "12px" }}>
+                          <span style={{ fontSize: "20px" }}>{taskStyle.icon}</span>
+                          <div style={{ flex: 1 }}>
+                            <div style={{ 
+                              fontWeight: 600, 
+                              color: "var(--text-primary)", 
+                              fontSize: "16px",
+                              marginBottom: "4px",
+                            }}>
+                              {task.title}
+                            </div>
+                            {task.description && (
+                              <div style={{ 
+                                fontSize: "14px", 
+                                color: "var(--text-secondary)",
+                                marginTop: "8px",
+                                lineHeight: "1.5",
+                              }}>
+                                {task.description}
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                        
+                        <div style={{ 
+                          display: "flex", 
+                          flexDirection: "column", 
+                          gap: "8px",
+                          paddingTop: "12px",
+                          borderTop: "1px solid var(--border-color)",
+                        }}>
+                          {task.projectName && (
+                            <div style={{ 
+                              fontSize: "13px", 
+                              color: "var(--text-secondary)",
+                              display: "flex",
+                              alignItems: "center",
+                              gap: "6px",
+                            }}>
+                              <span>📁</span>
+                              <span>{task.projectName}</span>
+                            </div>
+                          )}
+                          
+                          {task.assignedToName && (
+                            <div style={{ 
+                              fontSize: "13px", 
+                              color: "var(--text-secondary)",
+                              display: "flex",
+                              alignItems: "center",
+                              gap: "6px",
+                            }}>
+                              <span>👤</span>
+                              <span>{task.assignedToName}</span>
+                            </div>
+                          )}
+                          
+                          {taskDue && (
+                            <div style={{ 
+                              fontSize: "13px",
+                              color: urgencyStatus === "overdue" ? "#dc3545" : 
+                                     urgencyStatus === "due-today" ? "#ffc107" : 
+                                     "var(--text-secondary)",
+                              fontWeight: urgencyStatus === "overdue" || urgencyStatus === "due-today" ? 600 : 400,
+                              display: "flex",
+                              alignItems: "center",
+                              gap: "6px",
+                            }}>
+                              <span>📅</span>
+                              <span>Vence: {taskDue.toLocaleDateString("es-ES", { 
+                                weekday: "short",
+                                day: "numeric", 
+                                month: "short",
+                                year: "numeric"
+                              })}</span>
+                            </div>
+                          )}
+                          
+                          {!taskDue && taskStart && (
+                            <div style={{ 
+                              fontSize: "13px",
+                              color: "var(--text-secondary)",
+                              display: "flex",
+                              alignItems: "center",
+                              gap: "6px",
+                            }}>
+                              <span>📅</span>
+                              <span>Inicio: {taskStart.toLocaleDateString("es-ES", { 
+                                weekday: "short",
+                                day: "numeric", 
+                                month: "short",
+                                year: "numeric"
+                              })}</span>
+                            </div>
+                          )}
+                          
+                          <div style={{ 
+                            fontSize: "13px",
+                            color: "var(--text-secondary)",
+                            display: "flex",
+                            alignItems: "center",
+                            gap: "6px",
+                          }}>
+                            <span>📊</span>
+                            <span>Estado: {task.status}</span>
+                          </div>
+                        </div>
+                      </Card>
+                    );
+                  })
+              )}
+            </div>
           ) : (
             <Card style={{ overflowX: "auto", width: "100%", padding: 0 }}>
               <div style={{ 
