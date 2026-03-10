@@ -180,6 +180,8 @@ export default function Dashboard() {
               gap: "8px", 
               flexWrap: isMobile ? "nowrap" : "wrap",
               alignItems: "center",
+              overflowX: isMobile ? "auto" : "visible",
+              maxWidth: "100%",
             }}>
               {!isPersonalMode && !isPersonalRoute && organizationId && (
                 <>

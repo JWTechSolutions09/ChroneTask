@@ -322,7 +322,13 @@ export default function Timeline() {
                 ]
           }
           actions={
-            <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
+            <div style={{ 
+              display: "flex", 
+              gap: "10px", 
+              flexWrap: isMobile ? "nowrap" : "wrap",
+              overflowX: isMobile ? "auto" : "visible",
+              maxWidth: "100%",
+            }}>
               <select
                 value={projectId || ""}
                 onChange={(e) => {
@@ -345,7 +351,8 @@ export default function Timeline() {
                   backgroundColor: "var(--bg-primary)",
                   color: "var(--text-primary)",
                   minWidth: "120px",
-                  flex: "1 1 auto",
+                  flex: isMobile ? "0 0 auto" : "1 1 auto",
+                  whiteSpace: "nowrap",
                 }}
               >
                 <option value="">Todos los proyectos</option>
@@ -358,35 +365,55 @@ export default function Timeline() {
               <Button
                 variant="secondary"
                 onClick={() => navigateDate("prev")}
-                style={{ flex: "1 1 auto", minWidth: "80px" }}
+                style={{ 
+                  flex: isMobile ? "0 0 auto" : "1 1 auto", 
+                  minWidth: "80px",
+                  whiteSpace: "nowrap",
+                }}
               >
                 ← Anterior
               </Button>
               <Button
                 variant="secondary"
                 onClick={() => setCurrentDate(new Date())}
-                style={{ flex: "1 1 auto", minWidth: "60px" }}
+                style={{ 
+                  flex: isMobile ? "0 0 auto" : "1 1 auto", 
+                  minWidth: "60px",
+                  whiteSpace: "nowrap",
+                }}
               >
                 Hoy
               </Button>
               <Button
                 variant="secondary"
                 onClick={() => navigateDate("next")}
-                style={{ flex: "1 1 auto", minWidth: "80px" }}
+                style={{ 
+                  flex: isMobile ? "0 0 auto" : "1 1 auto", 
+                  minWidth: "80px",
+                  whiteSpace: "nowrap",
+                }}
               >
                 Siguiente →
               </Button>
               <Button
                 variant={view === "week" ? "primary" : "secondary"}
                 onClick={() => setView("week")}
-                style={{ flex: "1 1 auto", minWidth: "80px" }}
+                style={{ 
+                  flex: isMobile ? "0 0 auto" : "1 1 auto", 
+                  minWidth: "80px",
+                  whiteSpace: "nowrap",
+                }}
               >
                 Semana
               </Button>
               <Button
                 variant={view === "month" ? "primary" : "secondary"}
                 onClick={() => setView("month")}
-                style={{ flex: "1 1 auto", minWidth: "80px" }}
+                style={{ 
+                  flex: isMobile ? "0 0 auto" : "1 1 auto", 
+                  minWidth: "80px",
+                  whiteSpace: "nowrap",
+                }}
               >
                 Mes
               </Button>

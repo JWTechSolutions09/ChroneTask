@@ -394,14 +394,41 @@ export default function Calendar() {
         subtitle={`${MONTHS[month]} ${year}`}
         breadcrumbs={[{ label: "Calendario" }]}
         actions={
-          <>
-            <Button variant="secondary" onClick={goToToday}>
+          <div style={{ 
+            display: "flex", 
+            gap: "10px", 
+            flexWrap: isMobile ? "nowrap" : "wrap",
+            overflowX: isMobile ? "auto" : "visible",
+            maxWidth: "100%",
+          }}>
+            <Button 
+              variant="secondary" 
+              onClick={goToToday}
+              style={{ 
+                flex: isMobile ? "0 0 auto" : undefined,
+                whiteSpace: "nowrap",
+              }}
+            >
               Hoy
             </Button>
-            <Button variant="secondary" onClick={goToPreviousMonth}>
+            <Button 
+              variant="secondary" 
+              onClick={goToPreviousMonth}
+              style={{ 
+                flex: isMobile ? "0 0 auto" : undefined,
+                whiteSpace: "nowrap",
+              }}
+            >
               ←
             </Button>
-            <Button variant="secondary" onClick={goToNextMonth}>
+            <Button 
+              variant="secondary" 
+              onClick={goToNextMonth}
+              style={{ 
+                flex: isMobile ? "0 0 auto" : undefined,
+                whiteSpace: "nowrap",
+              }}
+            >
               →
             </Button>
             <Button 
@@ -413,10 +440,14 @@ export default function Calendar() {
                   openCreateEventModal();
                 }
               }}
+              style={{ 
+                flex: isMobile ? "0 0 auto" : undefined,
+                whiteSpace: "nowrap",
+              }}
             >
               + Nuevo Evento
             </Button>
-          </>
+          </div>
         }
       />
 
