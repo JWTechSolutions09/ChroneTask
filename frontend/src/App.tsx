@@ -9,6 +9,8 @@ import OrgSelect from "./pages/OrgSelect";
 import Dashboard from "./pages/Dashboard";
 import Projects from "./pages/Projects";
 import Board from "./pages/Board";
+import CreateTaskPage from "./pages/CreateTaskPage";
+import CreateNotePage from "./pages/CreateNotePage";
 import Settings from "./pages/Settings";
 import Notifications from "./pages/Notifications";
 import Analytics from "./pages/Analytics";
@@ -213,6 +215,14 @@ function AppContent() {
                 }
             />
             <Route
+                path="/personal/project/:projectId/create-task"
+                element={
+                    <PrivateRoute>
+                        <CreateTaskPage />
+                    </PrivateRoute>
+                }
+            />
+            <Route
                 path="/personal/timeline"
                 element={
                     <PrivateRoute>
@@ -225,6 +235,14 @@ function AppContent() {
                 element={
                     <PrivateRoute>
                         <Notes />
+                    </PrivateRoute>
+                }
+            />
+            <Route
+                path="/personal/create-note"
+                element={
+                    <PrivateRoute>
+                        <CreateNotePage />
                     </PrivateRoute>
                 }
             />
@@ -277,6 +295,14 @@ function AppContent() {
                 }
             />
             <Route
+                path="/org/:organizationId/project/:projectId/create-task"
+                element={
+                    <PrivateRoute>
+                        <CreateTaskPage />
+                    </PrivateRoute>
+                }
+            />
+            <Route
                 path="/org/:organizationId/notifications"
                 element={
                     <PrivateRoute>
@@ -317,10 +343,26 @@ function AppContent() {
                 }
             />
             <Route
+                path="/org/:organizationId/project/:projectId/create-note"
+                element={
+                    <PrivateRoute>
+                        <CreateNotePage />
+                    </PrivateRoute>
+                }
+            />
+            <Route
                 path="/org/:organizationId/notes"
                 element={
                     <PrivateRoute>
                         <Notes />
+                    </PrivateRoute>
+                }
+            />
+            <Route
+                path="/org/:organizationId/create-note"
+                element={
+                    <PrivateRoute>
+                        <CreateNotePage />
                     </PrivateRoute>
                 }
             />

@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback, useRef } from "react";
-import { useParams, useLocation } from "react-router-dom";
+import { useParams, useLocation, useNavigate } from "react-router-dom";
 import { http } from "../api/http";
 import Layout from "../components/Layout";
 import PageHeader from "../components/PageHeader";
@@ -73,6 +73,7 @@ const getTextColor = (backgroundColor: string): string => {
 export default function Notes() {
   const { organizationId, projectId } = useParams<{ organizationId?: string; projectId?: string }>();
   const location = useLocation();
+  const navigate = useNavigate();
   const { usageType } = useUserUsageType();
   const isPersonalMode = usageType === "personal";
   const isPersonalRoute = location?.pathname?.startsWith("/personal") ?? false;
@@ -600,7 +601,24 @@ export default function Notes() {
                 ]
           }
           actions={
-            <Button variant="primary" onClick={createNote}>
+            <Button 
+              variant="primary" 
+              onClick={() => {
+                if (isMobile) {
+                  // En móvil, redirigir a la página de crear nota
+                  if (isPersonalNotes || isPersonalMode || isPersonalRoute) {
+                    navigate("/personal/create-note");
+                  } else if (organizationId && projectId) {
+                    navigate(`/org/${organizationId}/project/${projectId}/create-note`);
+                  } else if (organizationId) {
+                    navigate(`/org/${organizationId}/create-note`);
+                  }
+                } else {
+                  // En desktop, crear nota directamente
+                  createNote();
+                }
+              }}
+            >
               + Nueva Nota
             </Button>
           }

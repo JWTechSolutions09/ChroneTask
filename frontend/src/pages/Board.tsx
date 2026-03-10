@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback } from "react";
-import { useParams, Link, useLocation } from "react-router-dom";
+import { useParams, Link, useLocation, useNavigate } from "react-router-dom";
 import { http } from "../api/http";
 import Layout from "../components/Layout";
 import PageHeader from "../components/PageHeader";
@@ -50,6 +50,7 @@ const STATUS_COLORS: Record<string, string> = {
 export default function Board() {
   const { organizationId, projectId } = useParams<{ organizationId?: string; projectId?: string }>();
   const location = useLocation();
+  const navigate = useNavigate();
   const { usageType } = useUserUsageType();
   const isPersonalMode = usageType === "personal";
   const isPersonalRoute = location?.pathname?.startsWith("/personal") ?? false;
@@ -321,7 +322,19 @@ export default function Board() {
   return (
     <Layout organizationId={isPersonalMode || isPersonalRoute ? undefined : organizationId}>
       <KeyboardShortcuts
-        onNewTask={() => setShowCreateModal(true)}
+        onNewTask={() => {
+          if (isMobile && projectId) {
+            // En móvil, redirigir a la página de crear tarea
+            if (organizationId) {
+              navigate(`/org/${organizationId}/project/${projectId}/create-task`);
+            } else {
+              navigate(`/personal/project/${projectId}/create-task`);
+            }
+          } else {
+            // En desktop, abrir modal
+            setShowCreateModal(true);
+          }
+        }}
         onSearch={() => {
           // TODO: Implementar búsqueda rápida
         }}
@@ -387,7 +400,19 @@ export default function Board() {
               )}
               <Button 
                 variant="primary" 
-                onClick={() => setShowCreateModal(true)}
+                onClick={() => {
+                  if (isMobile && projectId) {
+                    // En móvil, redirigir a la página de crear tarea
+                    if (organizationId) {
+                      navigate(`/org/${organizationId}/project/${projectId}/create-task`);
+                    } else {
+                      navigate(`/personal/project/${projectId}/create-task`);
+                    }
+                  } else {
+                    // En desktop, abrir modal
+                    setShowCreateModal(true);
+                  }
+                }}
                 style={{
                   minWidth: isMobile ? "120px" : "auto",
                   fontSize: isMobile ? "14px" : "15px",
@@ -897,7 +922,7 @@ export default function Board() {
             </div>
           )}
 
-          {showCreateModal && projectId && (
+          {showCreateModal && projectId && !isMobile && (
             <CreateTaskModal
               projectId={projectId}
               onClose={() => setShowCreateModal(false)}
