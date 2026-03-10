@@ -283,53 +283,161 @@ export default function Layout({ children, organizationId, usageType: propUsageT
         }}
       />
 
-      {/* Mobile Menu Button */}
-      <button
-        onClick={() => {
-          const isMobile = window.innerWidth <= 768;
-          setSidebarOpen(!sidebarOpen);
-          // Si se está abriendo en móvil, asegurar que no esté colapsado
-          if (!sidebarOpen && isMobile) {
-            setSidebarCollapsed(false);
-          }
-        }}
+      {/* Mobile Navbar - Solo visible en móvil */}
+      <nav
+        className="mobile-navbar"
         style={{
           position: "fixed",
-          top: "12px",
-          left: "12px",
+          top: 0,
+          left: 0,
+          right: 0,
           zIndex: 1001,
-          background: "var(--bg-primary)",
-          border: "2px solid var(--border-color)",
-          borderRadius: "12px",
-          padding: "12px",
-          cursor: "pointer",
+          backgroundColor: "var(--bg-primary)",
+          borderBottom: "1px solid var(--border-color)",
+          padding: "12px 16px",
           display: "none",
           alignItems: "center",
-          justifyContent: "center",
-          boxShadow: "0 4px 12px rgba(0, 0, 0, 0.15)",
-          fontSize: "24px",
-          color: "var(--text-primary)",
-          minWidth: "48px",
-          minHeight: "48px",
-          width: "48px",
-          height: "48px",
-          touchAction: "manipulation",
-          WebkitTapHighlightColor: "transparent",
-          transition: "all 0.2s ease",
-        }}
-        className="mobile-menu-btn"
-        aria-label="Toggle menu"
-        onTouchStart={(e) => {
-          e.currentTarget.style.transform = "scale(0.95)";
-          e.currentTarget.style.boxShadow = "0 2px 6px rgba(0, 0, 0, 0.2)";
-        }}
-        onTouchEnd={(e) => {
-          e.currentTarget.style.transform = "scale(1)";
-          e.currentTarget.style.boxShadow = "0 4px 12px rgba(0, 0, 0, 0.15)";
+          justifyContent: "space-between",
+          boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)",
         }}
       >
-        {sidebarOpen ? "✕" : "☰"}
-      </button>
+        {/* Botón Hamburguesa */}
+        <button
+          onClick={() => {
+            const isMobile = window.innerWidth <= 768;
+            setSidebarOpen(!sidebarOpen);
+            // Si se está abriendo en móvil, asegurar que no esté colapsado
+            if (!sidebarOpen && isMobile) {
+              setSidebarCollapsed(false);
+            }
+          }}
+          style={{
+            background: "var(--bg-primary)",
+            border: "2px solid var(--border-color)",
+            borderRadius: "10px",
+            padding: "10px",
+            cursor: "pointer",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            fontSize: "20px",
+            color: "var(--text-primary)",
+            width: "44px",
+            height: "44px",
+            touchAction: "manipulation",
+            WebkitTapHighlightColor: "transparent",
+            transition: "all 0.2s ease",
+          }}
+          aria-label="Toggle menu"
+          onTouchStart={(e) => {
+            e.currentTarget.style.transform = "scale(0.95)";
+            e.currentTarget.style.boxShadow = "0 2px 6px rgba(0, 0, 0, 0.2)";
+          }}
+          onTouchEnd={(e) => {
+            e.currentTarget.style.transform = "scale(1)";
+            e.currentTarget.style.boxShadow = "none";
+          }}
+        >
+          {sidebarOpen ? "✕" : "☰"}
+        </button>
+
+        {/* Logo/Título */}
+        <div style={{ 
+          display: "flex", 
+          alignItems: "center", 
+          gap: "8px",
+          flex: 1,
+          justifyContent: "center",
+        }}>
+          <span style={{ 
+            fontWeight: 700, 
+            fontSize: "18px", 
+            color: "var(--text-primary)", 
+            letterSpacing: "-0.5px",
+          }}>
+            ChroneTask
+          </span>
+        </div>
+
+        {/* Botones de acción */}
+        <div style={{ 
+          display: "flex", 
+          alignItems: "center", 
+          gap: "8px",
+        }}>
+          {/* Botón de cambio de tema */}
+          <button
+            onClick={() => {
+              toggleTheme();
+              if (window.innerWidth <= 768) {
+                closeMobileMenu();
+              }
+            }}
+            style={{
+              background: "var(--bg-primary)",
+              border: "2px solid var(--border-color)",
+              borderRadius: "10px",
+              padding: "10px",
+              cursor: "pointer",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              fontSize: "20px",
+              color: "var(--text-primary)",
+              width: "44px",
+              height: "44px",
+              touchAction: "manipulation",
+              WebkitTapHighlightColor: "transparent",
+              transition: "all 0.2s ease",
+            }}
+            aria-label={theme === "dark" ? "Modo Claro" : "Modo Oscuro"}
+            onTouchStart={(e) => {
+              e.currentTarget.style.transform = "scale(0.95)";
+            }}
+            onTouchEnd={(e) => {
+              e.currentTarget.style.transform = "scale(1)";
+            }}
+          >
+            {theme === "dark" ? "☀️" : "🌙"}
+          </button>
+
+          {/* Botón de configuración */}
+          <button
+            onClick={() => {
+              navigate("/settings");
+              if (window.innerWidth <= 768) {
+                closeMobileMenu();
+              }
+            }}
+            style={{
+              background: "var(--bg-primary)",
+              border: "2px solid var(--border-color)",
+              borderRadius: "10px",
+              padding: "10px",
+              cursor: "pointer",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              fontSize: "20px",
+              color: "var(--text-primary)",
+              width: "44px",
+              height: "44px",
+              touchAction: "manipulation",
+              WebkitTapHighlightColor: "transparent",
+              transition: "all 0.2s ease",
+            }}
+            aria-label="Configuración"
+            onTouchStart={(e) => {
+              e.currentTarget.style.transform = "scale(0.95)";
+            }}
+            onTouchEnd={(e) => {
+              e.currentTarget.style.transform = "scale(1)";
+            }}
+          >
+            ⚙️
+          </button>
+        </div>
+      </nav>
 
       {/* Sidebar / Mobile Dropdown Menu */}
       <aside
@@ -449,41 +557,7 @@ export default function Layout({ children, organizationId, usageType: propUsageT
               />
             </div>
           )}
-          {/* Botón de cerrar en móvil */}
-          <button
-            onClick={closeMobileMenu}
-            className="mobile-close-btn"
-            style={{
-              background: "var(--hover-bg)",
-              border: "2px solid var(--border-color)",
-              cursor: "pointer",
-              padding: "10px",
-              borderRadius: "10px",
-              color: "var(--text-primary)",
-              display: "none",
-              alignItems: "center",
-              justifyContent: "center",
-              transition: "all 0.2s",
-              width: "44px",
-              height: "44px",
-              flexShrink: 0,
-              minWidth: "44px",
-              minHeight: "44px",
-              fontSize: "20px",
-              fontWeight: 600,
-              touchAction: "manipulation",
-              WebkitTapHighlightColor: "transparent",
-            }}
-            aria-label="Cerrar menú"
-            onTouchStart={(e) => {
-              e.currentTarget.style.transform = "scale(0.95)";
-            }}
-            onTouchEnd={(e) => {
-              e.currentTarget.style.transform = "scale(1)";
-            }}
-          >
-            ✕
-          </button>
+          {/* Botón de cerrar en móvil - REMOVIDO, ahora se usa el navbar */}
           <button
             onClick={() => {
               setSidebarCollapsed(!sidebarCollapsed);
@@ -1032,6 +1106,7 @@ export default function Layout({ children, organizationId, usageType: propUsageT
           width: "100%",
           minWidth: 0,
           WebkitOverflowScrolling: "touch",
+          marginTop: isMobile ? "60px" : 0,
         }}
       >
         {children}
