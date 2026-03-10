@@ -669,8 +669,8 @@ export default function Notes() {
                     key={note.id}
                     style={{
                       width: "100%",
-                      backgroundColor: "var(--bg-primary)",
-                      border: "1px solid var(--border-color)",
+                      backgroundColor: note.color || "#FFE5E5",
+                      border: "1px solid rgba(0, 0, 0, 0.1)",
                       borderRadius: "12px",
                       padding: "16px",
                       marginBottom: "16px",
@@ -696,9 +696,9 @@ export default function Notes() {
                           backgroundColor: "transparent",
                           fontSize: "18px",
                           fontWeight: 600,
-                          color: "var(--text-primary)",
+                          color: getTextColor(note.color || "#FFE5E5"),
                           width: "100%",
-                          outline: editingNoteId === note.id ? "2px solid var(--primary)" : "none",
+                          outline: editingNoteId === note.id ? "2px solid rgba(0, 123, 255, 0.5)" : "none",
                           borderRadius: "4px",
                           padding: "4px 0",
                           boxSizing: "border-box" as const,
@@ -707,17 +707,50 @@ export default function Notes() {
                     </div>
 
                     {/* Contenido */}
-                    {note.content && (
-                      <div style={{ 
-                        marginBottom: "12px",
-                        fontSize: "15px",
-                        lineHeight: "1.6",
-                        color: "var(--text-secondary)",
-                        whiteSpace: "pre-wrap",
-                        wordWrap: "break-word",
-                      }}>
-                        {note.content}
-                      </div>
+                    {editingNoteId === note.id ? (
+                      <textarea
+                        value={note.content || ""}
+                        onChange={(e) => {
+                          const updated = { ...note, content: e.target.value };
+                          setNotes(notes.map((n) => (n.id === note.id ? updated : n)));
+                        }}
+                        onBlur={() => {
+                          updateNote(note);
+                          setEditingNoteId(null);
+                        }}
+                        placeholder="Escribe tu nota..."
+                        style={{
+                          width: "100%",
+                          border: "none",
+                          backgroundColor: "transparent",
+                          fontSize: "15px",
+                          lineHeight: "1.6",
+                          color: getTextColor(note.color || "#FFE5E5"),
+                          whiteSpace: "pre-wrap",
+                          wordWrap: "break-word",
+                          resize: "vertical",
+                          minHeight: "100px",
+                          padding: "8px",
+                          borderRadius: "8px",
+                          outline: "2px solid rgba(0, 123, 255, 0.3)",
+                          fontFamily: "inherit",
+                          marginBottom: "12px",
+                          boxSizing: "border-box" as const,
+                        }}
+                      />
+                    ) : (
+                      note.content && (
+                        <div style={{ 
+                          marginBottom: "12px",
+                          fontSize: "15px",
+                          lineHeight: "1.6",
+                          color: getTextColor(note.color || "#FFE5E5"),
+                          whiteSpace: "pre-wrap",
+                          wordWrap: "break-word",
+                        }}>
+                          {note.content}
+                        </div>
+                      )
                     )}
 
                     {/* Imagen si existe */}
@@ -743,8 +776,37 @@ export default function Notes() {
                       justifyContent: "flex-end", 
                       gap: "8px",
                       paddingTop: "12px",
-                      borderTop: "1px solid var(--border-color)",
+                      borderTop: isLightColor(note.color || "#FFE5E5")
+                        ? "1px solid rgba(0, 0, 0, 0.1)"
+                        : "1px solid rgba(255, 255, 255, 0.2)",
                     }}>
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setEditingNoteId(editingNoteId === note.id ? null : note.id);
+                        }}
+                        style={{
+                          width: "36px",
+                          height: "36px",
+                          borderRadius: "8px",
+                          backgroundColor: isLightColor(note.color || "#FFE5E5")
+                            ? "rgba(255, 255, 255, 0.7)"
+                            : "rgba(0, 0, 0, 0.2)",
+                          border: isLightColor(note.color || "#FFE5E5")
+                            ? "1px solid rgba(0, 0, 0, 0.1)"
+                            : "1px solid rgba(255, 255, 255, 0.2)",
+                          cursor: "pointer",
+                          fontSize: "18px",
+                          color: getTextColor(note.color || "#FFE5E5"),
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                        }}
+                        title={editingNoteId === note.id ? "Guardar" : "Editar"}
+                      >
+                        {editingNoteId === note.id ? "✓" : "✏️"}
+                      </button>
                       <button
                         type="button"
                         onClick={(e) => {
@@ -756,7 +818,9 @@ export default function Notes() {
                           height: "36px",
                           borderRadius: "8px",
                           backgroundColor: note.color || "#FFE5E5",
-                          border: "2px solid var(--border-color)",
+                          border: isLightColor(note.color || "#FFE5E5")
+                            ? "2px solid rgba(0, 0, 0, 0.2)"
+                            : "2px solid rgba(255, 255, 255, 0.5)",
                           cursor: "pointer",
                           display: "flex",
                           alignItems: "center",
@@ -819,11 +883,15 @@ export default function Notes() {
                           width: "36px",
                           height: "36px",
                           borderRadius: "8px",
-                          backgroundColor: "var(--hover-bg)",
-                          border: "1px solid var(--border-color)",
+                          backgroundColor: isLightColor(note.color || "#FFE5E5")
+                            ? "rgba(255, 255, 255, 0.7)"
+                            : "rgba(0, 0, 0, 0.2)",
+                          border: isLightColor(note.color || "#FFE5E5")
+                            ? "1px solid rgba(0, 0, 0, 0.1)"
+                            : "1px solid rgba(255, 255, 255, 0.2)",
                           cursor: "pointer",
                           fontSize: "20px",
-                          color: "var(--danger)",
+                          color: "#dc3545",
                           display: "flex",
                           alignItems: "center",
                           justifyContent: "center",
