@@ -1631,6 +1631,8 @@ input, textarea, select {
     min-width: 100vw !important;
     overflow-x: hidden !important;
     overflow-y: auto !important;
+    height: 100dvh !important;
+    max-height: 100dvh !important;
   }
 
   .create-task-modal-content {
@@ -1638,10 +1640,33 @@ input, textarea, select {
     width: 100vw !important;
     min-width: 100vw !important;
     margin: 0 !important;
-    padding: 20px 16px !important;
+    padding: 16px 12px !important;
     overflow-x: hidden !important;
     overflow-y: auto !important;
     box-sizing: border-box !important;
+    height: 100dvh !important;
+    max-height: 100dvh !important;
+    min-height: 100dvh !important;
+    display: flex !important;
+    flex-direction: column !important;
+  }
+  
+  /* Optimización para móvil vertical */
+  @media (max-width: 767.98px) and (orientation: portrait) {
+    .create-task-modal-content {
+      padding: 12px 10px !important;
+    }
+    
+    .create-task-modal-content form {
+      gap: 14px !important;
+    }
+    
+    .create-task-modal-content input,
+    .create-task-modal-content textarea,
+    .create-task-modal-content select {
+      padding: 12px !important;
+      font-size: 16px !important;
+    }
   }
 
   /* Sobrescribir cualquier estilo global que limite el ancho - MÁXIMA PRIORIDAD */

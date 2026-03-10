@@ -87,6 +87,12 @@ export default function Notes() {
   const [draggedNote, setDraggedNote] = useState<{ id: string; offsetX: number; offsetY: number } | null>(null);
   const [resizingNote, setResizingNote] = useState<{ id: string; startX: number; startY: number; startWidth: number; startHeight: number } | null>(null);
   const [isMobile, setIsMobile] = useState(false);
+  const [isPortrait, setIsPortrait] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return window.innerHeight > window.innerWidth;
+    }
+    return true;
+  });
   const [editingNoteId, setEditingNoteId] = useState<string | null>(null);
   const [drawingMode, setDrawingMode] = useState<{ noteId: string; enabled: boolean }>({ noteId: "", enabled: false });
   const [showColorPicker, setShowColorPicker] = useState<string | null>(null);
@@ -95,14 +101,19 @@ export default function Notes() {
   const canvasRefs = useRef<{ [key: string]: HTMLCanvasElement | null }>({});
   const { showToast } = useToast();
 
-  // Detectar si estamos en móvil
+  // Detectar si estamos en móvil y orientación
   useEffect(() => {
     const checkMobile = () => {
       setIsMobile(window.innerWidth <= 768);
+      setIsPortrait(window.innerHeight > window.innerWidth);
     };
     checkMobile();
     window.addEventListener('resize', checkMobile);
-    return () => window.removeEventListener('resize', checkMobile);
+    window.addEventListener('orientationchange', checkMobile);
+    return () => {
+      window.removeEventListener('resize', checkMobile);
+      window.removeEventListener('orientationchange', checkMobile);
+    };
   }, []);
 
   const loadNotes = useCallback(async () => {
@@ -599,8 +610,8 @@ export default function Notes() {
           ref={containerRef}
           style={{
             position: "relative",
-            minHeight: "calc(100vh - 200px)",
-            padding: isMobile ? "12px" : "24px",
+            minHeight: isMobile ? "calc(100dvh - 180px)" : "calc(100vh - 200px)",
+            padding: isMobile && isPortrait ? "10px" : isMobile ? "12px" : "24px",
             backgroundColor: "#f5f7fa",
             backgroundImage: isMobile ? "none" : `
               linear-gradient(90deg, rgba(0,0,0,0.02) 1px, transparent 1px),
@@ -610,8 +621,10 @@ export default function Notes() {
             backgroundSize: isMobile ? "auto" : "50px 50px, 50px 50px, 25px 25px",
             display: isMobile ? "flex" : "block",
             flexDirection: isMobile ? "column" : "initial",
-            gap: isMobile ? "12px" : "0",
-            overflow: "hidden",
+            gap: isMobile && isPortrait ? "10px" : isMobile ? "12px" : "0",
+            overflow: isMobile ? "auto" : "hidden",
+            overflowX: "hidden",
+            WebkitOverflowScrolling: "touch",
           }}
           className={isMobile ? "notes-mobile-container" : ""}
         >
@@ -640,7 +653,8 @@ export default function Notes() {
                     top: isMobile ? "auto" : note.positionY || 0,
                     width: isMobile ? "100%" : note.width || 300,
                     height: isMobile ? "auto" : note.height || 220,
-                    minHeight: isMobile ? "200px" : "220px",
+            minHeight: isMobile && isPortrait ? "180px" : isMobile ? "200px" : "220px",
+            maxHeight: isMobile && isPortrait ? "none" : isMobile ? "400px" : "none",
                     backgroundColor: note.color || "#FFE5E5",
                     padding: "0",
                     cursor: isMobile ? "default" : (draggedNote?.id === note.id ? "grabbing" : "default"),
@@ -649,7 +663,7 @@ export default function Notes() {
                       : "0 8px 24px rgba(0, 0, 0, 0.15), 0 3px 8px rgba(0, 0, 0, 0.1)",
                     display: "flex",
                     flexDirection: "column",
-                    marginBottom: isMobile ? "12px" : "0",
+                    marginBottom: isMobile && isPortrait ? "10px" : isMobile ? "12px" : "0",
                     borderRadius: "16px",
                     border: draggedNote?.id === note.id
                       ? "2px solid rgba(0, 123, 255, 0.5)"
@@ -662,6 +676,7 @@ export default function Notes() {
                       : "scale(1)",
                     zIndex: draggedNote?.id === note.id ? 1000 : 1,
                     overflow: "hidden",
+                    boxSizing: "border-box" as const,
                   }}
                   onMouseEnter={(e) => {
                     if (!isMobile && draggedNote?.id !== note.id) {
@@ -742,7 +757,14 @@ export default function Notes() {
                   </div>
 
                   {/* Contenido de la nota */}
-                  <div className="note-content" style={{ padding: "16px", flex: 1, display: "flex", flexDirection: "column" }}>
+                  <div className="note-content" style={{ 
+                    padding: isMobile && isPortrait ? "12px" : "16px", 
+                    flex: 1, 
+                    display: "flex", 
+                    flexDirection: "column",
+                    overflow: "auto",
+                    minHeight: 0,
+                  }}>
                     {/* Header con controles */}
                     <div style={{ display: "flex", justifyContent: "flex-end", alignItems: "center", marginBottom: "12px", gap: "8px" }}>
                       <input

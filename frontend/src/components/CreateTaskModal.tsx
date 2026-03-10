@@ -28,15 +28,26 @@ export default function CreateTaskModal({
     }
     return false;
   });
+  const [isPortrait, setIsPortrait] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return window.innerHeight > window.innerWidth;
+    }
+    return true;
+  });
   const { showToast } = useToast();
 
   useEffect(() => {
     const checkMobile = () => {
       setIsMobile(window.innerWidth <= 768);
+      setIsPortrait(window.innerHeight > window.innerWidth);
     };
     checkMobile();
     window.addEventListener('resize', checkMobile);
-    return () => window.removeEventListener('resize', checkMobile);
+    window.addEventListener('orientationchange', checkMobile);
+    return () => {
+      window.removeEventListener('resize', checkMobile);
+      window.removeEventListener('orientationchange', checkMobile);
+    };
   }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -70,8 +81,8 @@ export default function CreateTaskModal({
 
   // Estilos base para inputs
   const inputStyle = {
-    padding: isMobile ? "14px" : "14px 16px",
-    fontSize: isMobile ? "16px" : "15px",
+    padding: isMobile && isPortrait ? "12px" : isMobile ? "14px" : "14px 16px",
+    fontSize: isMobile && isPortrait ? "16px" : isMobile ? "16px" : "15px",
     borderRadius: "10px",
     border: "2px solid var(--border-color)",
     transition: "all 0.2s",
@@ -84,8 +95,8 @@ export default function CreateTaskModal({
 
   const labelStyle = {
     display: "block",
-    marginBottom: isMobile ? "10px" : "10px",
-    fontSize: isMobile ? "15px" : "15px",
+    marginBottom: isMobile && isPortrait ? "8px" : isMobile ? "10px" : "10px",
+    fontSize: isMobile && isPortrait ? "14px" : isMobile ? "15px" : "15px",
     fontWeight: 600,
     color: "var(--text-primary)",
     width: "100%",
@@ -123,21 +134,22 @@ export default function CreateTaskModal({
           width: isMobile ? "100vw" : "95%",
           maxWidth: isMobile ? "100vw" : "700px",
           minWidth: isMobile ? "100vw" : "auto",
-          minHeight: isMobile ? "100vh" : "auto",
-          maxHeight: isMobile ? "100vh" : "95vh",
-          height: isMobile ? "100vh" : "auto",
+          minHeight: isMobile && isPortrait ? "100dvh" : isMobile ? "100vh" : "auto",
+          maxHeight: isMobile && isPortrait ? "100dvh" : isMobile ? "100vh" : "95vh",
+          height: isMobile && isPortrait ? "100dvh" : isMobile ? "100vh" : "auto",
           overflowY: "auto",
           overflowX: "hidden",
           borderRadius: isMobile ? "0" : "16px",
           boxShadow: isMobile ? "none" : "0 20px 60px rgba(0, 0, 0, 0.3)",
           border: isMobile ? "none" : "1px solid rgba(0, 0, 0, 0.1)",
-          padding: isMobile ? "20px 16px" : "32px",
+          padding: isMobile && isPortrait ? "16px 12px" : isMobile ? "20px 16px" : "32px",
           margin: 0,
           backgroundColor: "var(--bg-primary)",
           position: "relative",
           display: "flex",
           flexDirection: "column",
           boxSizing: "border-box" as const,
+          WebkitOverflowScrolling: "touch",
           // Forzar ancho completo en móvil
           ...(isMobile && {
             width: "100vw",
@@ -155,20 +167,23 @@ export default function CreateTaskModal({
             display: "flex",
             justifyContent: "center",
             alignItems: "center",
-            marginBottom: isMobile ? "24px" : "28px",
-            paddingBottom: isMobile ? "16px" : "20px",
+            marginBottom: isMobile && isPortrait ? "16px" : isMobile ? "20px" : "28px",
+            paddingBottom: isMobile && isPortrait ? "12px" : isMobile ? "16px" : "20px",
             borderBottom: "2px solid var(--border-color)",
             position: "relative",
             boxSizing: "border-box" as const,
+            flexShrink: 0,
           }}
         >
           <h2 style={{ 
             margin: 0, 
-            fontSize: isMobile ? "24px" : "28px", 
+            fontSize: isMobile && isPortrait ? "20px" : isMobile ? "22px" : "28px", 
             fontWeight: 700, 
             color: "var(--text-primary)",
             textAlign: "center",
             width: "100%",
+            paddingRight: isMobile ? "40px" : "0",
+            boxSizing: "border-box" as const,
           }}>
             Nueva Tarea
           </h2>
@@ -177,11 +192,11 @@ export default function CreateTaskModal({
             style={{
               background: "var(--hover-bg)",
               border: "1px solid var(--border-color)",
-              fontSize: "24px",
+              fontSize: isMobile && isPortrait ? "20px" : "24px",
               cursor: "pointer",
               color: "var(--text-secondary)",
-              width: isMobile ? "36px" : "40px",
-              height: isMobile ? "36px" : "40px",
+              width: isMobile && isPortrait ? "32px" : isMobile ? "36px" : "40px",
+              height: isMobile && isPortrait ? "32px" : isMobile ? "36px" : "40px",
               borderRadius: "10px",
               display: "flex",
               alignItems: "center",
@@ -215,9 +230,13 @@ export default function CreateTaskModal({
             boxSizing: "border-box" as const,
             display: "flex",
             flexDirection: "column",
-            gap: isMobile ? "20px" : "20px",
+            gap: isMobile && isPortrait ? "16px" : isMobile ? "18px" : "20px",
             margin: 0,
             padding: 0,
+            flex: "1 1 auto",
+            minHeight: 0,
+            overflowY: "auto",
+            overflowX: "hidden",
           }}
         >
           {/* Título */}
@@ -249,12 +268,12 @@ export default function CreateTaskModal({
             <textarea
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              rows={isMobile ? 4 : 5}
+              rows={isMobile && isPortrait ? 3 : isMobile ? 4 : 5}
               placeholder="Describe detalladamente la tarea, requisitos, pasos a seguir, etc..."
               style={{
                 ...inputStyle,
                 resize: "vertical",
-                minHeight: isMobile ? "100px" : "120px",
+                minHeight: isMobile && isPortrait ? "80px" : isMobile ? "100px" : "120px",
                 fontFamily: "inherit",
                 lineHeight: "1.6",
               }}
@@ -273,7 +292,7 @@ export default function CreateTaskModal({
           <div style={{ 
             display: "grid", 
             gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", 
-            gap: isMobile ? "20px" : "16px",
+            gap: isMobile && isPortrait ? "16px" : isMobile ? "18px" : "16px",
             width: "100%",
             maxWidth: "100%",
             boxSizing: "border-box" as const,
@@ -349,7 +368,12 @@ export default function CreateTaskModal({
                 e.target.style.boxShadow = "none";
               }}
             />
-            <div style={{ fontSize: "13px", color: "var(--text-secondary)", marginTop: "8px" }}>
+            <div style={{ 
+              fontSize: isMobile && isPortrait ? "12px" : "13px", 
+              color: "var(--text-secondary)", 
+              marginTop: isMobile && isPortrait ? "6px" : "8px",
+              lineHeight: "1.4",
+            }}>
               Tiempo aproximado que tomará completar esta tarea
             </div>
           </div>
@@ -358,7 +382,7 @@ export default function CreateTaskModal({
           <div style={{ 
             display: "grid", 
             gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", 
-            gap: isMobile ? "20px" : "16px",
+            gap: isMobile && isPortrait ? "16px" : isMobile ? "18px" : "16px",
             width: "100%",
             maxWidth: "100%",
             boxSizing: "border-box" as const,
@@ -421,22 +445,23 @@ export default function CreateTaskModal({
           <div style={{ 
             display: "flex", 
             flexDirection: isMobile ? "column-reverse" : "row",
-            gap: "12px", 
+            gap: isMobile && isPortrait ? "10px" : "12px", 
             justifyContent: "flex-end", 
-            marginTop: "8px",
-            paddingTop: "20px",
+            marginTop: isMobile && isPortrait ? "4px" : "8px",
+            paddingTop: isMobile && isPortrait ? "16px" : "20px",
             borderTop: "2px solid var(--border-color)",
             width: "100%",
             maxWidth: "100%",
             boxSizing: "border-box" as const,
+            flexShrink: 0,
           }}>
             <button
               type="button"
               onClick={onClose}
               disabled={loading}
               style={{
-                padding: isMobile ? "16px" : "12px 24px",
-                fontSize: "15px",
+                padding: isMobile && isPortrait ? "14px" : isMobile ? "16px" : "12px 24px",
+                fontSize: isMobile && isPortrait ? "14px" : "15px",
                 fontWeight: 600,
                 borderRadius: "10px",
                 border: "2px solid var(--border-color)",
@@ -454,8 +479,8 @@ export default function CreateTaskModal({
               type="submit"
               disabled={loading || !title.trim()}
               style={{
-                padding: isMobile ? "16px" : "12px 24px",
-                fontSize: "15px",
+                padding: isMobile && isPortrait ? "14px" : isMobile ? "16px" : "12px 24px",
+                fontSize: isMobile && isPortrait ? "14px" : "15px",
                 fontWeight: 600,
                 borderRadius: "10px",
                 boxShadow: "0 4px 12px rgba(0, 123, 255, 0.3)",
