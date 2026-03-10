@@ -662,7 +662,7 @@ export default function Notes() {
             </div>
           ) : (
             <>
-              {notes.map((note) => (
+              {notes.map((note) => 
                 isMobile ? (
                   // Vista de lista simple para móvil
                   <div
