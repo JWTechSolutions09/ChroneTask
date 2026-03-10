@@ -663,56 +663,226 @@ export default function Notes() {
           ) : (
             <>
               {notes.map((note) => (
-                <Card
-                  key={note.id}
-                  style={{
-                    position: isMobile ? "relative" : "absolute",
-                    left: isMobile ? "auto" : note.positionX || 0,
-                    top: isMobile ? "auto" : note.positionY || 0,
-                    width: isMobile ? "100%" : note.width || 300,
-                    height: isMobile ? "auto" : note.height || 220,
-                    minHeight: isMobile ? "auto" : "220px",
-                    maxHeight: isMobile ? "none" : "none",
-                    backgroundColor: note.color || "#FFE5E5",
-                    padding: "0",
-                    cursor: isMobile ? "default" : (draggedNote?.id === note.id ? "grabbing" : "default"),
-                    boxShadow: draggedNote?.id === note.id
-                      ? "0 12px 40px rgba(0, 0, 0, 0.25), 0 6px 12px rgba(0, 0, 0, 0.15)"
-                      : "0 8px 24px rgba(0, 0, 0, 0.15), 0 3px 8px rgba(0, 0, 0, 0.1)",
-                    display: "flex",
-                    flexDirection: "column",
-                    marginBottom: isMobile ? "16px" : "0",
-                    borderRadius: "16px",
-                    border: draggedNote?.id === note.id
-                      ? "2px solid rgba(0, 123, 255, 0.5)"
-                      : "1px solid rgba(0, 0, 0, 0.1)",
-                    transition: draggedNote?.id === note.id
-                      ? "none"
-                      : "box-shadow 0.3s ease, transform 0.3s ease, border-color 0.3s ease",
-                    transform: draggedNote?.id === note.id
-                      ? "scale(1.02) rotate(1deg)"
-                      : "scale(1)",
-                    zIndex: draggedNote?.id === note.id ? 1000 : 1,
-                    overflow: isMobile ? "visible" : "hidden",
-                    boxSizing: "border-box" as const,
-                  }}
-                  onMouseEnter={(e) => {
-                    if (!isMobile && draggedNote?.id !== note.id) {
-                      e.currentTarget.style.boxShadow = "0 12px 32px rgba(0, 0, 0, 0.18), 0 4px 12px rgba(0, 0, 0, 0.12)";
-                      e.currentTarget.style.transform = "translateY(-4px) scale(1.01)";
-                      e.currentTarget.style.borderColor = "rgba(0, 123, 255, 0.3)";
-                    }
-                  }}
-                  onMouseLeave={(e) => {
-                    if (!isMobile && draggedNote?.id !== note.id) {
-                      e.currentTarget.style.boxShadow = "0 8px 24px rgba(0, 0, 0, 0.15), 0 3px 8px rgba(0, 0, 0, 0.1)";
-                      e.currentTarget.style.transform = "translateY(0) scale(1)";
-                      e.currentTarget.style.borderColor = "rgba(0, 0, 0, 0.1)";
-                    }
-                  }}
-                  className={isMobile ? "note-mobile-card" : ""}
-                >
-                  {/* Drag Handle - Solo en desktop */}
+                isMobile ? (
+                  // Vista de lista simple para móvil
+                  <div
+                    key={note.id}
+                    style={{
+                      width: "100%",
+                      backgroundColor: "var(--bg-primary)",
+                      border: "1px solid var(--border-color)",
+                      borderRadius: "12px",
+                      padding: "16px",
+                      marginBottom: "16px",
+                      boxSizing: "border-box" as const,
+                    }}
+                  >
+                    {/* Título */}
+                    <div style={{ marginBottom: "12px" }}>
+                      <input
+                        value={note.title || ""}
+                        onChange={(e) => {
+                          const updated = { ...note, title: e.target.value };
+                          setNotes(notes.map((n) => (n.id === note.id ? updated : n)));
+                        }}
+                        onBlur={() => {
+                          updateNote(note);
+                          setEditingNoteId(null);
+                        }}
+                        onFocus={() => setEditingNoteId(note.id)}
+                        placeholder="Título..."
+                        style={{
+                          border: "none",
+                          backgroundColor: "transparent",
+                          fontSize: "18px",
+                          fontWeight: 600,
+                          color: "var(--text-primary)",
+                          width: "100%",
+                          outline: editingNoteId === note.id ? "2px solid var(--primary)" : "none",
+                          borderRadius: "4px",
+                          padding: "4px 0",
+                          boxSizing: "border-box" as const,
+                        }}
+                      />
+                    </div>
+
+                    {/* Contenido */}
+                    {note.content && (
+                      <div style={{ 
+                        marginBottom: "12px",
+                        fontSize: "15px",
+                        lineHeight: "1.6",
+                        color: "var(--text-secondary)",
+                        whiteSpace: "pre-wrap",
+                        wordWrap: "break-word",
+                      }}>
+                        {note.content}
+                      </div>
+                    )}
+
+                    {/* Imagen si existe */}
+                    {note.imageUrl && (
+                      <div style={{ marginBottom: "12px", borderRadius: "8px", overflow: "hidden" }}>
+                        <img
+                          src={note.imageUrl}
+                          alt="Nota"
+                          style={{
+                            width: "100%",
+                            height: "auto",
+                            maxHeight: "300px",
+                            objectFit: "cover",
+                            display: "block",
+                          }}
+                        />
+                      </div>
+                    )}
+
+                    {/* Controles */}
+                    <div style={{ 
+                      display: "flex", 
+                      justifyContent: "flex-end", 
+                      gap: "8px",
+                      paddingTop: "12px",
+                      borderTop: "1px solid var(--border-color)",
+                    }}>
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setShowColorPicker(showColorPicker === note.id ? null : note.id);
+                        }}
+                        style={{
+                          width: "36px",
+                          height: "36px",
+                          borderRadius: "8px",
+                          backgroundColor: note.color || "#FFE5E5",
+                          border: "2px solid var(--border-color)",
+                          cursor: "pointer",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          fontSize: "18px",
+                        }}
+                        title="Cambiar color"
+                      >
+                        🎨
+                      </button>
+                      {showColorPicker === note.id && (
+                        <div
+                          style={{
+                            position: "absolute",
+                            backgroundColor: "var(--bg-primary)",
+                            borderRadius: "12px",
+                            padding: "12px",
+                            boxShadow: "0 4px 12px rgba(0, 0, 0, 0.15)",
+                            zIndex: 1001,
+                            display: "flex",
+                            gap: "8px",
+                            flexWrap: "wrap",
+                            marginTop: "40px",
+                            border: "1px solid var(--border-color)",
+                          }}
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          {NOTE_COLORS.map((color) => (
+                            <button
+                              key={color}
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                const updated = { ...note, color };
+                                setNotes(notes.map((n) => (n.id === note.id ? updated : n)));
+                                updateNote(updated);
+                                setShowColorPicker(null);
+                              }}
+                              style={{
+                                width: "32px",
+                                height: "32px",
+                                borderRadius: "8px",
+                                backgroundColor: color,
+                                border: note.color === color ? "3px solid var(--primary)" : "2px solid var(--border-color)",
+                                cursor: "pointer",
+                              }}
+                            />
+                          ))}
+                        </div>
+                      )}
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          if (window.confirm("¿Estás seguro de que quieres eliminar esta nota?")) {
+                            deleteNote(note.id);
+                          }
+                        }}
+                        style={{
+                          width: "36px",
+                          height: "36px",
+                          borderRadius: "8px",
+                          backgroundColor: "var(--hover-bg)",
+                          border: "1px solid var(--border-color)",
+                          cursor: "pointer",
+                          fontSize: "20px",
+                          color: "var(--danger)",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                        }}
+                        title="Eliminar nota"
+                      >
+                        ×
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  // Vista desktop con cards animadas
+                  <Card
+                    key={note.id}
+                    style={{
+                      position: "absolute",
+                      left: note.positionX || 0,
+                      top: note.positionY || 0,
+                      width: note.width || 300,
+                      height: note.height || 220,
+                      minHeight: "220px",
+                      backgroundColor: note.color || "#FFE5E5",
+                      padding: "0",
+                      cursor: draggedNote?.id === note.id ? "grabbing" : "default",
+                      boxShadow: draggedNote?.id === note.id
+                        ? "0 12px 40px rgba(0, 0, 0, 0.25), 0 6px 12px rgba(0, 0, 0, 0.15)"
+                        : "0 8px 24px rgba(0, 0, 0, 0.15), 0 3px 8px rgba(0, 0, 0, 0.1)",
+                      display: "flex",
+                      flexDirection: "column",
+                      borderRadius: "16px",
+                      border: draggedNote?.id === note.id
+                        ? "2px solid rgba(0, 123, 255, 0.5)"
+                        : "1px solid rgba(0, 0, 0, 0.1)",
+                      transition: draggedNote?.id === note.id
+                        ? "none"
+                        : "box-shadow 0.3s ease, transform 0.3s ease, border-color 0.3s ease",
+                      transform: draggedNote?.id === note.id
+                        ? "scale(1.02) rotate(1deg)"
+                        : "scale(1)",
+                      zIndex: draggedNote?.id === note.id ? 1000 : 1,
+                      overflow: "hidden",
+                      boxSizing: "border-box" as const,
+                    }}
+                    onMouseEnter={(e) => {
+                      if (draggedNote?.id !== note.id) {
+                        e.currentTarget.style.boxShadow = "0 12px 32px rgba(0, 0, 0, 0.18), 0 4px 12px rgba(0, 0, 0, 0.12)";
+                        e.currentTarget.style.transform = "translateY(-4px) scale(1.01)";
+                        e.currentTarget.style.borderColor = "rgba(0, 123, 255, 0.3)";
+                      }
+                    }}
+                    onMouseLeave={(e) => {
+                      if (draggedNote?.id !== note.id) {
+                        e.currentTarget.style.boxShadow = "0 8px 24px rgba(0, 0, 0, 0.15), 0 3px 8px rgba(0, 0, 0, 0.1)";
+                        e.currentTarget.style.transform = "translateY(0) scale(1)";
+                        e.currentTarget.style.borderColor = "rgba(0, 0, 0, 0.1)";
+                      }
+                    }}
+                  >
+                  {/* Drag Handle */}
                   {!isMobile && (
                     <div
                       className="drag-handle"
