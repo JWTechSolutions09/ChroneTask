@@ -712,69 +712,71 @@ export default function Notes() {
                   }}
                   className={isMobile ? "note-mobile-card" : ""}
                 >
-                  {/* Drag Handle - Barra superior para arrastrar */}
-                  <div
-                    className="drag-handle"
-                    onMouseDown={(e) => handleMouseDown(e, note)}
-                    style={{
-                      padding: "8px 16px",
-                      backgroundColor: isLightColor(note.color || "#FFE5E5") 
-                        ? "rgba(255, 255, 255, 0.3)" 
-                        : "rgba(0, 0, 0, 0.2)",
-                      borderBottom: isLightColor(note.color || "#FFE5E5")
-                        ? "1px solid rgba(0, 0, 0, 0.1)"
-                        : "1px solid rgba(255, 255, 255, 0.1)",
-                      cursor: isMobile ? "default" : (draggedNote?.id === note.id ? "grabbing" : "grab"),
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "space-between",
-                      userSelect: "none",
-                    }}
-                  >
-                    <div style={{ display: "flex", alignItems: "center", gap: "8px", flex: 1 }}>
-                      <div style={{
+                  {/* Drag Handle - Solo en desktop */}
+                  {!isMobile && (
+                    <div
+                      className="drag-handle"
+                      onMouseDown={(e) => handleMouseDown(e, note)}
+                      style={{
+                        padding: "8px 16px",
+                        backgroundColor: isLightColor(note.color || "#FFE5E5") 
+                          ? "rgba(255, 255, 255, 0.3)" 
+                          : "rgba(0, 0, 0, 0.2)",
+                        borderBottom: isLightColor(note.color || "#FFE5E5")
+                          ? "1px solid rgba(0, 0, 0, 0.1)"
+                          : "1px solid rgba(255, 255, 255, 0.1)",
+                        cursor: draggedNote?.id === note.id ? "grabbing" : "grab",
                         display: "flex",
-                        gap: "4px",
-                        opacity: 0.5,
-                        color: getTextColor(note.color || "#FFE5E5"),
-                      }}>
-                        <div style={{ width: "4px", height: "4px", borderRadius: "50%", backgroundColor: "currentColor" }} />
-                        <div style={{ width: "4px", height: "4px", borderRadius: "50%", backgroundColor: "currentColor" }} />
-                        <div style={{ width: "4px", height: "4px", borderRadius: "50%", backgroundColor: "currentColor" }} />
-                        <div style={{ width: "4px", height: "4px", borderRadius: "50%", backgroundColor: "currentColor" }} />
-                        <div style={{ width: "4px", height: "4px", borderRadius: "50%", backgroundColor: "currentColor" }} />
-                        <div style={{ width: "4px", height: "4px", borderRadius: "50%", backgroundColor: "currentColor" }} />
-                      </div>
-                      <input
-                        value={note.title || ""}
-                        onChange={(e) => {
-                          const updated = { ...note, title: e.target.value };
-                          setNotes(notes.map((n) => (n.id === note.id ? updated : n)));
-                        }}
-                        onBlur={() => {
-                          updateNote(note);
-                          setEditingNoteId(null);
-                        }}
-                        onFocus={() => setEditingNoteId(note.id)}
-                        placeholder="Título..."
-                        onClick={(e) => e.stopPropagation()}
-                        style={{
-                          border: "none",
-                          backgroundColor: "transparent",
-                          fontSize: isMobile ? "18px" : "16px",
-                          fontWeight: 600,
+                        alignItems: "center",
+                        justifyContent: "space-between",
+                        userSelect: "none",
+                      }}
+                    >
+                      <div style={{ display: "flex", alignItems: "center", gap: "8px", flex: 1 }}>
+                        <div style={{
+                          display: "flex",
+                          gap: "4px",
+                          opacity: 0.5,
                           color: getTextColor(note.color || "#FFE5E5"),
-                          flex: 1,
-                          outline: editingNoteId === note.id ? "2px solid rgba(0, 123, 255, 0.4)" : "none",
-                          borderRadius: "6px",
-                          padding: isMobile ? "8px" : "4px 8px",
-                          cursor: "text",
-                          width: "100%",
-                          boxSizing: "border-box" as const,
-                        }}
-                      />
+                        }}>
+                          <div style={{ width: "4px", height: "4px", borderRadius: "50%", backgroundColor: "currentColor" }} />
+                          <div style={{ width: "4px", height: "4px", borderRadius: "50%", backgroundColor: "currentColor" }} />
+                          <div style={{ width: "4px", height: "4px", borderRadius: "50%", backgroundColor: "currentColor" }} />
+                          <div style={{ width: "4px", height: "4px", borderRadius: "50%", backgroundColor: "currentColor" }} />
+                          <div style={{ width: "4px", height: "4px", borderRadius: "50%", backgroundColor: "currentColor" }} />
+                          <div style={{ width: "4px", height: "4px", borderRadius: "50%", backgroundColor: "currentColor" }} />
+                        </div>
+                        <input
+                          value={note.title || ""}
+                          onChange={(e) => {
+                            const updated = { ...note, title: e.target.value };
+                            setNotes(notes.map((n) => (n.id === note.id ? updated : n)));
+                          }}
+                          onBlur={() => {
+                            updateNote(note);
+                            setEditingNoteId(null);
+                          }}
+                          onFocus={() => setEditingNoteId(note.id)}
+                          placeholder="Título..."
+                          onClick={(e) => e.stopPropagation()}
+                          style={{
+                            border: "none",
+                            backgroundColor: "transparent",
+                            fontSize: "16px",
+                            fontWeight: 600,
+                            color: getTextColor(note.color || "#FFE5E5"),
+                            flex: 1,
+                            outline: editingNoteId === note.id ? "2px solid rgba(0, 123, 255, 0.4)" : "none",
+                            borderRadius: "6px",
+                            padding: "4px 8px",
+                            cursor: "text",
+                            width: "100%",
+                            boxSizing: "border-box" as const,
+                          }}
+                        />
+                      </div>
                     </div>
-                  </div>
+                  )}
 
                   {/* Contenido de la nota */}
                   <div className="note-content" style={{ 
@@ -787,36 +789,52 @@ export default function Notes() {
                     width: "100%",
                     boxSizing: "border-box" as const,
                   }}>
-                    {/* Header con controles */}
-                    <div style={{ display: "flex", justifyContent: "flex-end", alignItems: "center", marginBottom: "12px", gap: "8px" }}>
-                      <input
-                        value={note.title || ""}
-                        onChange={(e) => {
-                          const updated = { ...note, title: e.target.value };
-                          setNotes(notes.map((n) => (n.id === note.id ? updated : n)));
-                        }}
-                        onBlur={() => {
-                          updateNote(note);
-                          setEditingNoteId(null);
-                        }}
-                        onFocus={() => setEditingNoteId(note.id)}
-                        placeholder="Título..."
-                        style={{
-                          border: "none",
-                          backgroundColor: "transparent",
-                          fontSize: isMobile ? "20px" : "18px",
-                          fontWeight: 600,
-                          color: getTextColor(note.color || "#FFE5E5"),
-                          flex: 1,
-                          outline: editingNoteId === note.id ? "2px solid rgba(0, 123, 255, 0.3)" : "none",
-                          borderRadius: "4px",
-                          padding: isMobile ? "8px" : "4px 8px",
-                          margin: isMobile ? "0" : "-4px -8px",
-                          width: "100%",
-                          boxSizing: "border-box" as const,
-                        }}
-                      />
-                      <div className="note-controls" style={{ display: "flex", gap: "8px", alignItems: "center", flexShrink: 0 }}>
+                    {/* Header con título y controles - Solo título en móvil */}
+                    <div style={{ 
+                      display: "flex", 
+                      justifyContent: isMobile ? "space-between" : "flex-end", 
+                      alignItems: isMobile ? "flex-start" : "center", 
+                      marginBottom: isMobile ? "16px" : "12px", 
+                      gap: "8px",
+                      flexDirection: isMobile ? "column" : "row",
+                    }}>
+                      {isMobile && (
+                        <input
+                          value={note.title || ""}
+                          onChange={(e) => {
+                            const updated = { ...note, title: e.target.value };
+                            setNotes(notes.map((n) => (n.id === note.id ? updated : n)));
+                          }}
+                          onBlur={() => {
+                            updateNote(note);
+                            setEditingNoteId(null);
+                          }}
+                          onFocus={() => setEditingNoteId(note.id)}
+                          placeholder="Título..."
+                          style={{
+                            border: "none",
+                            backgroundColor: "transparent",
+                            fontSize: "20px",
+                            fontWeight: 600,
+                            color: getTextColor(note.color || "#FFE5E5"),
+                            flex: 1,
+                            outline: editingNoteId === note.id ? "2px solid rgba(0, 123, 255, 0.3)" : "none",
+                            borderRadius: "4px",
+                            padding: "8px 0",
+                            margin: "0",
+                            width: "100%",
+                            boxSizing: "border-box" as const,
+                          }}
+                        />
+                      )}
+                      <div className="note-controls" style={{ 
+                        display: "flex", 
+                        gap: isMobile ? "6px" : "8px", 
+                        alignItems: "center", 
+                        flexShrink: 0,
+                        flexWrap: isMobile ? "wrap" : "nowrap",
+                        justifyContent: isMobile ? "flex-end" : "flex-start",
+                      }}>
                         {/* Selector de color mejorado */}
                         <div style={{ position: "relative" }}>
                           <button
@@ -1106,7 +1124,7 @@ export default function Notes() {
                       onFocus={() => setEditingNoteId(note.id)}
                       placeholder="Escribe tu nota..."
                       onClick={(e) => e.stopPropagation()}
-                      rows={isMobile ? 8 : 6}
+                      rows={isMobile ? 10 : 6}
                       style={{
                         flex: 1,
                         border: "none",
@@ -1117,13 +1135,16 @@ export default function Notes() {
                         outline: editingNoteId === note.id ? "2px solid rgba(0, 123, 255, 0.4)" : "none",
                         borderRadius: "8px",
                         padding: isMobile ? "12px" : "8px",
-                        minHeight: isMobile ? "150px" : "100px",
+                        minHeight: isMobile ? "180px" : "100px",
                         fontFamily: "inherit",
-                        lineHeight: "1.6",
+                        lineHeight: "1.7",
                         cursor: "text",
                         width: "100%",
+                        maxWidth: "100%",
                         boxSizing: "border-box" as const,
                         overflowY: "auto",
+                        wordWrap: "break-word",
+                        overflowWrap: "break-word",
                       }}
                     />
                   </div>
