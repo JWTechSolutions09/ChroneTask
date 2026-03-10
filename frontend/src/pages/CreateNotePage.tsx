@@ -238,12 +238,12 @@ export default function CreateNotePage() {
               <textarea
                 value={content}
                 onChange={(e) => setContent(e.target.value)}
-                rows={8}
+                rows={12}
                 placeholder="Escribe el contenido de tu nota..."
                 style={{
                   ...inputStyle,
                   resize: "vertical",
-                  minHeight: "150px",
+                  minHeight: "250px",
                   fontFamily: "inherit",
                   lineHeight: "1.6",
                 }}
@@ -262,10 +262,11 @@ export default function CreateNotePage() {
             <div style={{ width: "100%", maxWidth: "100%", boxSizing: "border-box" as const }}>
               <label style={labelStyle}>Color</label>
               <div style={{
-                display: "grid",
-                gridTemplateColumns: "repeat(5, 1fr)",
-                gap: "12px",
+                display: "flex",
+                flexWrap: "wrap",
+                gap: "8px",
                 width: "100%",
+                justifyContent: "flex-start",
               }}>
                 {NOTE_COLORS.map((noteColor) => (
                   <button
@@ -273,15 +274,16 @@ export default function CreateNotePage() {
                     type="button"
                     onClick={() => setColor(noteColor)}
                     style={{
-                      width: "100%",
-                      aspectRatio: "1",
-                      borderRadius: "10px",
+                      width: "40px",
+                      height: "40px",
+                      borderRadius: "8px",
                       border: color === noteColor ? "3px solid var(--primary)" : "2px solid var(--border-color)",
                       backgroundColor: noteColor,
                       cursor: "pointer",
                       transition: "all 0.2s",
                       boxShadow: color === noteColor ? "0 4px 12px rgba(0, 123, 255, 0.3)" : "0 2px 4px rgba(0, 0, 0, 0.1)",
                       transform: color === noteColor ? "scale(1.1)" : "scale(1)",
+                      flexShrink: 0,
                     }}
                     onMouseEnter={(e) => {
                       if (color !== noteColor) {

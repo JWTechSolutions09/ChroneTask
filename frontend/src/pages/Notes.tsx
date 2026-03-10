@@ -577,7 +577,7 @@ export default function Notes() {
     );
   }
 
-  const pageTitle = isPersonalNotes ? "Notas Interactivas Personales" : "Notas del Proyecto";
+  const pageTitle = isPersonalNotes ? "Notas Personales" : "Notas del Proyecto";
 
   return (
     <Layout organizationId={isPersonalMode || isPersonalRoute || isPersonalNotes ? undefined : organizationId}>
