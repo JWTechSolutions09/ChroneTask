@@ -934,9 +934,27 @@ export default function Calendar() {
                   value={eventTitle}
                   onChange={(e) => setEventTitle(e.target.value)}
                   required
-                  className="input"
                   placeholder="Ej: Reunión con el equipo"
-                  style={{ padding: "12px 16px", fontSize: "15px" }}
+                  style={{
+                    padding: "12px 16px",
+                    fontSize: "15px",
+                    borderRadius: "12px",
+                    border: "2px solid var(--border-color)",
+                    transition: "all 0.2s",
+                    width: "100%",
+                    maxWidth: "100%",
+                    boxSizing: "border-box",
+                    backgroundColor: "var(--bg-primary)",
+                    color: "var(--text-primary)",
+                  }}
+                  onFocus={(e) => {
+                    e.target.style.borderColor = "var(--primary)";
+                    e.target.style.boxShadow = "0 0 0 3px rgba(0, 123, 255, 0.1)";
+                  }}
+                  onBlur={(e) => {
+                    e.target.style.borderColor = "var(--border-color)";
+                    e.target.style.boxShadow = "none";
+                  }}
                 />
               </div>
 
@@ -947,10 +965,32 @@ export default function Calendar() {
                 <textarea
                   value={eventDescription}
                   onChange={(e) => setEventDescription(e.target.value)}
-                  className="textarea"
-                  rows={3}
                   placeholder="Descripción del evento..."
-                  style={{ padding: "12px 16px", fontSize: "15px" }}
+                  rows={1}
+                  style={{
+                    padding: "12px 16px",
+                    fontSize: "15px",
+                    borderRadius: "12px",
+                    border: "2px solid var(--border-color)",
+                    transition: "all 0.2s",
+                    width: "100%",
+                    maxWidth: "100%",
+                    boxSizing: "border-box",
+                    backgroundColor: "var(--bg-primary)",
+                    color: "var(--text-primary)",
+                    fontFamily: "inherit",
+                    lineHeight: "1.6",
+                    resize: "vertical",
+                    minHeight: "48px",
+                  }}
+                  onFocus={(e) => {
+                    e.target.style.borderColor = "var(--primary)";
+                    e.target.style.boxShadow = "0 0 0 3px rgba(0, 123, 255, 0.1)";
+                  }}
+                  onBlur={(e) => {
+                    e.target.style.borderColor = "var(--border-color)";
+                    e.target.style.boxShadow = "none";
+                  }}
                 />
               </div>
 
