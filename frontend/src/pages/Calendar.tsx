@@ -978,10 +978,6 @@ export default function Calendar() {
                     boxSizing: "border-box",
                     backgroundColor: "var(--bg-primary)",
                     color: "var(--text-primary)",
-                    fontFamily: "inherit",
-                    lineHeight: "1.6",
-                    resize: "vertical",
-                    minHeight: "48px",
                   }}
                   onFocus={(e) => {
                     e.target.style.borderColor = "var(--primary)";
