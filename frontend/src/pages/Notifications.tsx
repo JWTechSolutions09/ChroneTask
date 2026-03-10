@@ -253,7 +253,7 @@ export default function Notifications() {
               <div style={{ fontSize: "18px", fontWeight: 600, marginBottom: "8px", color: "var(--text-primary)" }}>
                 No hay notificaciones
               </div>
-              <div>No tienes notificaciones {filter === "unread" ? "sin leer" : ""}</div>
+              <div>No tienes notificaciones{filter === "unread" ? " sin leer" : ""}</div>
             </div>
           ) : (
             <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>

@@ -465,7 +465,7 @@ export default function Timeline() {
                           padding: "2px 6px",
                           display: "inline-block",
                         }}>
-                          {tasksForDay.length} tarea{tasksForDay.length > 1 ? "s" : ""}
+                          {tasksForDay.length} {tasksForDay.length > 1 ? "tareas" : "tarea"}
                         </div>
                       )}
                     </div>

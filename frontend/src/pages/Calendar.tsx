@@ -752,7 +752,7 @@ export default function Calendar() {
                                 padding: "2px 6px",
                               }}
                             >
-                              +{remainingEventsCount} evento{remainingEventsCount > 1 ? "s" : ""} más
+                              +{remainingEventsCount} {remainingEventsCount > 1 ? "eventos" : "evento"} más
                             </div>
                           )}
                         </div>
@@ -837,19 +837,23 @@ export default function Calendar() {
                               </div>
                             );
                           })}
-                          {dayTasks.length > 3 && (
-                            <div
-                              style={{
-                                fontSize: "10px",
-                                color: "var(--text-secondary)",
-                                fontStyle: "italic",
-                                padding: "2px 6px",
-                                textAlign: "center",
-                              }}
-                            >
-                              +{dayTasks.length - 3} tarea{dayTasks.length - 3 > 1 ? "s" : ""} más
-                            </div>
-                          )}
+                          {(() => {
+                            const remainingTasks = dayTasks.length - 3;
+                            if (remainingTasks <= 0) return null;
+                            return (
+                              <div
+                                style={{
+                                  fontSize: "10px",
+                                  color: "var(--text-secondary)",
+                                  fontStyle: "italic",
+                                  padding: "2px 6px",
+                                  textAlign: "center",
+                                }}
+                              >
+                                +{remainingTasks} {remainingTasks > 1 ? "tareas" : "tarea"} más
+                              </div>
+                            );
+                          })()}
                         </div>
                       )}
                     </div>
