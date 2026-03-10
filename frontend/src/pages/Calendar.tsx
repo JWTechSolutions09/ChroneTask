@@ -632,6 +632,10 @@ export default function Calendar() {
                   const maxVisibleEvents = dayTasks.length > 0 ? 2 : 3;
                   const visibleEvents = dayEvents.slice(0, maxVisibleEvents);
                   const remainingEventsCount = dayEvents.length - maxVisibleEvents;
+                  
+                  // Calcular valores para tareas visibles
+                  const visibleTasks = dayTasks.slice(0, 3);
+                  const remainingTasksCount = dayTasks.length - 3;
 
                   return (
                     <div
@@ -761,7 +765,7 @@ export default function Calendar() {
                       {/* Tareas - Mejoradas y destacadas */}
                       {dayTasks.length > 0 && (
                         <div style={{ marginTop: "6px", display: "flex", flexDirection: "column", gap: "4px" }}>
-                          {dayTasks.slice(0, 3).map((task) => {
+                          {visibleTasks.map((task) => {
                             const taskStatus = getTaskStatus(task);
                             const statusStyles = {
                               overdue: {
@@ -837,23 +841,19 @@ export default function Calendar() {
                               </div>
                             );
                           })}
-                          {(() => {
-                            const remainingTasks = dayTasks.length - 3;
-                            if (remainingTasks <= 0) return null;
-                            return (
-                              <div
-                                style={{
-                                  fontSize: "10px",
-                                  color: "var(--text-secondary)",
-                                  fontStyle: "italic",
-                                  padding: "2px 6px",
-                                  textAlign: "center",
-                                }}
-                              >
-                                +{remainingTasks} {remainingTasks > 1 ? "tareas" : "tarea"} más
-                              </div>
-                            );
-                          })()}
+                          {remainingTasksCount > 0 && (
+                            <div
+                              style={{
+                                fontSize: "10px",
+                                color: "var(--text-secondary)",
+                                fontStyle: "italic",
+                                padding: "2px 6px",
+                                textAlign: "center",
+                              }}
+                            >
+                              +{remainingTasksCount} {remainingTasksCount > 1 ? "tareas" : "tarea"} más
+                            </div>
+                          )}
                         </div>
                       )}
                     </div>
