@@ -9,15 +9,19 @@ export default function Landing() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const heroRef = useRef<HTMLDivElement>(null);
   const featuresRef = useRef<HTMLDivElement>(null);
-  const techRef = useRef<HTMLDivElement>(null);
   const benefitsRef = useRef<HTMLDivElement>(null);
+  const howItWorksRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    // Forzar modo oscuro siempre
+    document.documentElement.setAttribute('data-theme', 'dark');
+    document.body.classList.add('dark-mode');
+    
     const handleScroll = () => {
       setScrollY(window.scrollY);
 
       // Determinar sección activa
-      const sections = [heroRef, featuresRef, techRef, benefitsRef];
+      const sections = [heroRef, featuresRef, benefitsRef, howItWorksRef];
       const scrollPosition = window.scrollY + window.innerHeight / 2;
 
       sections.forEach((ref, index) => {
@@ -31,7 +35,7 @@ export default function Landing() {
     };
 
     window.addEventListener("scroll", handleScroll, { passive: true });
-    handleScroll(); // Ejecutar una vez al montar
+    handleScroll();
 
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
@@ -51,7 +55,7 @@ export default function Landing() {
       });
     }, observerOptions);
 
-    const elements = document.querySelectorAll(".feature-card, .tech-card, .benefit-item");
+    const elements = document.querySelectorAll(".feature-card, .benefit-item, .step-card");
     elements.forEach((el) => {
       observer.observe(el);
     });
@@ -69,7 +73,6 @@ export default function Landing() {
     <div className="landing-page dark" data-theme="dark">
       {/* Navigation Bar */}
       <nav className="landing-nav">
-        {/* Mobile Menu Overlay */}
         {mobileMenuOpen && (
           <div
             className="landing-mobile-overlay"
@@ -92,10 +95,7 @@ export default function Landing() {
           </button>
           <div
             className={`nav-links ${mobileMenuOpen ? "mobile-open" : ""}`}
-            onClick={(e) => {
-              // Prevenir que el clic en el contenedor cierre el menú
-              e.stopPropagation();
-            }}
+            onClick={(e) => e.stopPropagation()}
           >
             <button onClick={(e) => {
               e.stopPropagation();
@@ -109,22 +109,22 @@ export default function Landing() {
             }}>Características</button>
             <button onClick={(e) => {
               e.stopPropagation();
-              scrollToSection(techRef);
-              setMobileMenuOpen(false);
-            }}>Tecnologías</button>
-            <button onClick={(e) => {
-              e.stopPropagation();
               scrollToSection(benefitsRef);
               setMobileMenuOpen(false);
-            }}>Ventajas</button>
+            }}>Beneficios</button>
+            <button onClick={(e) => {
+              e.stopPropagation();
+              scrollToSection(howItWorksRef);
+              setMobileMenuOpen(false);
+            }}>Cómo Funciona</button>
             <button
               className="btn-login"
               onClick={(e) => {
                 e.stopPropagation();
-                navigate("/login");
+                navigate("/access");
               }}
             >
-              <i className="fas fa-sign-in-alt"></i> Iniciar Sesión
+              <i className="fas fa-sign-in-alt"></i> Acceder
             </button>
           </div>
         </div>
@@ -141,25 +141,29 @@ export default function Landing() {
           <div className="hero-logo-container">
             <img src="/logolanding.png" alt="ChroneTask Logo" className="hero-logo" />
           </div>
+          <div className="hero-badge">
+            <i className="fas fa-star"></i>
+            <span>La solución #1 para gestión de proyectos</span>
+          </div>
           <h1 className="hero-title">
-            <span className="title-line">Gestiona tus proyectos</span>
-            <span className="title-line highlight">con inteligencia</span>
+            <span className="title-line">Organiza tu equipo,</span>
+            <span className="title-line highlight">cumple tus objetivos</span>
           </h1>
           <p className="hero-subtitle">
-            La plataforma todo-en-uno para equipos que buscan eficiencia, colaboración y resultados excepcionales
+            Simplifica la gestión de proyectos, mejora la colaboración de tu equipo y alcanza resultados excepcionales. Todo en una plataforma intuitiva y poderosa.
           </p>
           <div className="hero-cta">
-            <button className="cta-primary" onClick={() => navigate("/login")}>
-              <i className="fas fa-rocket"></i> Comenzar Ahora
+            <button className="cta-primary" onClick={() => navigate("/access")}>
+              <i className="fas fa-rocket"></i> Comenzar Gratis
             </button>
             <button className="cta-secondary" onClick={() => scrollToSection(featuresRef)}>
-              <i className="fas fa-book-open"></i> Conocer Más
+              <i className="fas fa-info-circle"></i> Conocer Más
             </button>
           </div>
           <div className="hero-stats">
             <div className="stat-item">
               <div className="stat-number">100%</div>
-              <div className="stat-label">Eficiencia</div>
+              <div className="stat-label">Más Productividad</div>
             </div>
             <div className="stat-item">
               <div className="stat-number">24/7</div>
@@ -167,7 +171,7 @@ export default function Landing() {
             </div>
             <div className="stat-item">
               <div className="stat-number">100+</div>
-              <div className="stat-label">Proyectos</div>
+              <div className="stat-label">Equipos Activos</div>
             </div>
           </div>
         </div>
@@ -181,103 +185,53 @@ export default function Landing() {
       <section ref={featuresRef} className="features-section">
         <div className="section-container">
           <div className="section-header">
-            <h2 className="section-title">Características Principales</h2>
+            <h2 className="section-title">Todo lo que necesitas para triunfar</h2>
             <p className="section-subtitle">
-              Todo lo que necesitas para gestionar proyectos exitosos
+              Herramientas poderosas diseñadas para equipos que buscan resultados reales
             </p>
           </div>
           <div className="features-grid">
-            <div className="feature-card" data-aos="fade-up">
-              <div className="feature-icon"><i className="fas fa-chart-line"></i></div>
-              <h3>Dashboard Inteligente</h3>
+            <div className="feature-card">
+              <div className="feature-icon">📊</div>
+              <h3>Vista General Inteligente</h3>
               <p>
-                Visualiza el estado de todos tus proyectos en un solo lugar.
-                Métricas en tiempo real y análisis profundo de rendimiento.
+                Monitorea el progreso de todos tus proyectos desde un solo lugar. Toma decisiones informadas con datos en tiempo real y métricas claras.
               </p>
             </div>
-            <div className="feature-card" data-aos="fade-up" data-aos-delay="100">
-              <div className="feature-icon"><i className="fas fa-users"></i></div>
+            <div className="feature-card">
+              <div className="feature-icon">👥</div>
               <h3>Colaboración en Equipo</h3>
               <p>
-                Trabaja junto a tu equipo con comentarios, notificaciones en tiempo real
-                y gestión de miembros por proyecto.
+                Trabaja junto a tu equipo sin fricciones. Comentarios instantáneos, notificaciones inteligentes y comunicación fluida en cada proyecto.
               </p>
             </div>
-            <div className="feature-card" data-aos="fade-up" data-aos-delay="200">
-              <div className="feature-icon"><i className="fas fa-calendar-alt"></i></div>
-              <h3>Cronograma Visual</h3>
+            <div className="feature-card">
+              <div className="feature-icon">📅</div>
+              <h3>Planificación Visual</h3>
               <p>
-                Planifica y visualiza tus proyectos con vistas tipo Gantt.
-                Arrastra tareas, gestiona dependencias y cumple plazos.
+                Organiza tus proyectos con vistas claras y cronogramas visuales. Gestiona plazos, dependencias y recursos de forma intuitiva.
               </p>
             </div>
-            <div className="feature-card" data-aos="fade-up" data-aos-delay="300">
-              <div className="feature-icon"><i className="fas fa-bell"></i></div>
-              <h3>Sistema de Notificaciones</h3>
+            <div className="feature-card">
+              <div className="feature-icon">🔔</div>
+              <h3>Notificaciones Inteligentes</h3>
               <p>
-                Mantente al día con notificaciones inteligentes sobre cambios,
-                comentarios y recordatorios importantes.
+                Mantente al día con alertas personalizadas sobre cambios importantes, comentarios y recordatorios. Nunca pierdas información relevante.
               </p>
             </div>
-            <div className="feature-card" data-aos="fade-up" data-aos-delay="400">
-              <div className="feature-icon"><i className="fas fa-chart-bar"></i></div>
-              <h3>Analíticas Avanzadas</h3>
+            <div className="feature-card">
+              <div className="feature-icon">📈</div>
+              <h3>Análisis de Rendimiento</h3>
               <p>
-                Analiza el rendimiento de tu equipo con métricas detalladas,
-                gráficos interactivos y reportes personalizables.
+                Descubre insights valiosos sobre el rendimiento de tu equipo. Gráficos claros y reportes que te ayudan a mejorar continuamente.
               </p>
             </div>
-            <div className="feature-card" data-aos="fade-up" data-aos-delay="500">
-              <div className="feature-icon"><i className="fas fa-bolt"></i></div>
-              <h3>SLA y Seguimiento</h3>
+            <div className="feature-card">
+              <div className="feature-icon">⏰</div>
+              <h3>Cumplimiento de Plazos</h3>
               <p>
-                Configura SLAs por proyecto y recibe alertas cuando se acerquen
-                los plazos límite. Cumple siempre a tiempo.
+                Configura alertas automáticas y recibe avisos cuando se acerquen los plazos límite. Cumple siempre a tiempo con tus compromisos.
               </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Technologies Section */}
-      <section ref={techRef} className="tech-section">
-        <div className="section-container">
-          <div className="section-header">
-            <h2 className="section-title">Tecnologías de Vanguardia</h2>
-            <p className="section-subtitle">
-              Construido con las mejores herramientas modernas
-            </p>
-          </div>
-          <div className="tech-grid">
-            <div className="tech-card">
-              <div className="tech-icon">⚛️</div>
-              <h3>React</h3>
-              <p>Interfaz moderna y reactiva</p>
-            </div>
-            <div className="tech-card">
-              <div className="tech-icon">🔷</div>
-              <h3>TypeScript</h3>
-              <p>Código robusto y escalable</p>
-            </div>
-            <div className="tech-card">
-              <div className="tech-icon">⚡</div>
-              <h3>ASP.NET Core</h3>
-              <p>Backend de alto rendimiento</p>
-            </div>
-            <div className="tech-card">
-              <div className="tech-icon">🗄️</div>
-              <h3>Entity Framework</h3>
-              <p>Gestión eficiente de datos</p>
-            </div>
-            <div className="tech-card">
-              <div className="tech-icon">🔐</div>
-              <h3>Autenticación Segura</h3>
-              <p>JWT y OAuth integrados</p>
-            </div>
-            <div className="tech-card">
-              <div className="tech-icon">☁️</div>
-              <h3>Cloud Ready</h3>
-              <p>Despliegue en la nube</p>
             </div>
           </div>
         </div>
@@ -286,73 +240,99 @@ export default function Landing() {
       {/* Benefits Section */}
       <section ref={benefitsRef} className="benefits-section">
         <div className="section-container">
+          <div className="benefits-header-text">
+            <h2 className="section-title">¿Por qué miles de equipos eligen ChroneTask?</h2>
+            <p className="benefits-intro">
+              No es solo una herramienta, es tu aliado para alcanzar el éxito en cada proyecto.
+            </p>
+          </div>
           <div className="benefits-content">
+            <div className="benefits-visual-image">
+              <img src="/LandingImage.png" alt="ChroneTask Dashboard" className="landing-feature-image" />
+            </div>
             <div className="benefits-text">
-              <h2 className="section-title">¿Por qué elegir ChroneTask?</h2>
               <div className="benefit-list">
                 <div className="benefit-item">
-                  <div className="benefit-icon"><i className="fas fa-bullseye"></i></div>
+                  <div className="benefit-icon">📦</div>
                   <div>
-                    <h3>Gestión Centralizada</h3>
-                    <p>Todo en un solo lugar: proyectos, tareas, equipos y métricas</p>
+                    <h3>Todo en un Solo Lugar</h3>
+                    <p>Proyectos, tareas, equipos y métricas centralizados. Olvídate de cambiar entre múltiples herramientas.</p>
                   </div>
                 </div>
                 <div className="benefit-item">
-                  <div className="benefit-icon"><i className="fas fa-bolt"></i></div>
+                  <div className="benefit-icon">⚡</div>
                   <div>
                     <h3>Colaboración en Tiempo Real</h3>
-                    <p>Comentarios, notificaciones y actualizaciones instantáneas</p>
+                    <p>Comunicación instantánea, actualizaciones en vivo y trabajo sincronizado. Tu equipo siempre en la misma página.</p>
                   </div>
                 </div>
                 <div className="benefit-item">
-                  <div className="benefit-icon"><i className="fas fa-sync-alt"></i></div>
+                  <div className="benefit-icon">🎛️</div>
                   <div>
-                    <h3>Flexibilidad Total</h3>
-                    <p>Adapta el sistema a tu flujo de trabajo, no al revés</p>
+                    <h3>Se Adapta a Tu Flujo</h3>
+                    <p>Personaliza el sistema según tus necesidades. No cambies tu forma de trabajar, adapta la herramienta a ti.</p>
                   </div>
                 </div>
                 <div className="benefit-item">
-                  <div className="benefit-icon"><i className="fas fa-chart-line"></i></div>
+                  <div className="benefit-icon">📈</div>
                   <div>
-                    <h3>Escalable y Confiable</h3>
-                    <p>Crece con tu empresa sin límites de usuarios o proyectos</p>
+                    <h3>Crece Sin Límites</h3>
+                    <p>Escalable para equipos pequeños y grandes empresas. Sin restricciones de usuarios o proyectos.</p>
                   </div>
                 </div>
                 <div className="benefit-item">
-                  <div className="benefit-icon"><i className="fas fa-sparkles"></i></div>
+                  <div className="benefit-icon">✨</div>
                   <div>
-                    <h3>Interfaz Intuitiva</h3>
-                    <p>Diseño moderno y fácil de usar, sin curva de aprendizaje</p>
+                    <h3>Fácil de Usar</h3>
+                    <p>Interfaz intuitiva que cualquiera puede dominar en minutos. Sin curva de aprendizaje complicada.</p>
                   </div>
                 </div>
                 <div className="benefit-item">
-                  <div className="benefit-icon"><i className="fas fa-building"></i></div>
+                  <div className="benefit-icon">🏢</div>
                   <div>
-                    <h3>Soporte Multi-Organización</h3>
-                    <p>Gestiona múltiples organizaciones desde una sola cuenta</p>
+                    <h3>Múltiples Organizaciones</h3>
+                    <p>Gestiona varios equipos o empresas desde una sola cuenta. Perfecto para consultores y freelancers.</p>
                   </div>
                 </div>
               </div>
             </div>
-            <div className="benefits-visual">
-              <div className="floating-card card-1">
-                <div className="card-content">
-                  <div className="card-icon"><i className="fas fa-chart-bar"></i></div>
-                  <div className="card-title">Analíticas</div>
-                </div>
-              </div>
-              <div className="floating-card card-2">
-                <div className="card-content">
-                  <div className="card-icon"><i className="fas fa-users"></i></div>
-                  <div className="card-title">Equipo</div>
-                </div>
-              </div>
-              <div className="floating-card card-3">
-                <div className="card-content">
-                  <div className="card-icon"><i className="fas fa-bolt"></i></div>
-                  <div className="card-title">Rápido</div>
-                </div>
-              </div>
+          </div>
+        </div>
+      </section>
+
+      {/* How It Works Section */}
+      <section ref={howItWorksRef} className="how-it-works-section">
+        <div className="section-container">
+          <div className="section-header">
+            <h2 className="section-title">Comienza en minutos, no en días</h2>
+            <p className="section-subtitle">
+              Configura tu equipo y empieza a trabajar de inmediato
+            </p>
+          </div>
+          <div className="steps-container">
+            <div className="step-card">
+              <div className="step-number">1</div>
+              <div className="step-icon">👤</div>
+              <h3>Crea tu Cuenta</h3>
+              <p>Regístrate gratis en menos de un minuto. Sin tarjeta de crédito requerida.</p>
+            </div>
+            <div className="step-card">
+              <div className="step-number">2</div>
+              <div className="step-icon">📋</div>
+              <h3>Crea tu Primer Proyecto</h3>
+              <p>Configura tu proyecto en segundos. Elige una plantilla o empieza desde cero.</p>
+            </div>
+            <div className="step-card">
+              <div className="step-number">3</div>
+              <div className="step-icon">👥</div>
+              <h3>Invita a tu Equipo</h3>
+              <p>Agrega miembros con un clic. Todos tendrán acceso inmediato y podrán empezar a trabajar.</p>
+            </div>
+            <div className="step-card">
+              <div className="step-number">4</div>
+              <div className="step-icon">🚀</div>
+              <h3>¡Comienza a Trabajar!</h3>
+              <p>Ya estás listo. Crea tareas, asigna responsabilidades y alcanza tus objetivos.</p>
             </div>
           </div>
         </div>
@@ -365,20 +345,31 @@ export default function Landing() {
         </div>
         <div className="section-container">
           <div className="cta-content">
-            <h2 className="cta-title">¿Listo para transformar tu gestión de proyectos?</h2>
+            <h2 className="cta-title">¿Listo para transformar tu productividad?</h2>
             <p className="cta-subtitle">
-              Únete a equipos que ya están aumentando su productividad con ChroneTask
+              Únete a cientos de equipos que ya están logrando más con menos esfuerzo
             </p>
             <div className="cta-buttons">
-              <button className="cta-primary-large" onClick={() => navigate("/login")}>
-                <i className="fas fa-gift"></i> Comenzar Gratis
-              </button>
-              <button className="cta-secondary-large" onClick={() => scrollToSection(featuresRef)}>
-                <i className="fas fa-eye"></i> Ver Demo
+              <button className="cta-primary-large" onClick={() => navigate("/access")}>
+                <i className="fas fa-gift"></i> Comenzar Gratis Ahora
               </button>
             </div>
+            <div className="cta-features">
+              <div className="cta-feature">
+                <i className="fas fa-check"></i>
+                <span>Sin tarjeta de crédito</span>
+              </div>
+              <div className="cta-feature">
+                <i className="fas fa-check"></i>
+                <span>Configuración en minutos</span>
+              </div>
+              <div className="cta-feature">
+                <i className="fas fa-check"></i>
+                <span>Soporte incluido</span>
+              </div>
+            </div>
             <div className="cta-footer">
-              <p>Desarrollado por <strong>JW TECH SOLUTIONS</strong></p>
+              <p>Desarrollado con ❤️ por <strong>JW TECH SOLUTIONS</strong></p>
             </div>
           </div>
         </div>
@@ -392,9 +383,9 @@ export default function Landing() {
             <span>ChroneTask</span>
           </div>
           <div className="footer-links">
-            <a href="#features">Características</a>
-            <a href="#tech">Tecnologías</a>
-            <a href="#benefits">Ventajas</a>
+            <a href="#features" onClick={(e) => { e.preventDefault(); scrollToSection(featuresRef); }}>Características</a>
+            <a href="#benefits" onClick={(e) => { e.preventDefault(); scrollToSection(benefitsRef); }}>Beneficios</a>
+            <a href="#how-it-works" onClick={(e) => { e.preventDefault(); scrollToSection(howItWorksRef); }}>Cómo Funciona</a>
           </div>
           <div className="footer-copyright">
             <p>© 2024 JW TECH SOLUTIONS. Todos los derechos reservados.</p>

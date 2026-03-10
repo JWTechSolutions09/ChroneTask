@@ -1,6 +1,7 @@
 import React from "react";
 import { Routes, Route, Navigate, useNavigate } from "react-router-dom";
 import Landing from "./pages/Landing";
+import Access from "./pages/Access";
 import Auth from "./pages/Auth";
 import Onboarding from "./pages/Onboarding";
 import Orgs from "./pages/Orgs";
@@ -142,6 +143,10 @@ function AppContent() {
             <Route
                 path="/"
                 element={<Landing />}
+            />
+            <Route
+                path="/access"
+                element={<Access />}
             />
             <Route
                 path="/login"
