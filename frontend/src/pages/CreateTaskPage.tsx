@@ -219,17 +219,23 @@ export default function CreateTaskPage() {
             <textarea
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              rows={15}
+              rows={20}
               placeholder="Describe detalladamente la tarea, requisitos, pasos a seguir, etc..."
+              className="create-task-textarea"
               style={{
                 ...inputStyle,
                 resize: "vertical",
-                minHeight: "300px",
-                maxHeight: "500px",
+                height: "400px",
+                minHeight: "400px",
+                maxHeight: "700px",
                 fontFamily: "inherit",
-                lineHeight: "1.6",
+                lineHeight: "1.8",
                 fontSize: "16px",
-                padding: "16px",
+                padding: "18px",
+                width: "100%",
+                boxSizing: "border-box" as const,
+                display: "block",
+                overflowY: "auto",
               }}
                 onFocus={(e) => {
                   e.target.style.borderColor = "var(--primary)";

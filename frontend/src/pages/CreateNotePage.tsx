@@ -238,17 +238,23 @@ export default function CreateNotePage() {
               <textarea
                 value={content}
                 onChange={(e) => setContent(e.target.value)}
-                rows={18}
+                rows={25}
                 placeholder="Escribe el contenido de tu nota..."
+                className="create-note-textarea"
                 style={{
                   ...inputStyle,
                   resize: "vertical",
-                  minHeight: "350px",
-                  maxHeight: "600px",
+                  height: "450px",
+                  minHeight: "450px",
+                  maxHeight: "800px",
                   fontFamily: "inherit",
-                  lineHeight: "1.6",
+                  lineHeight: "1.8",
                   fontSize: "16px",
-                  padding: "16px",
+                  padding: "18px",
+                  width: "100%",
+                  boxSizing: "border-box" as const,
+                  display: "block",
+                  overflowY: "auto",
                 }}
                 onFocus={(e) => {
                   e.target.style.borderColor = "var(--primary)";
