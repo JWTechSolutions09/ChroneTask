@@ -25,17 +25,14 @@ export default function PageHeader({ title, subtitle, breadcrumbs, actions }: Pa
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
-  // DESACTIVADO COMPLETAMENTE EN MÓVIL - No renderizar nada
-  if (isMobile) {
-    return null;
-  }
+  // Renderizar normalmente en móvil y desktop
 
   return (
     <div
       style={{
         backgroundColor: "var(--bg-primary)",
         borderBottom: "1px solid var(--border-color)",
-        padding: "24px",
+        padding: isMobile ? "16px" : "24px",
         position: "sticky",
         top: 0,
         zIndex: 100,
@@ -58,7 +55,7 @@ export default function PageHeader({ title, subtitle, breadcrumbs, actions }: Pa
         <div style={{ flex: "1 1 100%", minWidth: 0, maxWidth: "100%" }}>
           <h1
             style={{
-              fontSize: "28px",
+              fontSize: isMobile ? "20px" : "28px",
               fontWeight: 700,
               margin: 0,
               color: "var(--text-primary)",
@@ -74,7 +71,7 @@ export default function PageHeader({ title, subtitle, breadcrumbs, actions }: Pa
             <p
               style={{
                 margin: 0,
-                fontSize: "15px",
+                fontSize: isMobile ? "13px" : "15px",
                 color: "var(--text-secondary)",
                 fontWeight: 400,
                 wordWrap: "break-word",
@@ -89,13 +86,14 @@ export default function PageHeader({ title, subtitle, breadcrumbs, actions }: Pa
           <div 
             style={{ 
               display: "flex", 
-              gap: "8px", 
+              gap: isMobile ? "6px" : "8px", 
               alignItems: "center", 
               flexWrap: "nowrap",
-              width: "auto",
+              width: isMobile ? "100%" : "auto",
               maxWidth: "100%",
               justifyContent: "flex-start",
               overflowX: "auto",
+              WebkitOverflowScrolling: "touch",
             }}
             className="page-header-actions"
           >

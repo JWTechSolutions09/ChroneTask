@@ -1089,33 +1089,22 @@ input, textarea, select {
     min-width: 44px !important;
   }
 
-  /* PageHeader responsive - DESACTIVADO COMPLETAMENTE EN MÓVIL */
+  /* PageHeader responsive - Visible en móvil con ajustes */
   .page-header {
-    display: none !important;
-    visibility: hidden !important;
-    opacity: 0 !important;
-    height: 0 !important;
-    padding: 0 !important;
-    margin: 0 !important;
-    overflow: hidden !important;
-    position: absolute !important;
-    top: -9999px !important;
-    left: -9999px !important;
-    width: 0 !important;
-    max-width: 0 !important;
-    pointer-events: none !important;
-    user-select: none !important;
-  }
-  
-  /* Asegurar que cualquier hijo del page-header también esté oculto */
-  .page-header * {
-    display: none !important;
-    visibility: hidden !important;
-    opacity: 0 !important;
-    height: 0 !important;
-    width: 0 !important;
-    overflow: hidden !important;
-    pointer-events: none !important;
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    padding: 16px !important;
+    position: sticky !important;
+    top: 0 !important;
+    z-index: 100 !important;
+    background-color: var(--bg-primary) !important;
+    border-bottom: 1px solid var(--border-color) !important;
+    height: auto !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    pointer-events: auto !important;
+    user-select: auto !important;
   }
 
   .page-header-content {
