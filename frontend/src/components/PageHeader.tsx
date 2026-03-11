@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import Breadcrumbs from "./Breadcrumbs";
 
 type PageHeaderProps = {
@@ -9,6 +9,27 @@ type PageHeaderProps = {
 };
 
 export default function PageHeader({ title, subtitle, breadcrumbs, actions }: PageHeaderProps) {
+  const [isMobile, setIsMobile] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return window.innerWidth <= 768;
+    }
+    return false;
+  });
+
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
+  // No renderizar en móvil
+  if (isMobile) {
+    return null;
+  }
+
   return (
     <div
       style={{

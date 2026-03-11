@@ -840,6 +840,9 @@ input, textarea, select {
     padding-left: 16px !important;
     padding-right: 16px !important;
     box-sizing: border-box !important;
+    position: fixed !important;
+    top: 0 !important;
+    z-index: 1001 !important;
   }
 
   /* Ajustar el contenido principal para que no quede debajo del navbar */

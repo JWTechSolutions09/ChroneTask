@@ -284,6 +284,7 @@ export default function Layout({ children, organizationId, usageType: propUsageT
       />
 
       {/* Mobile Navbar - Solo visible en móvil */}
+      {isMobile && (
       <nav
         className="mobile-navbar"
         style={{
@@ -297,7 +298,7 @@ export default function Layout({ children, organizationId, usageType: propUsageT
           backgroundColor: "var(--bg-primary)",
           borderBottom: "1px solid var(--border-color)",
           padding: "12px 16px",
-          display: "none",
+          display: "flex",
           alignItems: "center",
           justifyContent: "space-between",
           boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)",
@@ -441,6 +442,7 @@ export default function Layout({ children, organizationId, usageType: propUsageT
           </button>
         </div>
       </nav>
+      )}
 
       {/* Sidebar / Mobile Dropdown Menu */}
       <aside
