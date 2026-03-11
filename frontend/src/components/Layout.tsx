@@ -283,8 +283,8 @@ export default function Layout({ children, organizationId, usageType: propUsageT
         }}
       />
 
-      {/* Mobile Navbar - DESACTIVADO TEMPORALMENTE */}
-      {/* {isMobile && (
+      {/* Mobile Navbar */}
+      {isMobile && (
       <nav
         className="mobile-navbar"
         style={{
@@ -305,11 +305,146 @@ export default function Layout({ children, organizationId, usageType: propUsageT
           boxSizing: "border-box",
         }}
       >
-        ...
-      </nav>
-      )} */}
+        {/* Botón Hamburguesa */}
+        <button
+          onClick={() => {
+            const isMobile = window.innerWidth <= 768;
+            setSidebarOpen(!sidebarOpen);
+            // Si se está abriendo en móvil, asegurar que no esté colapsado
+            if (!sidebarOpen && isMobile) {
+              setSidebarCollapsed(false);
+            }
+          }}
+          style={{
+            background: "var(--bg-primary)",
+            border: "2px solid var(--border-color)",
+            borderRadius: "10px",
+            padding: "10px",
+            cursor: "pointer",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            fontSize: "20px",
+            color: "var(--text-primary)",
+            width: "44px",
+            height: "44px",
+            touchAction: "manipulation",
+            WebkitTapHighlightColor: "transparent",
+            transition: "all 0.2s ease",
+          }}
+          aria-label="Toggle menu"
+          onTouchStart={(e) => {
+            e.currentTarget.style.transform = "scale(0.95)";
+            e.currentTarget.style.boxShadow = "0 2px 6px rgba(0, 0, 0, 0.2)";
+          }}
+          onTouchEnd={(e) => {
+            e.currentTarget.style.transform = "scale(1)";
+            e.currentTarget.style.boxShadow = "none";
+          }}
+        >
+          {sidebarOpen ? "✕" : "☰"}
+        </button>
 
-      {/* Sidebar / Mobile Dropdown Menu - DESACTIVADO EN MÓVIL */}
+        {/* Logo/Título */}
+        <div style={{ 
+          display: "flex", 
+          alignItems: "center", 
+          gap: "8px",
+          flex: 1,
+          justifyContent: "center",
+        }}>
+          <span style={{ 
+            fontWeight: 700, 
+            fontSize: "18px", 
+            color: "var(--text-primary)", 
+            letterSpacing: "-0.5px",
+          }}>
+            ChroneTask
+          </span>
+        </div>
+
+        {/* Botones de acción */}
+        <div style={{ 
+          display: "flex", 
+          alignItems: "center", 
+          gap: "8px",
+        }}>
+          {/* Botón de cambio de tema */}
+          <button
+            onClick={() => {
+              toggleTheme();
+              if (window.innerWidth <= 768) {
+                closeMobileMenu();
+              }
+            }}
+            style={{
+              background: "var(--bg-primary)",
+              border: "2px solid var(--border-color)",
+              borderRadius: "10px",
+              padding: "10px",
+              cursor: "pointer",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              fontSize: "20px",
+              color: "var(--text-primary)",
+              width: "44px",
+              height: "44px",
+              touchAction: "manipulation",
+              WebkitTapHighlightColor: "transparent",
+              transition: "all 0.2s ease",
+            }}
+            aria-label={theme === "dark" ? "Modo Claro" : "Modo Oscuro"}
+            onTouchStart={(e) => {
+              e.currentTarget.style.transform = "scale(0.95)";
+            }}
+            onTouchEnd={(e) => {
+              e.currentTarget.style.transform = "scale(1)";
+            }}
+          >
+            {theme === "dark" ? "☀️" : "🌙"}
+          </button>
+
+          {/* Botón de configuración */}
+          <button
+            onClick={() => {
+              navigate("/settings");
+              if (window.innerWidth <= 768) {
+                closeMobileMenu();
+              }
+            }}
+            style={{
+              background: "var(--bg-primary)",
+              border: "2px solid var(--border-color)",
+              borderRadius: "10px",
+              padding: "10px",
+              cursor: "pointer",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              fontSize: "20px",
+              color: "var(--text-primary)",
+              width: "44px",
+              height: "44px",
+              touchAction: "manipulation",
+              WebkitTapHighlightColor: "transparent",
+              transition: "all 0.2s ease",
+            }}
+            aria-label="Configuración"
+            onTouchStart={(e) => {
+              e.currentTarget.style.transform = "scale(0.95)";
+            }}
+            onTouchEnd={(e) => {
+              e.currentTarget.style.transform = "scale(1)";
+            }}
+          >
+            ⚙️
+          </button>
+        </div>
+      </nav>
+      )}
+
+      {/* Sidebar / Mobile Dropdown Menu */}
       <aside
         style={{
           // En desktop, usar estos estilos
@@ -320,20 +455,8 @@ export default function Layout({ children, organizationId, usageType: propUsageT
             borderRight: "1px solid var(--border-color)",
             transition: "width 0.3s ease",
           }),
-          // En móvil, ocultar completamente
-          ...(isMobile && {
-            display: "none",
-            visibility: "hidden",
-            opacity: 0,
-            height: 0,
-            width: 0,
-            overflow: "hidden",
-            position: "absolute",
-            top: "-9999px",
-            left: "-9999px",
-            pointerEvents: "none",
-          }),
           backgroundColor: "var(--bg-primary)",
+          display: "flex",
           flexDirection: "column",
           top: 0,
           overflowY: "auto",
