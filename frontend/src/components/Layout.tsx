@@ -309,7 +309,7 @@ export default function Layout({ children, organizationId, usageType: propUsageT
       </nav>
       )} */}
 
-      {/* Sidebar / Mobile Dropdown Menu */}
+      {/* Sidebar / Mobile Dropdown Menu - DESACTIVADO EN MÓVIL */}
       <aside
         style={{
           // En desktop, usar estos estilos
@@ -320,8 +320,20 @@ export default function Layout({ children, organizationId, usageType: propUsageT
             borderRight: "1px solid var(--border-color)",
             transition: "width 0.3s ease",
           }),
+          // En móvil, ocultar completamente
+          ...(isMobile && {
+            display: "none",
+            visibility: "hidden",
+            opacity: 0,
+            height: 0,
+            width: 0,
+            overflow: "hidden",
+            position: "absolute",
+            top: "-9999px",
+            left: "-9999px",
+            pointerEvents: "none",
+          }),
           backgroundColor: "var(--bg-primary)",
-          display: "flex",
           flexDirection: "column",
           top: 0,
           overflowY: "auto",
