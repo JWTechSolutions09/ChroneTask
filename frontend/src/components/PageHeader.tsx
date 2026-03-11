@@ -25,7 +25,7 @@ export default function PageHeader({ title, subtitle, breadcrumbs, actions }: Pa
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
-  // No renderizar en móvil
+  // DESACTIVADO COMPLETAMENTE EN MÓVIL - No renderizar nada
   if (isMobile) {
     return null;
   }

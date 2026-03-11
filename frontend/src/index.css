@@ -1098,7 +1098,7 @@ input, textarea, select {
     min-width: 44px !important;
   }
 
-  /* PageHeader responsive - Oculto completamente en móvil */
+  /* PageHeader responsive - DESACTIVADO COMPLETAMENTE EN MÓVIL */
   .page-header {
     display: none !important;
     visibility: hidden !important;
@@ -1112,6 +1112,19 @@ input, textarea, select {
     left: -9999px !important;
     width: 0 !important;
     max-width: 0 !important;
+    pointer-events: none !important;
+    user-select: none !important;
+  }
+  
+  /* Asegurar que cualquier hijo del page-header también esté oculto */
+  .page-header * {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    height: 0 !important;
+    width: 0 !important;
+    overflow: hidden !important;
+    pointer-events: none !important;
   }
 
   .page-header-content {
