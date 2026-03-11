@@ -272,16 +272,8 @@ export default function Layout({ children, organizationId, usageType: propUsageT
 
   return (
     <div style={{ display: "flex", minHeight: "100vh", backgroundColor: "var(--bg-secondary)", position: "relative" }}>
-      {/* Mobile Menu Overlay */}
-      <div
-        className={`mobile-overlay ${sidebarOpen ? 'active' : ''}`}
-        onClick={closeMobileMenu}
-        onTouchEnd={(e) => {
-          // Solo cerrar en touchEnd, no en touchStart, para evitar cierres accidentales
-          e.stopPropagation();
-          closeMobileMenu();
-        }}
-      />
+      {/* Mobile Menu Overlay - DESACTIVADO */}
+      {/* <div className="mobile-overlay" /> */}
 
       {/* Mobile Navbar */}
       {isMobile && (
@@ -305,45 +297,8 @@ export default function Layout({ children, organizationId, usageType: propUsageT
           boxSizing: "border-box",
         }}
       >
-        {/* Botón Hamburguesa */}
-        <button
-          onClick={() => {
-            const isMobile = window.innerWidth <= 768;
-            setSidebarOpen(!sidebarOpen);
-            // Si se está abriendo en móvil, asegurar que no esté colapsado
-            if (!sidebarOpen && isMobile) {
-              setSidebarCollapsed(false);
-            }
-          }}
-          style={{
-            background: "var(--bg-primary)",
-            border: "2px solid var(--border-color)",
-            borderRadius: "10px",
-            padding: "10px",
-            cursor: "pointer",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            fontSize: "20px",
-            color: "var(--text-primary)",
-            width: "44px",
-            height: "44px",
-            touchAction: "manipulation",
-            WebkitTapHighlightColor: "transparent",
-            transition: "all 0.2s ease",
-          }}
-          aria-label="Toggle menu"
-          onTouchStart={(e) => {
-            e.currentTarget.style.transform = "scale(0.95)";
-            e.currentTarget.style.boxShadow = "0 2px 6px rgba(0, 0, 0, 0.2)";
-          }}
-          onTouchEnd={(e) => {
-            e.currentTarget.style.transform = "scale(1)";
-            e.currentTarget.style.boxShadow = "none";
-          }}
-        >
-          {sidebarOpen ? "✕" : "☰"}
-        </button>
+        {/* Botón Hamburguesa - DESACTIVADO */}
+        {/* <button>...</button> */}
 
         {/* Logo/Título */}
         <div style={{ 
@@ -454,6 +409,19 @@ export default function Layout({ children, organizationId, usageType: propUsageT
             height: "100vh",
             borderRight: "1px solid var(--border-color)",
             transition: "width 0.3s ease",
+          }),
+          // En móvil, ocultar completamente
+          ...(isMobile && {
+            display: "none",
+            visibility: "hidden",
+            opacity: 0,
+            height: 0,
+            width: 0,
+            overflow: "hidden",
+            position: "absolute",
+            top: "-9999px",
+            left: "-9999px",
+            pointerEvents: "none",
           }),
           backgroundColor: "var(--bg-primary)",
           display: "flex",
