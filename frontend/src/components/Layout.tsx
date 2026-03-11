@@ -291,6 +291,8 @@ export default function Layout({ children, organizationId, usageType: propUsageT
           top: 0,
           left: 0,
           right: 0,
+          width: "100%",
+          maxWidth: "100vw",
           zIndex: 1001,
           backgroundColor: "var(--bg-primary)",
           borderBottom: "1px solid var(--border-color)",
@@ -299,6 +301,7 @@ export default function Layout({ children, organizationId, usageType: propUsageT
           alignItems: "center",
           justifyContent: "space-between",
           boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)",
+          boxSizing: "border-box",
         }}
       >
         {/* Botón Hamburguesa */}
