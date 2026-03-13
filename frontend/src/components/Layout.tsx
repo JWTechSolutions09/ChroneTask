@@ -5,6 +5,7 @@ import { http } from "../api/http";
 import { useTheme } from "../contexts/ThemeContext";
 import { useUserUsageType, UsageType } from "../hooks/useUserUsageType";
 import { useTerminology } from "../hooks/useTerminology";
+import AppNavbar from "./AppNavbar";
 
 type LayoutProps = {
   children: React.ReactNode;
@@ -271,9 +272,12 @@ export default function Layout({ children, organizationId, usageType: propUsageT
   }, [sidebarOpen]);
 
   return (
-    <div style={{ display: "flex", minHeight: "100vh", backgroundColor: "var(--bg-secondary)", position: "relative" }}>
-      {/* Mobile Menu Overlay - DESACTIVADO */}
-      {/* <div className="mobile-overlay" /> */}
+    <div style={{ display: "flex", minHeight: "100vh", backgroundColor: "var(--bg-secondary)", position: "relative", flexDirection: "column" }}>
+      {/* Barra superior global de la aplicación (similar al landing) */}
+      <AppNavbar />
+
+      {/* Contenedor principal con sidebar + contenido */}
+      <div style={{ display: "flex", flex: 1, position: "relative" }}>
 
       {/* Sidebar / Mobile Dropdown Menu */}
       <aside

@@ -826,36 +826,135 @@ select {
     overflow-x: hidden;
   }
 
-  /* Mobile Navbar - eliminado (no se usa) */
-  .mobile-navbar {
-    display: none !important;
+  /* Navbar global de la app (similar al landing) */
+  .app-nav {
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    background: rgba(10, 10, 10, 0.96);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-bottom: 1px solid var(--border-color);
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.4);
   }
 
-  /* Contenido principal sin offset extra (solo PageHeader) */
-  .main-content {
-    margin-top: 0 !important;
-    margin-left: 0 !important;
-    width: 100% !important;
-    max-width: 100% !important;
-    overflow-x: hidden !important;
-    box-sizing: border-box !important;
-    padding-top: 0 !important;
+  .app-nav-container {
+    max-width: min(1200px, 95vw);
+    margin: 0 auto;
+    padding: 12px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
   }
 
-  /* PageHeader en la parte superior (como antes) */
-  .page-header {
-    display: block !important;
-    position: sticky !important;
-    top: 0 !important;
-    z-index: 100 !important;
-    width: 100% !important;
-    margin: 0 !important;
-    padding: 16px !important;
-    box-sizing: border-box !important;
-    background-color: var(--bg-primary) !important;
-    border-bottom: 1px solid var(--border-color) !important;
-    opacity: 1 !important;
-    visibility: visible !important;
+  .app-nav-logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--text-primary);
+  }
+
+  .app-nav-logo img {
+    width: 32px;
+    height: 32px;
+    object-fit: contain;
+  }
+
+  .app-nav-logo span {
+    font-weight: 700;
+    font-size: 18px;
+    letter-spacing: -0.4px;
+  }
+
+  .app-nav-toggle {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 6px;
+  }
+
+  .app-nav-toggle span {
+    width: 22px;
+    height: 2px;
+    background: var(--text-primary);
+    border-radius: 3px;
+    transition: all 0.2s ease;
+  }
+
+  .app-nav-toggle span.open:nth-child(1) {
+    transform: rotate(45deg) translate(5px, 5px);
+  }
+
+  .app-nav-toggle span.open:nth-child(2) {
+    opacity: 0;
+  }
+
+  .app-nav-toggle span.open:nth-child(3) {
+    transform: rotate(-45deg) translate(5px, -5px);
+  }
+
+  .app-nav-links {
+    display: none;
+  }
+
+  .app-nav-mobile-overlay {
+    position: fixed;
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0.6);
+    z-index: 999;
+  }
+
+  .app-nav-links.mobile-open {
+    position: fixed;
+    top: 56px;
+    left: 0;
+    right: 0;
+    background: var(--bg-primary);
+    border-bottom: 1px solid var(--border-color);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+    padding: 12px 16px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    z-index: 1000;
+  }
+
+  .app-nav-link {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 12px;
+    border-radius: 10px;
+    border: 1px solid var(--border-color);
+    background: var(--bg-secondary);
+    color: var(--text-secondary);
+    font-size: 14px;
+    cursor: pointer;
+  }
+
+  .app-nav-link-icon {
+    font-size: 16px;
+  }
+
+  .app-nav-link.active {
+    background: var(--primary);
+    color: #ffffff;
+    border-color: var(--primary);
+  }
+
+  .app-nav-link-primary {
+    background: #f87171;
+    border-color: #f87171;
+    color: #111827;
+    font-weight: 600;
   }
 
   .mobile-menu-btn {
