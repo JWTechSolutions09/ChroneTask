@@ -684,17 +684,6 @@ select {
     max-width: 100% !important;
   }
 
-  /* Ajustar PageHeader - Oculto completamente en móvil */
-  .page-header {
-    display: none !important;
-    visibility: hidden !important;
-    opacity: 0 !important;
-    height: 0 !important;
-    padding: 0 !important;
-    margin: 0 !important;
-    overflow: hidden !important;
-  }
-
   [style*="padding: 24px"] {
     padding: clamp(0.75rem, 3vw, 1rem) !important;
   }
