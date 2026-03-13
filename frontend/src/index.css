@@ -30,7 +30,7 @@
   --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
   --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
   --transition: all 0.2s ease-in-out;
-  
+
   /* Light theme (default) */
   --bg-primary: #ffffff;
   --bg-secondary: #f8f9fa;
@@ -353,6 +353,7 @@ a:hover {
     opacity: 0;
     transform: translateY(-10px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -364,6 +365,7 @@ a:hover {
     transform: translateX(100%);
     opacity: 0;
   }
+
   to {
     transform: translateX(0);
     opacity: 1;
@@ -371,9 +373,12 @@ a:hover {
 }
 
 @keyframes pulse {
-  0%, 100% {
+
+  0%,
+  100% {
     opacity: 1;
   }
+
   50% {
     opacity: 0.5;
   }
@@ -383,6 +388,7 @@ a:hover {
   0% {
     background-position: -1000px 0;
   }
+
   100% {
     background-position: 1000px 0;
   }
@@ -408,24 +414,20 @@ a:hover {
 
 /* Loading skeleton */
 .skeleton {
-  background: linear-gradient(
-    90deg,
-    #f0f0f0 25%,
-    #e0e0e0 50%,
-    #f0f0f0 75%
-  );
+  background: linear-gradient(90deg,
+      #f0f0f0 25%,
+      #e0e0e0 50%,
+      #f0f0f0 75%);
   background-size: 200% 100%;
   animation: shimmer 1.5s infinite;
   border-radius: 4px;
 }
 
 [data-theme="dark"] .skeleton {
-  background: linear-gradient(
-    90deg,
-    #353535 25%,
-    #404040 50%,
-    #353535 75%
-  );
+  background: linear-gradient(90deg,
+      #353535 25%,
+      #404040 50%,
+      #353535 75%);
   background-size: 200% 100%;
 }
 
@@ -596,7 +598,8 @@ p {
 }
 
 /* Botones adaptivos */
-button, .btn {
+button,
+.btn {
   font-size: clamp(0.75rem, 1.5vw + 0.25rem, 0.875rem);
   padding: clamp(0.5rem, 1vw + 0.25rem, 0.75rem) clamp(0.75rem, 2vw + 0.5rem, 1rem);
   min-height: clamp(36px, 5vw, 44px);
@@ -604,7 +607,9 @@ button, .btn {
 }
 
 /* Inputs adaptivos */
-input, textarea, select {
+input,
+textarea,
+select {
   font-size: clamp(0.875rem, 1.5vw + 0.25rem, 1rem);
   padding: clamp(0.5rem, 1vw + 0.25rem, 0.75rem) clamp(0.75rem, 2vw + 0.5rem, 1rem);
   width: 100%;
@@ -704,7 +709,9 @@ input, textarea, select {
   }
 
   /* Texto que no se desborde */
-  p, span, div {
+  p,
+  span,
+  div {
     word-wrap: break-word;
     overflow-wrap: break-word;
     hyphens: auto;
@@ -713,6 +720,7 @@ input, textarea, select {
 
 /* Sidebar adaptivo - Menú desplegable desde arriba en móvil */
 @media (max-width: 767.98px) {
+
   /* Prevenir scroll del body cuando sidebar está abierto */
   body.sidebar-open {
     overflow: hidden !important;
@@ -746,13 +754,13 @@ input, textarea, select {
   }
 
   /* Header del sidebar - Oculto en móvil (duplicado con navbar) */
-  .sidebar.mobile-dropdown-menu > div:first-child,
+  .sidebar.mobile-dropdown-menu>div:first-child,
   .sidebar.mobile-dropdown-menu .sidebar-header {
     display: none !important;
   }
 
   /* Nav container - Ajustar padding superior ya que no hay header */
-  .sidebar.mobile-dropdown-menu > nav {
+  .sidebar.mobile-dropdown-menu>nav {
     padding: clamp(1rem, 3vw, 1.25rem) clamp(0.75rem, 2vw, 1rem) !important;
     overflow-y: auto !important;
     overflow-x: hidden !important;
@@ -766,7 +774,7 @@ input, textarea, select {
   }
 
   /* Secciones del nav */
-  .sidebar.mobile-dropdown-menu nav > div {
+  .sidebar.mobile-dropdown-menu nav>div {
     margin-bottom: clamp(0.75rem, 2vw, 1rem) !important;
     width: 100% !important;
     display: flex !important;
@@ -811,7 +819,7 @@ input, textarea, select {
 
   /* Todos los elementos visibles cuando está abierto */
   .sidebar.mobile-dropdown-menu.open nav,
-  .sidebar.mobile-dropdown-menu.open nav > div,
+  .sidebar.mobile-dropdown-menu.open nav>div,
   .sidebar.mobile-dropdown-menu.open nav a,
   .sidebar.mobile-dropdown-menu.open nav button {
     opacity: 1 !important;
@@ -819,51 +827,61 @@ input, textarea, select {
     pointer-events: auto !important;
   }
 
-  /* Mobile Navbar - Activado y estilizado */
+  /* ===== LAYOUT MÓVIL LIMPIO ===== */
+
+  html,
+  body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    overflow-x: hidden;
+  }
+
+  /* Mobile Navbar - ancho completo y altura fija */
   .mobile-navbar {
     display: flex !important;
-    visibility: visible !important;
-    opacity: 1 !important;
     position: fixed !important;
     top: 0 !important;
     left: 0 !important;
     right: 0 !important;
-    width: 100vw !important;
-    max-width: 100vw !important;
-    height: auto !important;
-    z-index: 1001 !important;
-    background-color: var(--bg-primary) !important;
-    border-bottom: 1px solid var(--border-color) !important;
-    padding: 12px 16px !important;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    height: 64px !important;
+    padding: 0 16px !important;
     box-sizing: border-box !important;
     align-items: center !important;
     justify-content: space-between !important;
+    background-color: var(--bg-primary) !important;
+    border-bottom: 1px solid var(--border-color) !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
+    z-index: 1001 !important;
   }
 
-  /* Ajustar el contenido principal para que no quede debajo del navbar */
+  /* Contenido principal debajo del navbar */
   .main-content {
-    margin-top: 60px !important;
+    margin-top: 64px !important;
+    margin-left: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    overflow-x: hidden !important;
+    box-sizing: border-box !important;
     padding-top: 0 !important;
   }
-  
-  /* Ajustar PageHeader para que quede debajo del navbar */
+
+  /* PageHeader fijo debajo del navbar */
   .page-header {
-    top: 60px !important;
-  }
-
-  /* Asegurar que no haya overflow horizontal */
-  body, html {
-    overflow-x: hidden !important;
-    max-width: 100vw !important;
-    margin: 0 !important;
-    padding: 0 !important;
+    display: block !important;
+    position: sticky !important;
+    top: 64px !important;
+    z-index: 100 !important;
     width: 100% !important;
-  }
-
-  * {
-    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 16px !important;
     box-sizing: border-box !important;
+    background-color: var(--bg-primary) !important;
+    border-bottom: 1px solid var(--border-color) !important;
+    opacity: 1 !important;
+    visibility: visible !important;
   }
 
   .mobile-menu-btn {
@@ -910,7 +928,7 @@ input, textarea, select {
   }
 
   /* Mejorar padding del sidebar en móvil */
-  .sidebar.mobile-dropdown-menu > nav {
+  .sidebar.mobile-dropdown-menu>nav {
     padding: 16px 12px !important;
     overflow-y: auto !important;
     overflow-x: hidden !important;
@@ -923,7 +941,7 @@ input, textarea, select {
     width: 100% !important;
     gap: 8px !important;
   }
-  
+
   /* Mejorar items de navegación en móvil */
   .sidebar.mobile-dropdown-menu nav a,
   .sidebar.mobile-dropdown-menu nav .mobile-nav-item-open {
@@ -935,7 +953,7 @@ input, textarea, select {
     overflow-wrap: break-word !important;
     white-space: normal !important;
   }
-  
+
   .sidebar.mobile-dropdown-menu nav a span:first-child {
     font-size: 22px !important;
     min-width: 28px !important;
@@ -947,7 +965,7 @@ input, textarea, select {
     box-sizing: border-box !important;
   }
 
-  .sidebar.mobile-dropdown-menu > * {
+  .sidebar.mobile-dropdown-menu>* {
     width: 100% !important;
     flex-shrink: 0 !important;
   }
@@ -960,7 +978,7 @@ input, textarea, select {
   }
 
   /* Mejorar secciones del sidebar */
-  .sidebar.mobile-dropdown-menu nav > div {
+  .sidebar.mobile-dropdown-menu nav>div {
     margin-bottom: clamp(0.75rem, 2vw, 1rem) !important;
     width: 100% !important;
     display: flex !important;
@@ -972,7 +990,7 @@ input, textarea, select {
   }
 
   /* Títulos de sección */
-  .sidebar.mobile-dropdown-menu nav > div > div:first-child {
+  .sidebar.mobile-dropdown-menu nav>div>div:first-child {
     padding: clamp(0.5rem, 1.5vw, 0.625rem) clamp(0.5rem, 2vw, 0.625rem) !important;
     font-size: clamp(0.625rem, 2vw, 0.6875rem) !important;
     text-transform: uppercase !important;
@@ -1053,7 +1071,7 @@ input, textarea, select {
     max-width: 100vw !important;
   }
 
-  .sidebar.mobile-dropdown-menu > div:first-child {
+  .sidebar.mobile-dropdown-menu>div:first-child {
     padding: clamp(0.75rem, 3vw, 0.875rem) clamp(0.625rem, 2.5vw, 0.75rem) !important;
   }
 
@@ -1103,23 +1121,7 @@ input, textarea, select {
     min-width: 44px !important;
   }
 
-  /* PageHeader responsive - Visible en móvil con ajustes */
-  .page-header {
-    display: block !important;
-    visibility: visible !important;
-    opacity: 1 !important;
-    padding: 16px !important;
-    position: sticky !important;
-    top: 0 !important;
-    z-index: 100 !important;
-    background-color: var(--bg-primary) !important;
-    border-bottom: 1px solid var(--border-color) !important;
-    height: auto !important;
-    width: 100% !important;
-    max-width: 100% !important;
-    pointer-events: auto !important;
-    user-select: auto !important;
-  }
+  /* PageHeader - ajustes secundarios (estructura interna) */
 
   .page-header-content {
     flex-direction: column !important;
@@ -1140,7 +1142,7 @@ input, textarea, select {
     -webkit-overflow-scrolling: touch !important;
   }
 
-  .page-header-actions > div {
+  .page-header-actions>div {
     flex-wrap: nowrap !important;
     display: flex !important;
     gap: 8px !important;
@@ -1148,7 +1150,7 @@ input, textarea, select {
     -webkit-overflow-scrolling: touch !important;
   }
 
-  .page-header-actions > * {
+  .page-header-actions>* {
     flex-shrink: 0 !important;
     min-width: auto !important;
   }
@@ -1179,14 +1181,15 @@ input, textarea, select {
     padding-bottom: 8px !important;
   }
 
-  .kanban-board > div {
+  .kanban-board>div {
     min-width: 280px !important;
     max-width: 280px !important;
     flex-shrink: 0 !important;
   }
 
   /* Prevenir overflow en todos los contenedores */
-  body, html {
+  body,
+  html {
     overflow-x: hidden !important;
     width: 100% !important;
     max-width: 100vw !important;
@@ -1207,7 +1210,7 @@ input, textarea, select {
   }
 
   /* ===== ESTILOS RESPONSIVE PARA PÁGINAS ESPECÍFICAS ===== */
-  
+
   /* Página de Notas - Canvas interactivo */
   [style*="position: relative"][style*="min-height: calc(100vh - 200px)"] {
     min-height: calc(100vh - 150px) !important;
@@ -1228,7 +1231,7 @@ input, textarea, select {
   }
 
   /* Contenedor de notas en móvil - cambiar a columna */
-  [style*="position: relative"][style*="min-height"] > div[style*="position: absolute"] {
+  [style*="position: relative"][style*="min-height"]>div[style*="position: absolute"] {
     position: relative !important;
     left: auto !important;
     top: auto !important;
@@ -1277,7 +1280,7 @@ input, textarea, select {
     max-width: 100% !important;
   }
 
-  form > div {
+  form>div {
     width: 100% !important;
     margin-bottom: clamp(0.75rem, 2vw, 1rem) !important;
   }
@@ -1308,7 +1311,7 @@ input, textarea, select {
   }
 
   /* Listas de notificaciones */
-  [style*="display: flex"][style*="flex-direction: column"] > div {
+  [style*="display: flex"][style*="flex-direction: column"]>div {
     width: 100% !important;
     margin-bottom: clamp(0.5rem, 1.5vw, 0.75rem) !important;
   }
@@ -1464,7 +1467,7 @@ input, textarea, select {
 
   /* Board - Mejorar columnas kanban */
   .kanban-column,
-  .kanban-board > div {
+  .kanban-board>div {
     min-width: 240px !important;
     max-width: 240px !important;
   }
@@ -1475,7 +1478,7 @@ input, textarea, select {
     gap: 12px !important;
   }
 
-  [style*="gridTemplateColumns: repeat(auto-fit"][style*="minmax(150px"] > * {
+  [style*="gridTemplateColumns: repeat(auto-fit"][style*="minmax(150px"]>* {
     padding: 12px !important;
   }
 
@@ -1495,7 +1498,7 @@ input, textarea, select {
     display: flex !important;
   }
 
-  .page-header-actions > div {
+  .page-header-actions>div {
     flex-direction: row !important;
     flex-wrap: nowrap !important;
     display: flex !important;
@@ -1603,7 +1606,7 @@ input, textarea, select {
   }
 
   /* Notifications - Lista de notificaciones */
-  [style*="display: flex"][style*="flex-direction: column"] > div[style*="padding"] {
+  [style*="display: flex"][style*="flex-direction: column"]>div[style*="padding"] {
     padding: 12px !important;
     margin-bottom: 8px !important;
   }
@@ -1632,7 +1635,8 @@ input, textarea, select {
   input[type="date"],
   textarea,
   select {
-    font-size: 16px !important; /* Evitar zoom en iOS */
+    font-size: 16px !important;
+    /* Evitar zoom en iOS */
     padding: 10px !important;
     width: 100% !important;
     max-width: 100% !important;
@@ -1675,7 +1679,18 @@ input, textarea, select {
   }
 
   /* Asegurar que los textos no se desborden */
-  h1, h2, h3, h4, h5, h6, p, span, div, label, button, a {
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6,
+  p,
+  span,
+  div,
+  label,
+  button,
+  a {
     word-wrap: break-word !important;
     overflow-wrap: break-word !important;
     hyphens: auto !important;
@@ -1683,7 +1698,9 @@ input, textarea, select {
   }
 
   /* Mejorar botones para móvil */
-  button, .btn, [role="button"] {
+  button,
+  .btn,
+  [role="button"] {
     min-height: 44px !important;
     min-width: 44px !important;
     touch-action: manipulation !important;
@@ -1692,14 +1709,18 @@ input, textarea, select {
   }
 
   /* Mejorar inputs para móvil */
-  input, textarea, select {
-    font-size: 16px !important; /* Evitar zoom en iOS */
+  input,
+  textarea,
+  select {
+    font-size: 16px !important;
+    /* Evitar zoom en iOS */
     min-height: 44px !important;
     padding: 12px 16px !important;
   }
 
   /* Mejorar cards para móvil */
-  .card, [class*="Card"] {
+  .card,
+  [class*="Card"] {
     margin-bottom: 12px !important;
     padding: 16px !important;
   }
@@ -1714,7 +1735,8 @@ input, textarea, select {
     padding: 16px 12px !important;
   }
 
-  [style*="gap: 20px"], [style*="gap: 16px"] {
+  [style*="gap: 20px"],
+  [style*="gap: 16px"] {
     gap: 12px !important;
   }
 
@@ -1785,17 +1807,17 @@ input, textarea, select {
     display: flex !important;
     flex-direction: column !important;
   }
-  
+
   /* Optimización para móvil vertical */
   @media (max-width: 767.98px) and (orientation: portrait) {
     .create-task-modal-content {
       padding: 12px 10px !important;
     }
-    
+
     .create-task-modal-content form {
       gap: 14px !important;
     }
-    
+
     .create-task-modal-content input,
     .create-task-modal-content textarea,
     .create-task-modal-content select {
