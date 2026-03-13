@@ -828,12 +828,7 @@ select {
 
   /* Navbar global de la app (similar al landing) */
   .app-nav {
-    position: sticky;
-    top: 0;
-    z-index: 1000;
     background: rgba(10, 10, 10, 0.96);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
     border-bottom: 1px solid var(--border-color);
     box-shadow: 0 2px 12px rgba(0, 0, 0, 0.4);
   }
