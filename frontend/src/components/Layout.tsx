@@ -948,8 +948,8 @@ export default function Layout({ children, organizationId, usageType: propUsageT
         </nav>
       </aside>
 
-      {/* Main Content */}
-      <main
+            {/* Main Content */}
+            <main
         className="main-content"
         style={{
           flex: 1,
@@ -965,6 +965,7 @@ export default function Layout({ children, organizationId, usageType: propUsageT
         {children}
       </main>
     </div>
+  </div>
   );
 }
 
