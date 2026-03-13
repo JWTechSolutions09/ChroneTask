@@ -274,8 +274,7 @@ export default function Layout({ children, organizationId, usageType: propUsageT
   return (
     <div style={{ display: "flex", minHeight: "100vh", backgroundColor: "var(--bg-secondary)", position: "relative", flexDirection: "column" }}>
       {/* Barra superior global de la aplicación (similar al landing) */}
-      <AppNavbar />
-
+      {isMobile && <AppNavbar />}
       {/* Contenedor principal con sidebar + contenido */}
       <div style={{ display: "flex", flex: 1, position: "relative" }}>
 
