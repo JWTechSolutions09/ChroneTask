@@ -826,29 +826,14 @@ select {
     overflow-x: hidden;
   }
 
-  /* Mobile Navbar - ancho completo y altura fija */
+  /* Mobile Navbar - eliminado (no se usa) */
   .mobile-navbar {
-    display: flex !important;
-    position: fixed !important;
-    top: 0 !important;
-    left: 0 !important;
-    right: 0 !important;
-    width: 100% !important;
-    max-width: 100% !important;
-    height: 64px !important;
-    padding: 0 16px !important;
-    box-sizing: border-box !important;
-    align-items: center !important;
-    justify-content: space-between !important;
-    background-color: var(--bg-primary) !important;
-    border-bottom: 1px solid var(--border-color) !important;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
-    z-index: 1001 !important;
+    display: none !important;
   }
 
-  /* Contenido principal debajo del navbar */
+  /* Contenido principal sin offset extra (solo PageHeader) */
   .main-content {
-    margin-top: 64px !important;
+    margin-top: 0 !important;
     margin-left: 0 !important;
     width: 100% !important;
     max-width: 100% !important;
@@ -857,11 +842,11 @@ select {
     padding-top: 0 !important;
   }
 
-  /* PageHeader fijo debajo del navbar */
+  /* PageHeader en la parte superior (como antes) */
   .page-header {
     display: block !important;
     position: sticky !important;
-    top: 64px !important;
+    top: 0 !important;
     z-index: 100 !important;
     width: 100% !important;
     margin: 0 !important;
