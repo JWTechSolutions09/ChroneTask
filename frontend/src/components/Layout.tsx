@@ -280,38 +280,41 @@ export default function Layout({ children, organizationId, usageType: propUsageT
 
       {/* Sidebar / Mobile Dropdown Menu */}
       <aside
-        style={{
-          // En desktop, usar estos estilos
-          ...(!isMobile && {
-            width: effectiveCollapsed ? "70px" : "280px",
-            position: "sticky",
-            height: "100vh",
-            borderRight: "1px solid var(--border-color)",
-            transition: "width 0.3s ease",
-          }),
-          // En móvil, ocultar completamente
-          ...(isMobile && {
-            display: "none",
-            visibility: "hidden",
-            opacity: 0,
-            height: 0,
-            width: 0,
-            overflow: "hidden",
-            position: "absolute",
-            top: "-9999px",
-            left: "-9999px",
-            pointerEvents: "none",
-          }),
-          backgroundColor: "var(--bg-primary)",
-          display: "flex",
-          flexDirection: "column",
-          top: 0,
-          overflowY: "auto",
-          overflowX: "hidden",
-          boxShadow: theme === "dark" ? "2px 0 8px rgba(0, 0, 0, 0.3)" : "2px 0 8px rgba(0, 0, 0, 0.05)",
-          zIndex: 100,
-        }}
-        className={`sidebar ${sidebarOpen ? "open" : ""} mobile-dropdown-menu`}
+  style={{
+    backgroundColor: "var(--bg-primary)",
+    flexDirection: "column",
+    top: 0,
+    overflowY: "auto",
+    overflowX: "hidden",
+    boxShadow: theme === "dark"
+      ? "2px 0 8px rgba(0, 0, 0, 0.3)"
+      : "2px 0 8px rgba(0, 0, 0, 0.05)",
+    zIndex: 100,
+
+    ...(!isMobile && {
+      display: "flex",
+      width: effectiveCollapsed ? "70px" : "280px",
+      position: "sticky",
+      height: "100vh",
+      borderRight: "1px solid var(--border-color)",
+      transition: "width 0.3s ease",
+    }),
+
+    ...(isMobile && {
+      display: "none",
+      visibility: "hidden",
+      opacity: 0,
+      height: 0,
+      width: 0,
+      overflow: "hidden",
+      position: "absolute",
+      top: "-9999px",
+      left: "-9999px",
+      pointerEvents: "none",
+    }),
+  }}
+  className={`sidebar ${sidebarOpen ? "open" : ""} mobile-dropdown-menu`}
+
         onClick={(e) => {
           // Prevenir que el clic en el sidebar cierre el menú
           e.stopPropagation();
