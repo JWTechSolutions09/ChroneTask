@@ -1254,18 +1254,21 @@ select {
   }
 
   .kanban-board>div {
-    min-width: 300px !important;
-    max-width: 300px !important;
-    width: 300px !important;
+    min-width: 340px !important;
+    max-width: 340px !important;
+    width: 340px !important;
     flex-shrink: 0 !important;
+    padding: 10px !important;
+    box-sizing: border-box !important;
   }
 
   /* Tarjetas de tareas en móvil */
   .kanban-board .hover-lift {
-    padding: 14px !important;
+    padding: 12px !important;
     margin-bottom: 10px !important;
     width: 100% !important;
     min-width: 0 !important;
+    max-width: 100% !important;
     box-sizing: border-box !important;
   }
 

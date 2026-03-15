@@ -136,10 +136,13 @@ export default function TimeTracker({
         display: "flex",
         flexDirection: "column",
         gap: isMobile ? "10px" : "8px",
-        padding: isMobile ? "12px" : "8px",
+        padding: isMobile ? "10px" : "8px",
         backgroundColor: isRunning ? "rgba(0, 123, 255, 0.1)" : "var(--bg-secondary)",
         borderRadius: "8px",
         border: isRunning ? "1px solid #007bff" : "1px solid #dee2e6",
+        width: "100%",
+        minWidth: 0,
+        boxSizing: "border-box",
       }}
     >
       {error && (
@@ -159,8 +162,10 @@ export default function TimeTracker({
       <div style={{ 
         display: "flex", 
         alignItems: "center", 
-        gap: isMobile ? "12px" : "8px",
+        gap: isMobile ? "10px" : "8px",
         flexWrap: isMobile ? "wrap" : "nowrap",
+        width: "100%",
+        minWidth: 0,
       }}>
         {isRunning ? (
           <>
@@ -190,18 +195,19 @@ export default function TimeTracker({
               disabled={loading}
               style={{
                 marginLeft: isMobile ? "0" : "auto",
-                padding: isMobile ? "10px 16px" : "4px 8px",
-                fontSize: isMobile ? "13px" : "11px",
+                padding: isMobile ? "12px 16px" : "4px 8px",
+                fontSize: isMobile ? "14px" : "11px",
                 backgroundColor: "#dc3545",
                 color: "white",
                 border: "none",
-                borderRadius: "6px",
+                borderRadius: "8px",
                 cursor: loading ? "not-allowed" : "pointer",
                 fontWeight: 600,
                 minHeight: isMobile ? "44px" : "auto",
-                minWidth: isMobile ? "100px" : "auto",
                 width: isMobile ? "100%" : "auto",
                 flex: isMobile ? "1 1 100%" : "0 0 auto",
+                boxSizing: "border-box",
+                whiteSpace: "nowrap",
               }}
             >
               {loading ? "..." : "⏹ Detener"}
@@ -221,18 +227,19 @@ export default function TimeTracker({
               disabled={loading}
               style={{
                 marginLeft: isMobile ? "0" : "auto",
-                padding: isMobile ? "10px 16px" : "4px 8px",
-                fontSize: isMobile ? "13px" : "11px",
+                padding: isMobile ? "12px 16px" : "4px 8px",
+                fontSize: isMobile ? "14px" : "11px",
                 backgroundColor: "#28a745",
                 color: "white",
                 border: "none",
-                borderRadius: "6px",
+                borderRadius: "8px",
                 cursor: loading ? "not-allowed" : "pointer",
                 fontWeight: 600,
                 minHeight: isMobile ? "44px" : "auto",
-                minWidth: isMobile ? "100px" : "auto",
                 width: isMobile ? "100%" : "auto",
                 flex: isMobile ? "1 1 100%" : "0 0 auto",
+                boxSizing: "border-box",
+                whiteSpace: "nowrap",
               }}
             >
               {loading ? "..." : "▶ Iniciar"}

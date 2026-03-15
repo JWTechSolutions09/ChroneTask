@@ -561,15 +561,16 @@ export default function Board() {
                     style={{
                       backgroundColor: "var(--bg-primary)",
                       borderRadius: "12px",
-                      padding: isMobile ? "12px" : "16px",
+                      padding: isMobile ? "10px" : "16px",
                       minHeight: isMobile ? "400px" : "600px",
-                      minWidth: isMobile ? "300px" : "auto",
-                      maxWidth: isMobile ? "300px" : "none",
-                      width: isMobile ? "300px" : "auto",
+                      minWidth: isMobile ? "340px" : "auto",
+                      maxWidth: isMobile ? "340px" : "none",
+                      width: isMobile ? "340px" : "auto",
                       boxShadow: "0 2px 8px 0 rgba(0, 0, 0, 0.08)",
                       border: touchTarget === status ? `2px solid ${statusColor}` : "1px solid var(--border-color)",
                       transition: "all 0.2s ease",
                       flexShrink: 0,
+                      boxSizing: "border-box",
                     }}
                     onDragOver={!isMobile ? handleDragOver : undefined}
                     onDrop={!isMobile ? (e) => handleDrop(e, status) : undefined}
@@ -648,7 +649,7 @@ export default function Board() {
                           onTouchEnd={handleTouchEnd}
                           className="hover-lift fade-in"
                           style={{
-                            padding: isMobile ? "14px" : "14px",
+                            padding: isMobile ? "12px" : "14px",
                             borderLeft: `4px solid ${STATUS_COLORS[task.status] || "#6c757d"}`,
                             cursor: isMobile ? "pointer" : "grab",
                             backgroundColor: "var(--bg-primary)",
@@ -661,6 +662,7 @@ export default function Board() {
                             userSelect: "none",
                             width: "100%",
                             minWidth: 0,
+                            maxWidth: "100%",
                             boxSizing: "border-box",
                           }}
                           onMouseEnter={!isMobile ? (e) => {
