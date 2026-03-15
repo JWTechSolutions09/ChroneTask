@@ -914,7 +914,7 @@ export default function Board() {
                                     changeTaskStatus(task.id, getNextStatus(task.status)!);
                                   }}
                                   style={{
-                                    padding: isMobile ? "10px 14px" : "6px 10px",
+                                    padding: isMobile ? "8px 14px" : "6px 10px",
                                     fontSize: isMobile ? "13px" : "11px",
                                     fontWeight: 600,
                                     border: "none",
@@ -929,7 +929,7 @@ export default function Board() {
                                     gap: "6px",
                                     flex: isMobile ? "1 1 100%" : 1,
                                     minWidth: isMobile ? "100%" : "90px",
-                                    minHeight: isMobile ? "40px" : "auto",
+                                    minHeight: isMobile ? "36px" : "auto",
                                     width: isMobile ? "100%" : "auto",
                                   }}
                                   onMouseEnter={(e) => {
@@ -953,7 +953,7 @@ export default function Board() {
                                     changeTaskStatus(task.id, "Done");
                                   }}
                                   style={{
-                                    padding: isMobile ? "10px 14px" : "6px 10px",
+                                    padding: isMobile ? "8px 14px" : "6px 10px",
                                     fontSize: isMobile ? "13px" : "11px",
                                     fontWeight: 600,
                                     border: "none",
@@ -966,7 +966,7 @@ export default function Board() {
                                     alignItems: "center",
                                     justifyContent: "center",
                                     gap: "6px",
-                                    minHeight: isMobile ? "40px" : "auto",
+                                    minHeight: isMobile ? "36px" : "auto",
                                     width: isMobile ? "100%" : "auto",
                                     flex: isMobile ? "1 1 100%" : "0 0 auto",
                                   }}
