@@ -55,7 +55,7 @@ export default function Landing() {
       });
     }, observerOptions);
 
-    const elements = document.querySelectorAll(".feature-card, .benefit-item, .step-card");
+    const elements = document.querySelectorAll(".feature-card, .benefit-item, .step-card, .detailed-feature-item");
     elements.forEach((el) => {
       observer.observe(el);
     });
@@ -232,6 +232,146 @@ export default function Landing() {
               <p>
                 Configura alertas automáticas y recibe avisos cuando se acerquen los plazos límite. Cumple siempre a tiempo con tus compromisos.
               </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Detailed Features Showcase Section */}
+      <section className="detailed-features-section">
+        <div className="section-container">
+          <div className="section-header">
+            <h2 className="section-title">Descubre todas nuestras funcionalidades</h2>
+            <p className="section-subtitle">
+              Herramientas diseñadas para potenciar la productividad de tu equipo
+            </p>
+          </div>
+          
+          <div className="detailed-features-grid">
+            <div className="detailed-feature-item">
+              <div className="detailed-feature-image">
+                <img src="/Calendario.png" alt="Calendario" />
+              </div>
+              <div className="detailed-feature-content">
+                <h3>Calendario Inteligente</h3>
+                <p>
+                  Visualiza y gestiona todos tus eventos, reuniones y plazos en un calendario intuitivo. 
+                  Sincroniza con tus proyectos y nunca pierdas una fecha importante. Organiza tu tiempo 
+                  de manera eficiente y mantén a tu equipo siempre alineado.
+                </p>
+              </div>
+            </div>
+
+            <div className="detailed-feature-item">
+              <div className="detailed-feature-image">
+                <img src="/Gestiondetareas.png" alt="Gestión de Tareas" />
+              </div>
+              <div className="detailed-feature-content">
+                <h3>Gestión de Tareas Avanzada</h3>
+                <p>
+                  Crea, asigna y rastrea tareas con facilidad. Organiza tus proyectos con listas, 
+                  etiquetas y prioridades. Visualiza el progreso en tiempo real y asegúrate de que 
+                  cada miembro del equipo sepa exactamente qué hacer y cuándo hacerlo.
+                </p>
+              </div>
+            </div>
+
+            <div className="detailed-feature-item">
+              <div className="detailed-feature-image">
+                <img src="/Gestiondemiembros.png" alt="Gestión de Miembros" />
+              </div>
+              <div className="detailed-feature-content">
+                <h3>Gestión de Miembros</h3>
+                <p>
+                  Administra tu equipo con herramientas poderosas. Asigna roles, gestiona permisos 
+                  y mantén un control total sobre quién puede acceder a qué. Facilita la colaboración 
+                  mientras mantienes la seguridad y organización de tu proyecto.
+                </p>
+              </div>
+            </div>
+
+            <div className="detailed-feature-item">
+              <div className="detailed-feature-image">
+                <img src="/Invitacion de miembros .png" alt="Invitación de Miembros" />
+              </div>
+              <div className="detailed-feature-content">
+                <h3>Invitación de Miembros</h3>
+                <p>
+                  Invita a nuevos miembros a tu equipo con un solo clic. El proceso es rápido, 
+                  seguro y personalizable. Define roles desde el inicio y haz que la incorporación 
+                  de nuevos colaboradores sea tan simple como enviar un enlace.
+                </p>
+              </div>
+            </div>
+
+            <div className="detailed-feature-item">
+              <div className="detailed-feature-image">
+                <img src="/Comentariosinteractivosenlastareas.png" alt="Comentarios Interactivos" />
+              </div>
+              <div className="detailed-feature-content">
+                <h3>Comentarios Interactivos en las Tareas</h3>
+                <p>
+                  Fomenta la comunicación directa en cada tarea. Comenta, menciona miembros, 
+                  adjunta archivos y mantén conversaciones contextualizadas. Toda la información 
+                  relevante queda registrada donde realmente importa.
+                </p>
+              </div>
+            </div>
+
+            <div className="detailed-feature-item">
+              <div className="detailed-feature-image">
+                <img src="/Resumenyanaliticas.png" alt="Resumen y Analíticas" />
+              </div>
+              <div className="detailed-feature-content">
+                <h3>Resumen y Analíticas</h3>
+                <p>
+                  Toma decisiones basadas en datos reales. Visualiza el rendimiento de tu equipo, 
+                  identifica cuellos de botella y celebra los logros. Gráficos claros y reportes 
+                  detallados te ayudan a optimizar continuamente tu flujo de trabajo.
+                </p>
+              </div>
+            </div>
+
+            <div className="detailed-feature-item">
+              <div className="detailed-feature-image">
+                <img src="/Notasdelproyecto.png" alt="Notas del Proyecto" />
+              </div>
+              <div className="detailed-feature-content">
+                <h3>Notas del Proyecto</h3>
+                <p>
+                  Documenta ideas, decisiones y contexto importante directamente en tus proyectos. 
+                  Mantén toda la información relevante organizada y accesible para todo el equipo. 
+                  Las notas colaborativas hacen que el conocimiento fluya sin fricciones.
+                </p>
+              </div>
+            </div>
+
+            <div className="detailed-feature-item">
+              <div className="detailed-feature-image">
+                <img src="/Notaspersonales.png" alt="Notas Personales" />
+              </div>
+              <div className="detailed-feature-content">
+                <h3>Notas Personales</h3>
+                <p>
+                  Organiza tus pensamientos, recordatorios y tareas personales en un espacio privado. 
+                  Mantén tus notas personales separadas pero accesibles, y gestiona tanto tu trabajo 
+                  en equipo como tus responsabilidades individuales desde un solo lugar.
+                </p>
+              </div>
+            </div>
+
+            <div className="detailed-feature-item">
+              <div className="detailed-feature-image">
+                <img src="/Panelnotificaciones.png" alt="Panel de Notificaciones" />
+              </div>
+              <div className="detailed-feature-content">
+                <h3>Panel de Notificaciones</h3>
+                <p>
+                  Mantente al día con todo lo que importa. Recibe alertas personalizadas sobre 
+                  cambios, comentarios, asignaciones y recordatorios. Un centro de notificaciones 
+                  inteligente que te ayuda a priorizar y no perderte nada importante.
+                </p>
+              </div>
             </div>
           </div>
         </div>
