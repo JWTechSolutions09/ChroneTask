@@ -47,10 +47,10 @@
   --bg-primary: #1e1e1e;
   --bg-secondary: #2a2a2a;
   --bg-tertiary: #353535;
-  /* Textos mejorados para máxima legibilidad */
+  /* Textos mejorados para máxima legibilidad - Aumentar contraste */
   --text-primary: #ffffff;
-  --text-secondary: #d0d0d0;
-  --text-tertiary: #a0a0a0;
+  --text-secondary: #e0e0e0;
+  --text-tertiary: #b0b0b0;
   /* Bordes más visibles */
   --border-color: #404040;
   --hover-bg: #353535;
@@ -211,8 +211,12 @@ code {
 }
 
 .btn:disabled {
-  opacity: 0.6;
+  opacity: 0.8;
   cursor: not-allowed;
+}
+
+[data-theme="dark"] .btn:disabled {
+  opacity: 0.9;
 }
 
 .input {
@@ -326,7 +330,7 @@ code {
 .empty-state-icon {
   font-size: 48px;
   margin-bottom: 16px;
-  opacity: 0.5;
+  opacity: 0.7;
 }
 
 .card-hover {
@@ -502,7 +506,7 @@ a:hover {
 [data-theme="dark"] .input::placeholder,
 [data-theme="dark"] .textarea::placeholder {
   color: var(--text-tertiary);
-  opacity: 0.8;
+  opacity: 1;
 }
 
 /* Mejorar contraste de links en modo oscuro */

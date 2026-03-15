@@ -28,7 +28,7 @@ type CommentAttachment = {
 };
 
 type ProjectCommentsPanelProps = {
-  organizationId: string;
+  organizationId?: string;
   projectId: string;
   projectName: string;
   isOpen: boolean;
@@ -58,7 +58,10 @@ export default function ProjectCommentsPanel({
     if (!isOpen) return;
     setLoading(true);
     try {
-      const res = await http.get(`/api/orgs/${organizationId}/projects/${projectId}/comments`);
+      const endpoint = organizationId 
+        ? `/api/orgs/${organizationId}/projects/${projectId}/comments`
+        : `/api/users/me/projects/${projectId}/comments`;
+      const res = await http.get(endpoint);
       setComments(res.data || []);
     } catch (ex: any) {
       const errorMsg = ex?.response?.data?.message ?? ex.message ?? "Error cargando comentarios";
@@ -100,7 +103,11 @@ export default function ProjectCommentsPanel({
         fileSize: file.size,
       }));
 
-      await http.post(`/api/orgs/${organizationId}/projects/${projectId}/comments`, {
+      const endpoint = organizationId 
+        ? `/api/orgs/${organizationId}/projects/${projectId}/comments`
+        : `/api/users/me/projects/${projectId}/comments`;
+      
+      await http.post(endpoint, {
         content: newComment.trim(),
         isPinned,
         color: selectedColor || undefined,

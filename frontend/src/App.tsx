@@ -224,6 +224,22 @@ function AppContent() {
                 }
             />
             <Route
+                path="/personal/project/:projectId/timeline"
+                element={
+                    <PrivateRoute>
+                        <Timeline />
+                    </PrivateRoute>
+                }
+            />
+            <Route
+                path="/personal/project/:projectId/notes"
+                element={
+                    <PrivateRoute>
+                        <Notes />
+                    </PrivateRoute>
+                }
+            />
+            <Route
                 path="/personal/timeline"
                 element={
                     <PrivateRoute>

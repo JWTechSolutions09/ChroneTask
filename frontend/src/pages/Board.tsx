@@ -364,40 +364,48 @@ export default function Board() {
               width: "100%",
               justifyContent: isMobile ? "center" : "flex-start",
             }}>
-              {!isMobile && (
-                <>
-                  <Button variant="secondary" onClick={() => setShowCommentsPanel(true)}>
-                    💬 Comentarios
-                  </Button>
-                  {!isPersonalMode && !isPersonalRoute && organizationId && (
-                    <Button variant="secondary" onClick={() => setShowMemberModal(true)}>
-                      👥 Miembros
-                    </Button>
-                  )}
-                  <Button
-                    variant="secondary"
-                    onClick={() => {
-                      const basePath = isPersonalMode || isPersonalRoute 
-                        ? `/personal/project/${projectId}` 
-                        : `/org/${organizationId}/project/${projectId}`;
-                      window.location.href = `${basePath}/notes`;
-                    }}
-                  >
-                    📝 Notas
-                  </Button>
-                  <Button
-                    variant="secondary"
-                    onClick={() => {
-                      const basePath = isPersonalMode || isPersonalRoute 
-                        ? `/personal/project/${projectId}` 
-                        : `/org/${organizationId}/project/${projectId}`;
-                      window.location.href = `${basePath}/timeline`;
-                    }}
-                  >
-                    📅 Cronograma
-                  </Button>
-                </>
+              <Button 
+                variant="secondary" 
+                onClick={() => setShowCommentsPanel(true)}
+                style={isMobile ? { fontSize: "12px", padding: "8px 12px" } : {}}
+              >
+                {isMobile ? "💬" : "💬 Comentarios"}
+              </Button>
+              {!isPersonalMode && !isPersonalRoute && organizationId && (
+                <Button 
+                  variant="secondary" 
+                  onClick={() => setShowMemberModal(true)}
+                  style={isMobile ? { fontSize: "12px", padding: "8px 12px" } : {}}
+                >
+                  {isMobile ? "👥" : "👥 Miembros"}
+                </Button>
               )}
+              <Button
+                variant="secondary"
+                onClick={() => {
+                  if (isPersonalMode || isPersonalRoute) {
+                    navigate(`/personal/project/${projectId}/notes`);
+                  } else if (organizationId && projectId) {
+                    navigate(`/org/${organizationId}/project/${projectId}/notes`);
+                  }
+                }}
+                style={isMobile ? { fontSize: "12px", padding: "8px 12px" } : {}}
+              >
+                {isMobile ? "📝" : "📝 Notas"}
+              </Button>
+              <Button
+                variant="secondary"
+                onClick={() => {
+                  if (isPersonalMode || isPersonalRoute) {
+                    navigate(`/personal/project/${projectId}/timeline`);
+                  } else if (organizationId && projectId) {
+                    navigate(`/org/${organizationId}/project/${projectId}/timeline`);
+                  }
+                }}
+                style={isMobile ? { fontSize: "12px", padding: "8px 12px" } : {}}
+              >
+                {isMobile ? "📅" : "📅 Cronograma"}
+              </Button>
               <Button 
                 variant="primary" 
                 onClick={() => {
@@ -693,13 +701,15 @@ export default function Board() {
                                       onBlur={() => setAssigningTaskId(null)}
                                       autoFocus
                                       style={{
-                                        padding: "4px 8px",
-                                        fontSize: "11px",
+                                        padding: isMobile ? "8px 12px" : "4px 8px",
+                                        fontSize: isMobile ? "14px" : "11px",
                                         border: "1px solid #007bff",
                                         borderRadius: "6px",
                                         backgroundColor: "var(--bg-primary)",
+                                        color: "var(--text-primary)",
                                         cursor: "pointer",
-                                        minWidth: "120px",
+                                        minWidth: isMobile ? "140px" : "120px",
+                                        minHeight: isMobile ? "44px" : "auto",
                                       }}
                                       onClick={(e) => e.stopPropagation()}
                                     >
@@ -721,9 +731,11 @@ export default function Board() {
                                         display: "flex",
                                         alignItems: "center",
                                         gap: "6px",
-                                        padding: "4px 8px",
+                                        padding: isMobile ? "8px 12px" : "4px 8px",
                                         borderRadius: "6px",
                                         transition: "background-color 0.2s",
+                                        minHeight: isMobile ? "44px" : "auto",
+                                        minWidth: isMobile ? "44px" : "auto",
                                       }}
                                       onMouseEnter={(e) => {
                                         e.currentTarget.style.backgroundColor = "var(--hover-bg)";
@@ -787,8 +799,8 @@ export default function Board() {
                                     changeTaskStatus(task.id, getPreviousStatus(task.status)!);
                                   }}
                                   style={{
-                                    padding: "6px 10px",
-                                    fontSize: "11px",
+                                    padding: isMobile ? "8px 12px" : "6px 10px",
+                                    fontSize: isMobile ? "12px" : "11px",
                                     fontWeight: 600,
                                     border: "none",
                                     borderRadius: "6px",
@@ -799,6 +811,8 @@ export default function Board() {
                                     display: "flex",
                                     alignItems: "center",
                                     gap: "4px",
+                                    minHeight: isMobile ? "44px" : "auto",
+                                    minWidth: isMobile ? "44px" : "auto",
                                   }}
                                   onMouseEnter={(e) => {
                                     e.currentTarget.style.backgroundColor = "var(--border-color)";
@@ -821,8 +835,8 @@ export default function Board() {
                                     changeTaskStatus(task.id, getNextStatus(task.status)!);
                                   }}
                                   style={{
-                                    padding: "6px 10px",
-                                    fontSize: "11px",
+                                    padding: isMobile ? "8px 12px" : "6px 10px",
+                                    fontSize: isMobile ? "12px" : "11px",
                                     fontWeight: 600,
                                     border: "none",
                                     borderRadius: "6px",
@@ -834,7 +848,8 @@ export default function Board() {
                                     alignItems: "center",
                                     gap: "4px",
                                     flex: 1,
-                                    minWidth: "90px",
+                                    minWidth: isMobile ? "100px" : "90px",
+                                    minHeight: isMobile ? "44px" : "auto",
                                     justifyContent: "center",
                                   }}
                                   onMouseEnter={(e) => {
@@ -858,8 +873,8 @@ export default function Board() {
                                     changeTaskStatus(task.id, "Done");
                                   }}
                                   style={{
-                                    padding: "6px 10px",
-                                    fontSize: "11px",
+                                    padding: isMobile ? "8px 12px" : "6px 10px",
+                                    fontSize: isMobile ? "12px" : "11px",
                                     fontWeight: 600,
                                     border: "none",
                                     borderRadius: "6px",
@@ -870,6 +885,8 @@ export default function Board() {
                                     display: "flex",
                                     alignItems: "center",
                                     gap: "4px",
+                                    minHeight: isMobile ? "44px" : "auto",
+                                    minWidth: isMobile ? "44px" : "auto",
                                   }}
                                   onMouseEnter={(e) => {
                                     e.currentTarget.style.backgroundColor = "#218838";
@@ -945,9 +962,9 @@ export default function Board() {
             />
           )}
 
-          {showCommentsPanel && organizationId && projectId && (
+          {showCommentsPanel && projectId && (
             <ProjectCommentsPanel
-              organizationId={organizationId}
+              organizationId={isPersonalMode || isPersonalRoute ? undefined : organizationId}
               projectId={projectId}
               projectName={projectName || "Proyecto"}
               isOpen={showCommentsPanel}
@@ -955,11 +972,11 @@ export default function Board() {
             />
           )}
 
-          {selectedTask && organizationId && projectId && (
+          {selectedTask && projectId && (
             <TaskDetailModal
               task={selectedTask}
               projectId={projectId}
-              organizationId={organizationId}
+              organizationId={isPersonalMode || isPersonalRoute ? undefined : organizationId}
               isOpen={!!selectedTask}
               onClose={() => {
                 setSelectedTask(null);
