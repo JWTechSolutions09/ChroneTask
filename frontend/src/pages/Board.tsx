@@ -914,8 +914,8 @@ export default function Board() {
                                     changeTaskStatus(task.id, getNextStatus(task.status)!);
                                   }}
                                   style={{
-                                    padding: isMobile ? "12px 16px" : "6px 10px",
-                                    fontSize: isMobile ? "14px" : "11px",
+                                    padding: isMobile ? "10px 14px" : "6px 10px",
+                                    fontSize: isMobile ? "13px" : "11px",
                                     fontWeight: 600,
                                     border: "none",
                                     borderRadius: "8px",
@@ -929,7 +929,7 @@ export default function Board() {
                                     gap: "6px",
                                     flex: isMobile ? "1 1 100%" : 1,
                                     minWidth: isMobile ? "100%" : "90px",
-                                    minHeight: isMobile ? "44px" : "auto",
+                                    minHeight: isMobile ? "40px" : "auto",
                                     width: isMobile ? "100%" : "auto",
                                   }}
                                   onMouseEnter={(e) => {
@@ -953,8 +953,8 @@ export default function Board() {
                                     changeTaskStatus(task.id, "Done");
                                   }}
                                   style={{
-                                    padding: isMobile ? "10px 16px" : "6px 10px",
-                                    fontSize: isMobile ? "14px" : "11px",
+                                    padding: isMobile ? "10px 14px" : "6px 10px",
+                                    fontSize: isMobile ? "13px" : "11px",
                                     fontWeight: 600,
                                     border: "none",
                                     borderRadius: "8px",
@@ -966,7 +966,7 @@ export default function Board() {
                                     alignItems: "center",
                                     justifyContent: "center",
                                     gap: "6px",
-                                    minHeight: isMobile ? "44px" : "auto",
+                                    minHeight: isMobile ? "40px" : "auto",
                                     width: isMobile ? "100%" : "auto",
                                     flex: isMobile ? "1 1 100%" : "0 0 auto",
                                   }}

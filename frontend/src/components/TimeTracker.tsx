@@ -197,7 +197,7 @@ export default function TimeTracker({
               onClick={stopTimer}
               disabled={loading}
               style={{
-                padding: isMobile ? "8px 12px" : "4px 8px",
+                padding: isMobile ? "7px 10px" : "4px 8px",
                 fontSize: isMobile ? "12px" : "11px",
                 backgroundColor: "#dc3545",
                 color: "white",
@@ -205,7 +205,7 @@ export default function TimeTracker({
                 borderRadius: "6px",
                 cursor: loading ? "not-allowed" : "pointer",
                 fontWeight: 600,
-                minHeight: isMobile ? "36px" : "auto",
+                minHeight: isMobile ? "34px" : "auto",
                 flexShrink: 0,
                 boxSizing: "border-box",
                 whiteSpace: "nowrap",
@@ -232,7 +232,7 @@ export default function TimeTracker({
               onClick={startTimer}
               disabled={loading}
               style={{
-                padding: isMobile ? "8px 12px" : "4px 8px",
+                padding: isMobile ? "7px 10px" : "4px 8px",
                 fontSize: isMobile ? "12px" : "11px",
                 backgroundColor: "#28a745",
                 color: "white",
@@ -240,7 +240,7 @@ export default function TimeTracker({
                 borderRadius: "6px",
                 cursor: loading ? "not-allowed" : "pointer",
                 fontWeight: 600,
-                minHeight: isMobile ? "36px" : "auto",
+                minHeight: isMobile ? "34px" : "auto",
                 flexShrink: 0,
                 boxSizing: "border-box",
                 whiteSpace: "nowrap",
