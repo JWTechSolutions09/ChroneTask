@@ -55,7 +55,7 @@ type CommentReaction = {
 type TaskDetailModalProps = {
   task: Task;
   projectId: string;
-  organizationId: string;
+  organizationId?: string;
   isOpen: boolean;
   onClose: () => void;
   onTaskUpdate: () => void;

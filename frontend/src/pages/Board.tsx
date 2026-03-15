@@ -185,7 +185,7 @@ export default function Board() {
     e.preventDefault();
     const touch = e.changedTouches[0];
     const elementBelow = document.elementFromPoint(touch.clientX, touch.clientY);
-    
+
     if (elementBelow) {
       const statusColumn = elementBelow.closest('[data-status]');
       if (statusColumn) {
@@ -195,7 +195,7 @@ export default function Board() {
         }
       }
     }
-    
+
     setTouchStart(null);
     setTouchTarget(null);
   }, [isMobile, touchStart, handleStatusChange]);
@@ -306,7 +306,7 @@ export default function Board() {
       </Layout>
     );
   }
-  
+
   if (!isPersonalMode && !isPersonalRoute && !organizationId) {
     return (
       <Layout organizationId={organizationId}>
@@ -346,29 +346,29 @@ export default function Board() {
           breadcrumbs={
             isPersonalMode || isPersonalRoute
               ? [
-                  { label: "Mis Proyectos", to: "/personal/projects" },
-                  { label: projectName || "Board" },
-                ]
+                { label: "Mis Proyectos", to: "/personal/projects" },
+                { label: projectName || "Board" },
+              ]
               : [
-                  { label: t.organizations, to: "/org-select" },
-                  { label: "Dashboard", to: `/org/${organizationId}/dashboard` },
-                  { label: "Proyectos", to: `/org/${organizationId}/projects` },
-                  { label: projectName || "Board" },
-                ]
+                { label: t.organizations, to: "/org-select" },
+                { label: "Dashboard", to: `/org/${organizationId}/dashboard` },
+                { label: "Proyectos", to: `/org/${organizationId}/projects` },
+                { label: projectName || "Board" },
+              ]
           }
           actions={
-            <div style={{ 
-              display: "flex", 
-              gap: isMobile ? "10px" : "8px", 
-              flexWrap: isMobile ? "wrap" : "nowrap", 
+            <div style={{
+              display: "flex",
+              gap: isMobile ? "10px" : "8px",
+              flexWrap: isMobile ? "wrap" : "nowrap",
               width: "100%",
               justifyContent: isMobile ? "flex-start" : "flex-start",
             }}>
-              <Button 
-                variant="secondary" 
+              <Button
+                variant="secondary"
                 onClick={() => setShowCommentsPanel(true)}
-                style={isMobile ? { 
-                  fontSize: "14px", 
+                style={isMobile ? {
+                  fontSize: "14px",
                   padding: "12px 16px",
                   minHeight: "44px",
                   minWidth: "44px",
@@ -382,11 +382,11 @@ export default function Board() {
                 {isMobile ? "💬 Comentarios" : "💬 Comentarios"}
               </Button>
               {!isPersonalMode && !isPersonalRoute && organizationId && (
-                <Button 
-                  variant="secondary" 
+                <Button
+                  variant="secondary"
                   onClick={() => setShowMemberModal(true)}
-                  style={isMobile ? { 
-                    fontSize: "14px", 
+                  style={isMobile ? {
+                    fontSize: "14px",
                     padding: "12px 16px",
                     minHeight: "44px",
                     minWidth: "44px",
@@ -409,8 +409,8 @@ export default function Board() {
                     navigate(`/org/${organizationId}/project/${projectId}/notes`);
                   }
                 }}
-                style={isMobile ? { 
-                  fontSize: "14px", 
+                style={isMobile ? {
+                  fontSize: "14px",
                   padding: "12px 16px",
                   minHeight: "44px",
                   minWidth: "44px",
@@ -432,8 +432,8 @@ export default function Board() {
                     navigate(`/org/${organizationId}/project/${projectId}/timeline`);
                   }
                 }}
-                style={isMobile ? { 
-                  fontSize: "14px", 
+                style={isMobile ? {
+                  fontSize: "14px",
                   padding: "12px 16px",
                   minHeight: "44px",
                   minWidth: "44px",
@@ -446,8 +446,8 @@ export default function Board() {
               >
                 {isMobile ? "📅 Cronograma" : "📅 Cronograma"}
               </Button>
-              <Button 
-                variant="primary" 
+              <Button
+                variant="primary"
                 onClick={() => {
                   if (isMobile && projectId) {
                     // En móvil, redirigir a la página de crear tarea
@@ -629,9 +629,9 @@ export default function Board() {
                     </div>
 
                     {/* Tasks */}
-                    <div style={{ 
-                      display: "flex", 
-                      flexDirection: "column", 
+                    <div style={{
+                      display: "flex",
+                      flexDirection: "column",
                       gap: isMobile ? "12px" : "12px",
                       minWidth: 0,
                       width: "100%",
@@ -664,7 +664,8 @@ export default function Board() {
                             minWidth: 0,
                             maxWidth: "100%",
                             boxSizing: "border-box",
-                            overflow: "hidden",
+                            overflow: "visible",
+                            height: "auto",
                           }}
                           onMouseEnter={!isMobile ? (e) => {
                             e.currentTarget.style.borderColor = STATUS_COLORS[task.status] || "#6c757d";
@@ -681,10 +682,10 @@ export default function Board() {
                         >
                           {/* Header: Type, Priority, Title, Description */}
                           <div style={{ marginBottom: "12px", minWidth: 0, width: "100%" }}>
-                            <div style={{ 
-                              display: "flex", 
-                              alignItems: "center", 
-                              gap: "8px", 
+                            <div style={{
+                              display: "flex",
+                              alignItems: "center",
+                              gap: "8px",
                               marginBottom: "8px",
                               flexWrap: "wrap",
                             }}>
@@ -779,10 +780,10 @@ export default function Board() {
                               }}
                             >
                               {!isPersonalMode && !isPersonalRoute && (
-                                <div style={{ 
-                                  display: "flex", 
-                                  alignItems: "center", 
-                                  gap: "6px", 
+                                <div style={{
+                                  display: "flex",
+                                  alignItems: "center",
+                                  gap: "6px",
                                   position: "relative",
                                   minWidth: 0,
                                   flex: isMobile ? "1 1 100%" : "0 0 auto",
@@ -849,8 +850,8 @@ export default function Board() {
                                     >
                                       <span style={{ fontSize: isMobile ? "16px" : "14px", flexShrink: 0 }}>👤</span>
                                       {task.assignedToName ? (
-                                        <span style={{ 
-                                          fontWeight: 600, 
+                                        <span style={{
+                                          fontWeight: 600,
                                           color: "var(--text-primary)",
                                           fontSize: isMobile ? "14px" : "12px",
                                           wordBreak: "break-word",
@@ -860,8 +861,8 @@ export default function Board() {
                                           {task.assignedToName}
                                         </span>
                                       ) : (
-                                        <span style={{ 
-                                          opacity: 0.6, 
+                                        <span style={{
+                                          opacity: 0.6,
                                           fontSize: isMobile ? "13px" : "11px",
                                         }}>
                                           Asignar
@@ -914,8 +915,8 @@ export default function Board() {
                                     changeTaskStatus(task.id, getNextStatus(task.status)!);
                                   }}
                                   style={{
-                                    padding: isMobile ? "8px 14px" : "6px 10px",
-                                    fontSize: isMobile ? "13px" : "11px",
+                                    padding: isMobile ? "6px 12px" : "6px 10px",
+                                    fontSize: isMobile ? "12px" : "11px",
                                     fontWeight: 600,
                                     border: "none",
                                     borderRadius: "8px",
@@ -929,7 +930,7 @@ export default function Board() {
                                     gap: "6px",
                                     flex: isMobile ? "1 1 100%" : 1,
                                     minWidth: isMobile ? "100%" : "90px",
-                                    minHeight: isMobile ? "36px" : undefined,
+                                    minHeight: isMobile ? "32px" : undefined,
                                     width: isMobile ? "100%" : "auto",
                                   }}
                                   onMouseEnter={(e) => {
@@ -953,8 +954,8 @@ export default function Board() {
                                     changeTaskStatus(task.id, "Done");
                                   }}
                                   style={{
-                                    padding: isMobile ? "8px 14px" : "6px 10px",
-                                    fontSize: isMobile ? "13px" : "11px",
+                                    padding: isMobile ? "6px 12px" : "6px 10px",
+                                    fontSize: isMobile ? "12px" : "11px",
                                     fontWeight: 600,
                                     border: "none",
                                     borderRadius: "8px",
@@ -966,7 +967,7 @@ export default function Board() {
                                     alignItems: "center",
                                     justifyContent: "center",
                                     gap: "6px",
-                                    minHeight: isMobile ? "36px" : undefined,
+                                    minHeight: isMobile ? "32px" : undefined,
                                     width: isMobile ? "100%" : "auto",
                                     flex: isMobile ? "1 1 100%" : "0 0 auto",
                                   }}
@@ -988,11 +989,12 @@ export default function Board() {
 
                             {/* Time Tracker */}
                             {projectId && (
-                              <div style={{ 
-                                marginTop: isMobile ? "8px" : "8px",
+                              <div style={{
+                                marginTop: isMobile ? "6px" : "8px",
                                 width: "100%",
                                 minWidth: 0,
                                 marginBottom: 0,
+                                boxSizing: "border-box",
                               }}>
                                 <TimeTracker
                                   taskId={task.id}

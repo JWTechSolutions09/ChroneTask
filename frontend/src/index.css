@@ -697,9 +697,7 @@ select {
   }
 
   /* Asegurar que los contenedores flex no se desborden */
-  [style*="display: flex"] {
-    flex-wrap: wrap !important;
-  }
+  /* REMOVIDO: Esta regla era demasiado agresiva y rompía layouts internos */
 
   /* Texto que no se desborde */
   p,
@@ -1274,7 +1272,7 @@ select {
   }
 
   /* Contenedor interno de tarjetas */
-  .kanban-board .hover-lift > div {
+  .kanban-board .hover-lift>div {
     min-width: 0 !important;
     width: 100% !important;
   }
@@ -1309,30 +1307,30 @@ select {
   }
 
   /* TimeTracker dentro de cards */
-  .kanban-board .hover-lift [style*="marginTop"][style*="width: 100%"] {
-    margin-top: 8px !important;
-    margin-bottom: 0 !important;
+  /* Contenedor del TimeTracker - selector más específico */
+  .kanban-board .hover-lift>div:last-child>div:last-child {
+    margin-top: 6px !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    box-sizing: border-box !important;
   }
 
-  .kanban-board .hover-lift [style*="marginTop"][style*="width: 100%"] > div {
-    padding: 6px !important;
-    gap: 6px !important;
-    margin: 0 !important;
+  .kanban-board .hover-lift>div:last-child>div:last-child>* {
+    max-width: 100% !important;
+    box-sizing: border-box !important;
   }
 
-  .kanban-board .hover-lift [style*="marginTop"][style*="width: 100%"] button {
-    min-height: 36px !important;
-    padding: 8px 12px !important;
-    font-size: 12px !important;
-    margin: 0 !important;
+  /* TimeTracker específico */
+  .kanban-board .hover-lift .time-tracker {
+    width: 100% !important;
+    overflow: hidden !important;
+    box-sizing: border-box !important;
+    max-width: 100% !important;
   }
 
-  /* Botón Completar más compacto en móvil */
-  .kanban-board .hover-lift button[style*="backgroundColor"][style*="#28a745"] {
-    min-height: 36px !important;
-    padding: 8px 14px !important;
-    font-size: 13px !important;
-    gap: 4px !important;
+  .kanban-board .hover-lift .time-tracker * {
+    max-width: 100% !important;
+    box-sizing: border-box !important;
   }
 
   /* Sección de meta información (asignación + tiempo) */
@@ -1342,7 +1340,7 @@ select {
   }
 
   /* Contenedor de asignación y tiempo */
-  .kanban-board .hover-lift [style*="borderTop"] > div:first-child {
+  .kanban-board .hover-lift [style*="borderTop"]>div:first-child {
     flex-direction: column !important;
     gap: 10px !important;
     width: 100% !important;

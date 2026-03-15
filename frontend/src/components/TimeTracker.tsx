@@ -132,6 +132,7 @@ export default function TimeTracker({
 
   return (
     <div
+      className="time-tracker"
       style={{
         display: "flex",
         flexDirection: "column",
@@ -142,8 +143,10 @@ export default function TimeTracker({
         border: isRunning ? "1px solid #007bff" : "1px solid #dee2e6",
         width: "100%",
         minWidth: 0,
+        maxWidth: "100%",
         boxSizing: "border-box",
         margin: 0,
+        overflow: "hidden",
       }}
     >
       {error && (
