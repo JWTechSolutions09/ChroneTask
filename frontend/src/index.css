@@ -828,6 +828,8 @@ select {
 
   /* Navbar global de la app (similar al landing) */
   .app-nav {
+    position: relative !important;
+    top: auto !important;
     background: rgba(10, 10, 10, 0.96);
     border-bottom: 1px solid var(--border-color);
     box-shadow: 0 2px 12px rgba(0, 0, 0, 0.4);
@@ -899,6 +901,14 @@ select {
     display: none;
   }
 
+  .app-nav {
+    position: relative;
+  }
+
+  .app-nav-container {
+    position: relative;
+  }
+
   .app-nav-mobile-overlay {
     position: fixed;
     inset: 0;
@@ -907,8 +917,8 @@ select {
   }
 
   .app-nav-links.mobile-open {
-    position: fixed;
-    top: 56px;
+    position: absolute;
+    top: 100%;
     left: 0;
     right: 0;
     background: var(--bg-primary);
