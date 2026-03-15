@@ -483,7 +483,7 @@ export default function Board() {
           }
         />
 
-        <div style={{ padding: isMobile ? "12px" : "24px" }}>
+        <div style={{ padding: isMobile ? "8px" : "24px", width: "100%", boxSizing: "border-box" }}>
           {err && <div className="alert alert-error">{err}</div>}
 
           {/* Quick Stats */}
@@ -561,11 +561,11 @@ export default function Board() {
                     style={{
                       backgroundColor: "var(--bg-primary)",
                       borderRadius: "12px",
-                      padding: isMobile ? "10px" : "16px",
+                      padding: isMobile ? "8px" : "16px",
                       minHeight: isMobile ? "400px" : "600px",
-                      minWidth: isMobile ? "340px" : "auto",
-                      maxWidth: isMobile ? "340px" : "none",
-                      width: isMobile ? "340px" : "auto",
+                      minWidth: isMobile ? "360px" : "auto",
+                      maxWidth: isMobile ? "360px" : "none",
+                      width: isMobile ? "360px" : "auto",
                       boxShadow: "0 2px 8px 0 rgba(0, 0, 0, 0.08)",
                       border: touchTarget === status ? `2px solid ${statusColor}` : "1px solid var(--border-color)",
                       transition: "all 0.2s ease",
@@ -635,6 +635,7 @@ export default function Board() {
                       gap: isMobile ? "12px" : "12px",
                       minWidth: 0,
                       width: "100%",
+                      boxSizing: "border-box",
                     }}>
                       {statusTasks.map((task) => (
                         <div
@@ -664,7 +665,7 @@ export default function Board() {
                             minWidth: 0,
                             maxWidth: "100%",
                             boxSizing: "border-box",
-                            overflow: "hidden",
+                            overflow: "visible",
                             height: "auto",
                           }}
                           onMouseEnter={!isMobile ? (e) => {
