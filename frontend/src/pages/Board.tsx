@@ -990,11 +990,11 @@ export default function Board() {
                                     changeTaskStatus(task.id, "Done");
                                   }}
                                   style={{
-                                    padding: isMobile ? "12px 16px" : "6px 10px",
-                                    fontSize: isMobile ? "14px" : "11px",
+                                    padding: isMobile ? "8px 14px" : "6px 10px",
+                                    fontSize: isMobile ? "13px" : "11px",
                                     fontWeight: 600,
                                     border: "none",
-                                    borderRadius: "8px",
+                                    borderRadius: "6px",
                                     backgroundColor: "#28a745",
                                     color: "var(--white)",
                                     cursor: "pointer",
@@ -1002,8 +1002,8 @@ export default function Board() {
                                     display: "flex",
                                     alignItems: "center",
                                     justifyContent: "center",
-                                    gap: "6px",
-                                    minHeight: isMobile ? "44px" : "auto",
+                                    gap: "4px",
+                                    minHeight: isMobile ? "36px" : "auto",
                                     width: isMobile ? "100%" : "auto",
                                     flex: isMobile ? "1 1 100%" : "0 0 auto",
                                   }}

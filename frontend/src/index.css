@@ -1315,16 +1315,24 @@ select {
   }
 
   .kanban-board .hover-lift [style*="marginTop"][style*="width: 100%"] > div {
-    padding: 8px !important;
-    gap: 8px !important;
+    padding: 6px !important;
+    gap: 6px !important;
     margin: 0 !important;
   }
 
   .kanban-board .hover-lift [style*="marginTop"][style*="width: 100%"] button {
-    min-height: 40px !important;
-    padding: 10px 14px !important;
-    font-size: 13px !important;
+    min-height: 36px !important;
+    padding: 8px 12px !important;
+    font-size: 12px !important;
     margin: 0 !important;
+  }
+
+  /* Botón Completar más compacto en móvil */
+  .kanban-board .hover-lift button[style*="backgroundColor"][style*="#28a745"] {
+    min-height: 36px !important;
+    padding: 8px 14px !important;
+    font-size: 13px !important;
+    gap: 4px !important;
   }
 
   /* Sección de meta información (asignación + tiempo) */

@@ -135,10 +135,10 @@ export default function TimeTracker({
       style={{
         display: "flex",
         flexDirection: "column",
-        gap: isMobile ? "8px" : "8px",
-        padding: isMobile ? "8px" : "8px",
+        gap: isMobile ? "6px" : "8px",
+        padding: isMobile ? "6px" : "8px",
         backgroundColor: isRunning ? "rgba(0, 123, 255, 0.1)" : "var(--bg-secondary)",
-        borderRadius: "8px",
+        borderRadius: "6px",
         border: isRunning ? "1px solid #007bff" : "1px solid #dee2e6",
         width: "100%",
         minWidth: 0,
@@ -163,7 +163,7 @@ export default function TimeTracker({
       <div style={{ 
         display: "flex", 
         alignItems: "center", 
-        gap: isMobile ? "8px" : "8px",
+        gap: isMobile ? "6px" : "8px",
         flexWrap: isMobile ? "wrap" : "nowrap",
         width: "100%",
         minWidth: 0,
@@ -183,7 +183,7 @@ export default function TimeTracker({
             />
             <span
               style={{
-                fontSize: isMobile ? "14px" : "12px",
+                fontSize: isMobile ? "13px" : "12px",
                 fontWeight: 600,
                 color: "#007bff",
                 fontFamily: "monospace",
@@ -197,15 +197,15 @@ export default function TimeTracker({
               disabled={loading}
               style={{
                 marginLeft: isMobile ? "0" : "auto",
-                padding: isMobile ? "10px 14px" : "4px 8px",
-                fontSize: isMobile ? "13px" : "11px",
+                padding: isMobile ? "8px 12px" : "4px 8px",
+                fontSize: isMobile ? "12px" : "11px",
                 backgroundColor: "#dc3545",
                 color: "white",
                 border: "none",
                 borderRadius: "6px",
                 cursor: loading ? "not-allowed" : "pointer",
                 fontWeight: 600,
-                minHeight: isMobile ? "40px" : "auto",
+                minHeight: isMobile ? "36px" : "auto",
                 width: isMobile ? "100%" : "auto",
                 flex: isMobile ? "1 1 100%" : "0 0 auto",
                 boxSizing: "border-box",
@@ -219,7 +219,7 @@ export default function TimeTracker({
         ) : (
           <>
             <span style={{ 
-              fontSize: isMobile ? "13px" : "11px", 
+              fontSize: isMobile ? "12px" : "11px", 
               color: "var(--text-secondary)",
               flex: isMobile ? "1 1 auto" : "0 0 auto",
             }}>
@@ -230,15 +230,15 @@ export default function TimeTracker({
               disabled={loading}
               style={{
                 marginLeft: isMobile ? "0" : "auto",
-                padding: isMobile ? "10px 14px" : "4px 8px",
-                fontSize: isMobile ? "13px" : "11px",
+                padding: isMobile ? "8px 12px" : "4px 8px",
+                fontSize: isMobile ? "12px" : "11px",
                 backgroundColor: "#28a745",
                 color: "white",
                 border: "none",
                 borderRadius: "6px",
                 cursor: loading ? "not-allowed" : "pointer",
                 fontWeight: 600,
-                minHeight: isMobile ? "40px" : "auto",
+                minHeight: isMobile ? "36px" : "auto",
                 width: isMobile ? "100%" : "auto",
                 flex: isMobile ? "1 1 100%" : "0 0 auto",
                 boxSizing: "border-box",
