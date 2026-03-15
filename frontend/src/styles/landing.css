@@ -58,6 +58,15 @@ body {
   box-shadow: 0 2px 20px var(--landing-shadow);
 }
 
+@media (max-width: 767.98px) {
+  .landing-nav {
+    position: relative !important;
+    top: auto !important;
+    left: auto !important;
+    right: auto !important;
+  }
+}
+
 .nav-container {
   max-width: min(1200px, 95vw);
   margin: 0 auto;

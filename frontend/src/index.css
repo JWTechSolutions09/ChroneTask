@@ -901,14 +901,6 @@ select {
     display: none;
   }
 
-  .app-nav {
-    position: relative;
-  }
-
-  .app-nav-container {
-    position: relative;
-  }
-
   .app-nav-mobile-overlay {
     position: fixed;
     inset: 0;

@@ -237,6 +237,69 @@ export default function Landing() {
         </div>
       </section>
 
+      {/* Benefits Section */}
+      <section ref={benefitsRef} className="benefits-section">
+        <div className="section-container">
+          <div className="benefits-header-text">
+            <h2 className="section-title">¿Por qué miles de equipos eligen ChroneTask?</h2>
+            <p className="benefits-intro">
+              No es solo una herramienta, es tu aliado para alcanzar el éxito en cada proyecto.
+            </p>
+          </div>
+          <div className="benefits-content">
+            <div className="benefits-visual-image">
+              <img src="/LandingImage.png" alt="ChroneTask Dashboard" className="landing-feature-image" />
+            </div>
+            <div className="benefits-text">
+              <div className="benefit-list">
+                <div className="benefit-item">
+                  <div className="benefit-icon">📦</div>
+                  <div>
+                    <h3>Todo en un Solo Lugar</h3>
+                    <p>Proyectos, tareas, equipos y métricas centralizados. Olvídate de cambiar entre múltiples herramientas.</p>
+                  </div>
+                </div>
+                <div className="benefit-item">
+                  <div className="benefit-icon">⚡</div>
+                  <div>
+                    <h3>Colaboración en Tiempo Real</h3>
+                    <p>Comunicación instantánea, actualizaciones en vivo y trabajo sincronizado. Tu equipo siempre en la misma página.</p>
+                  </div>
+                </div>
+                <div className="benefit-item">
+                  <div className="benefit-icon">🎛️</div>
+                  <div>
+                    <h3>Se Adapta a Tu Flujo</h3>
+                    <p>Personaliza el sistema según tus necesidades. No cambies tu forma de trabajar, adapta la herramienta a ti.</p>
+                  </div>
+                </div>
+                <div className="benefit-item">
+                  <div className="benefit-icon">📈</div>
+                  <div>
+                    <h3>Crece Sin Límites</h3>
+                    <p>Escalable para equipos pequeños y grandes empresas. Sin restricciones de usuarios o proyectos.</p>
+                  </div>
+                </div>
+                <div className="benefit-item">
+                  <div className="benefit-icon">✨</div>
+                  <div>
+                    <h3>Fácil de Usar</h3>
+                    <p>Interfaz intuitiva que cualquiera puede dominar en minutos. Sin curva de aprendizaje complicada.</p>
+                  </div>
+                </div>
+                <div className="benefit-item">
+                  <div className="benefit-icon">🏢</div>
+                  <div>
+                    <h3>Múltiples Organizaciones</h3>
+                    <p>Gestiona varios equipos o empresas desde una sola cuenta. Perfecto para consultores y freelancers.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Detailed Features Showcase Section */}
       <section className="detailed-features-section">
         <div className="section-container">
@@ -371,69 +434,6 @@ export default function Landing() {
                   cambios, comentarios, asignaciones y recordatorios. Un centro de notificaciones 
                   inteligente que te ayuda a priorizar y no perderte nada importante.
                 </p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Benefits Section */}
-      <section ref={benefitsRef} className="benefits-section">
-        <div className="section-container">
-          <div className="benefits-header-text">
-            <h2 className="section-title">¿Por qué miles de equipos eligen ChroneTask?</h2>
-            <p className="benefits-intro">
-              No es solo una herramienta, es tu aliado para alcanzar el éxito en cada proyecto.
-            </p>
-          </div>
-          <div className="benefits-content">
-            <div className="benefits-visual-image">
-              <img src="/LandingImage.png" alt="ChroneTask Dashboard" className="landing-feature-image" />
-            </div>
-            <div className="benefits-text">
-              <div className="benefit-list">
-                <div className="benefit-item">
-                  <div className="benefit-icon">📦</div>
-                  <div>
-                    <h3>Todo en un Solo Lugar</h3>
-                    <p>Proyectos, tareas, equipos y métricas centralizados. Olvídate de cambiar entre múltiples herramientas.</p>
-                  </div>
-                </div>
-                <div className="benefit-item">
-                  <div className="benefit-icon">⚡</div>
-                  <div>
-                    <h3>Colaboración en Tiempo Real</h3>
-                    <p>Comunicación instantánea, actualizaciones en vivo y trabajo sincronizado. Tu equipo siempre en la misma página.</p>
-                  </div>
-                </div>
-                <div className="benefit-item">
-                  <div className="benefit-icon">🎛️</div>
-                  <div>
-                    <h3>Se Adapta a Tu Flujo</h3>
-                    <p>Personaliza el sistema según tus necesidades. No cambies tu forma de trabajar, adapta la herramienta a ti.</p>
-                  </div>
-                </div>
-                <div className="benefit-item">
-                  <div className="benefit-icon">📈</div>
-                  <div>
-                    <h3>Crece Sin Límites</h3>
-                    <p>Escalable para equipos pequeños y grandes empresas. Sin restricciones de usuarios o proyectos.</p>
-                  </div>
-                </div>
-                <div className="benefit-item">
-                  <div className="benefit-icon">✨</div>
-                  <div>
-                    <h3>Fácil de Usar</h3>
-                    <p>Interfaz intuitiva que cualquiera puede dominar en minutos. Sin curva de aprendizaje complicada.</p>
-                  </div>
-                </div>
-                <div className="benefit-item">
-                  <div className="benefit-icon">🏢</div>
-                  <div>
-                    <h3>Múltiples Organizaciones</h3>
-                    <p>Gestiona varios equipos o empresas desde una sola cuenta. Perfecto para consultores y freelancers.</p>
-                  </div>
-                </div>
               </div>
             </div>
           </div>
