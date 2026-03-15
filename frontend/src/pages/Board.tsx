@@ -929,7 +929,7 @@ export default function Board() {
                                     gap: "6px",
                                     flex: isMobile ? "1 1 100%" : 1,
                                     minWidth: isMobile ? "100%" : "90px",
-                                    minHeight: isMobile ? "36px" : "auto",
+                                    minHeight: isMobile ? "36px" : undefined,
                                     width: isMobile ? "100%" : "auto",
                                   }}
                                   onMouseEnter={(e) => {
@@ -966,7 +966,7 @@ export default function Board() {
                                     alignItems: "center",
                                     justifyContent: "center",
                                     gap: "6px",
-                                    minHeight: isMobile ? "36px" : "auto",
+                                    minHeight: isMobile ? "36px" : undefined,
                                     width: isMobile ? "100%" : "auto",
                                     flex: isMobile ? "1 1 100%" : "0 0 auto",
                                   }}
