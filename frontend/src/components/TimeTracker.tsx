@@ -163,40 +163,40 @@ export default function TimeTracker({
       <div style={{ 
         display: "flex", 
         alignItems: "center", 
-        gap: isMobile ? "6px" : "8px",
-        flexWrap: isMobile ? "wrap" : "nowrap",
+        justifyContent: "space-between",
+        gap: isMobile ? "8px" : "8px",
         width: "100%",
         minWidth: 0,
         margin: 0,
       }}>
         {isRunning ? (
           <>
-            <div
-              style={{
-                width: isMobile ? "10px" : "8px",
-                height: isMobile ? "10px" : "8px",
-                borderRadius: "50%",
-                backgroundColor: "#dc3545",
-                animation: "pulse 2s infinite",
-                flexShrink: 0,
-              }}
-            />
-            <span
-              style={{
-                fontSize: isMobile ? "13px" : "12px",
-                fontWeight: 600,
-                color: "#007bff",
-                fontFamily: "monospace",
-                flex: isMobile ? "1 1 auto" : "0 0 auto",
-              }}
-            >
-              {formatTime(elapsedSeconds)}
-            </span>
+            <div style={{ display: "flex", alignItems: "center", gap: "8px", flex: "1 1 auto" }}>
+              <div
+                style={{
+                  width: isMobile ? "10px" : "8px",
+                  height: isMobile ? "10px" : "8px",
+                  borderRadius: "50%",
+                  backgroundColor: "#dc3545",
+                  animation: "pulse 2s infinite",
+                  flexShrink: 0,
+                }}
+              />
+              <span
+                style={{
+                  fontSize: isMobile ? "13px" : "12px",
+                  fontWeight: 600,
+                  color: "#007bff",
+                  fontFamily: "monospace",
+                }}
+              >
+                {formatTime(elapsedSeconds)}
+              </span>
+            </div>
             <button
               onClick={stopTimer}
               disabled={loading}
               style={{
-                marginLeft: isMobile ? "0" : "auto",
                 padding: isMobile ? "8px 12px" : "4px 8px",
                 fontSize: isMobile ? "12px" : "11px",
                 backgroundColor: "#dc3545",
@@ -206,8 +206,7 @@ export default function TimeTracker({
                 cursor: loading ? "not-allowed" : "pointer",
                 fontWeight: 600,
                 minHeight: isMobile ? "36px" : "auto",
-                width: isMobile ? "100%" : "auto",
-                flex: isMobile ? "1 1 100%" : "0 0 auto",
+                flexShrink: 0,
                 boxSizing: "border-box",
                 whiteSpace: "nowrap",
                 margin: 0,
@@ -219,17 +218,20 @@ export default function TimeTracker({
         ) : (
           <>
             <span style={{ 
-              fontSize: isMobile ? "12px" : "11px", 
+              fontSize: isMobile ? "13px" : "11px", 
               color: "var(--text-secondary)",
-              flex: isMobile ? "1 1 auto" : "0 0 auto",
+              display: "flex",
+              alignItems: "center",
+              gap: "6px",
+              flex: "1 1 auto",
             }}>
-              ⏱️ {formatTotalTime(totalMinutes)}
+              <span style={{ fontSize: isMobile ? "16px" : "14px" }}>⏱️</span>
+              <span>{formatTotalTime(totalMinutes)}</span>
             </span>
             <button
               onClick={startTimer}
               disabled={loading}
               style={{
-                marginLeft: isMobile ? "0" : "auto",
                 padding: isMobile ? "8px 12px" : "4px 8px",
                 fontSize: isMobile ? "12px" : "11px",
                 backgroundColor: "#28a745",
@@ -239,14 +241,17 @@ export default function TimeTracker({
                 cursor: loading ? "not-allowed" : "pointer",
                 fontWeight: 600,
                 minHeight: isMobile ? "36px" : "auto",
-                width: isMobile ? "100%" : "auto",
-                flex: isMobile ? "1 1 100%" : "0 0 auto",
+                flexShrink: 0,
                 boxSizing: "border-box",
                 whiteSpace: "nowrap",
                 margin: 0,
+                display: "flex",
+                alignItems: "center",
+                gap: "4px",
               }}
             >
-              {loading ? "..." : "▶ Iniciar"}
+              <span>▶</span>
+              <span>{loading ? "..." : "Iniciar"}</span>
             </button>
           </>
         )}

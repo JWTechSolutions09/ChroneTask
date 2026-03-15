@@ -907,44 +907,6 @@ export default function Board() {
                                 boxSizing: "border-box",
                               }}
                             >
-                              {getPreviousStatus(task.status) && (
-                                <button
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    changeTaskStatus(task.id, getPreviousStatus(task.status)!);
-                                  }}
-                                  style={{
-                                    padding: isMobile ? "12px 16px" : "6px 10px",
-                                    fontSize: isMobile ? "14px" : "11px",
-                                    fontWeight: 600,
-                                    border: "none",
-                                    borderRadius: "8px",
-                                    backgroundColor: "var(--bg-tertiary)",
-                                    color: "var(--text-primary)",
-                                    cursor: "pointer",
-                                    transition: "all 0.2s",
-                                    display: "flex",
-                                    alignItems: "center",
-                                    justifyContent: "center",
-                                    gap: "6px",
-                                    minHeight: isMobile ? "44px" : "auto",
-                                    width: isMobile ? "100%" : "auto",
-                                    flex: isMobile ? "1 1 100%" : "0 0 auto",
-                                  }}
-                                  onMouseEnter={(e) => {
-                                    e.currentTarget.style.backgroundColor = "var(--border-color)";
-                                    e.currentTarget.style.transform = "scale(1.02)";
-                                  }}
-                                  onMouseLeave={(e) => {
-                                    e.currentTarget.style.backgroundColor = "var(--bg-tertiary)";
-                                    e.currentTarget.style.transform = "scale(1)";
-                                  }}
-                                  title={`Mover a ${getPreviousStatus(task.status)}`}
-                                >
-                                  <span>←</span>
-                                  <span>Anterior</span>
-                                </button>
-                              )}
                               {getNextStatus(task.status) && (
                                 <button
                                   onClick={(e) => {
@@ -968,6 +930,7 @@ export default function Board() {
                                     flex: isMobile ? "1 1 100%" : 1,
                                     minWidth: isMobile ? "100%" : "90px",
                                     minHeight: isMobile ? "44px" : "auto",
+                                    width: isMobile ? "100%" : "auto",
                                   }}
                                   onMouseEnter={(e) => {
                                     e.currentTarget.style.opacity = "0.9";
@@ -990,11 +953,11 @@ export default function Board() {
                                     changeTaskStatus(task.id, "Done");
                                   }}
                                   style={{
-                                    padding: isMobile ? "8px 14px" : "6px 10px",
-                                    fontSize: isMobile ? "13px" : "11px",
+                                    padding: isMobile ? "10px 16px" : "6px 10px",
+                                    fontSize: isMobile ? "14px" : "11px",
                                     fontWeight: 600,
                                     border: "none",
-                                    borderRadius: "6px",
+                                    borderRadius: "8px",
                                     backgroundColor: "#28a745",
                                     color: "var(--white)",
                                     cursor: "pointer",
@@ -1002,8 +965,8 @@ export default function Board() {
                                     display: "flex",
                                     alignItems: "center",
                                     justifyContent: "center",
-                                    gap: "4px",
-                                    minHeight: isMobile ? "36px" : "auto",
+                                    gap: "6px",
+                                    minHeight: isMobile ? "44px" : "auto",
                                     width: isMobile ? "100%" : "auto",
                                     flex: isMobile ? "1 1 100%" : "0 0 auto",
                                   }}
