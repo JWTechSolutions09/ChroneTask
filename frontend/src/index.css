@@ -1265,11 +1265,12 @@ select {
   /* Tarjetas de tareas en móvil */
   .kanban-board .hover-lift {
     padding: 12px !important;
-    margin-bottom: 10px !important;
+    margin-bottom: 12px !important;
     width: 100% !important;
     min-width: 0 !important;
     max-width: 100% !important;
     box-sizing: border-box !important;
+    overflow: hidden !important;
   }
 
   /* Contenedor interno de tarjetas */
@@ -1301,9 +1302,29 @@ select {
   /* Contenedor de botones de acciones en tarjetas */
   .kanban-board .hover-lift [style*="display: flex"][style*="flexDirection"] {
     flex-direction: column !important;
-    gap: 10px !important;
+    gap: 8px !important;
     width: 100% !important;
     min-width: 0 !important;
+    margin-bottom: 10px !important;
+  }
+
+  /* TimeTracker dentro de cards */
+  .kanban-board .hover-lift [style*="marginTop"][style*="width: 100%"] {
+    margin-top: 8px !important;
+    margin-bottom: 0 !important;
+  }
+
+  .kanban-board .hover-lift [style*="marginTop"][style*="width: 100%"] > div {
+    padding: 8px !important;
+    gap: 8px !important;
+    margin: 0 !important;
+  }
+
+  .kanban-board .hover-lift [style*="marginTop"][style*="width: 100%"] button {
+    min-height: 40px !important;
+    padding: 10px 14px !important;
+    font-size: 13px !important;
+    margin: 0 !important;
   }
 
   /* Sección de meta información (asignación + tiempo) */

@@ -632,7 +632,7 @@ export default function Board() {
                     <div style={{ 
                       display: "flex", 
                       flexDirection: "column", 
-                      gap: isMobile ? "14px" : "12px",
+                      gap: isMobile ? "12px" : "12px",
                       minWidth: 0,
                       width: "100%",
                     }}>
@@ -656,7 +656,7 @@ export default function Board() {
                             borderRadius: "10px",
                             boxShadow: "0 2px 4px 0 rgba(0, 0, 0, 0.08)",
                             transition: "all 0.2s ease",
-                            marginBottom: "10px",
+                            marginBottom: isMobile ? "12px" : "10px",
                             border: "1px solid var(--border-color)",
                             touchAction: isMobile ? "pan-y" : "none",
                             userSelect: "none",
@@ -664,6 +664,7 @@ export default function Board() {
                             minWidth: 0,
                             maxWidth: "100%",
                             boxSizing: "border-box",
+                            overflow: "hidden",
                           }}
                           onMouseEnter={!isMobile ? (e) => {
                             e.currentTarget.style.borderColor = STATUS_COLORS[task.status] || "#6c757d";
@@ -758,8 +759,8 @@ export default function Board() {
                           {/* Meta Info Section: Assignment & Time */}
                           <div
                             style={{
-                              marginTop: "12px",
-                              paddingTop: "12px",
+                              marginTop: isMobile ? "10px" : "12px",
+                              paddingTop: isMobile ? "10px" : "12px",
                               borderTop: "1px solid var(--border-color)",
                               minWidth: 0,
                               width: "100%",
@@ -772,7 +773,7 @@ export default function Board() {
                                 justifyContent: isMobile ? "flex-start" : "space-between",
                                 alignItems: isMobile ? "stretch" : "center",
                                 gap: isMobile ? "10px" : "8px",
-                                marginBottom: "12px",
+                                marginBottom: isMobile ? "10px" : "12px",
                                 minWidth: 0,
                                 width: "100%",
                               }}
@@ -898,8 +899,8 @@ export default function Board() {
                               style={{
                                 display: "flex",
                                 flexDirection: isMobile ? "column" : "row",
-                                gap: isMobile ? "10px" : "6px",
-                                marginBottom: isMobile ? "12px" : "8px",
+                                gap: isMobile ? "8px" : "6px",
+                                marginBottom: isMobile ? "10px" : "8px",
                                 flexWrap: isMobile ? "nowrap" : "wrap",
                                 width: "100%",
                                 minWidth: 0,
@@ -1025,9 +1026,10 @@ export default function Board() {
                             {/* Time Tracker */}
                             {projectId && (
                               <div style={{ 
-                                marginTop: isMobile ? "12px" : "8px",
+                                marginTop: isMobile ? "8px" : "8px",
                                 width: "100%",
                                 minWidth: 0,
+                                marginBottom: 0,
                               }}>
                                 <TimeTracker
                                   taskId={task.id}
