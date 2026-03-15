@@ -15,6 +15,7 @@ export default function TimeTracker({
   totalMinutes,
   onTimeUpdate,
 }: TimeTrackerProps) {
+  const { showToast } = useToast();
   const [isRunning, setIsRunning] = useState(false);
   const [elapsedSeconds, setElapsedSeconds] = useState(0);
   const [loading, setLoading] = useState(false);
@@ -163,18 +164,19 @@ export default function TimeTracker({
         </div>
       )}
 
-      <div style={{ 
-        display: "flex", 
-        alignItems: "center", 
+      <div style={{
+        display: "flex",
+        alignItems: "center",
         justifyContent: "space-between",
         gap: isMobile ? "8px" : "8px",
         width: "100%",
         minWidth: 0,
         margin: 0,
+        flexWrap: "nowrap",
       }}>
         {isRunning ? (
           <>
-            <div style={{ display: "flex", alignItems: "center", gap: "8px", flex: "1 1 auto" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: "8px", flex: "1 1 auto", minWidth: 0 }}>
               <div
                 style={{
                   width: isMobile ? "10px" : "8px",
@@ -191,6 +193,7 @@ export default function TimeTracker({
                   fontWeight: 600,
                   color: "#007bff",
                   fontFamily: "monospace",
+                  minWidth: 0,
                 }}
               >
                 {formatTime(elapsedSeconds)}
@@ -220,16 +223,17 @@ export default function TimeTracker({
           </>
         ) : (
           <>
-            <span style={{ 
-              fontSize: isMobile ? "13px" : "11px", 
+            <span style={{
+              fontSize: isMobile ? "13px" : "11px",
               color: "var(--text-secondary)",
               display: "flex",
               alignItems: "center",
               gap: "6px",
               flex: "1 1 auto",
+              minWidth: 0,
             }}>
-              <span style={{ fontSize: isMobile ? "16px" : "14px" }}>⏱️</span>
-              <span>{formatTotalTime(totalMinutes)}</span>
+              <span style={{ fontSize: isMobile ? "16px" : "14px", flexShrink: 0 }}>⏱️</span>
+              <span style={{ minWidth: 0 }}>{formatTotalTime(totalMinutes)}</span>
             </span>
             <button
               onClick={startTimer}

@@ -1307,66 +1307,79 @@ select {
   }
 
   /* TimeTracker dentro de cards */
-  /* Contenedor del TimeTracker - selector más específico */
-  .kanban-board .hover-lift>div:last-child>div:last-child {
-    margin-top: 6px !important;
+  /* Task Card - Estilos específicos con clases para móvil */
+  .kanban-board .task-card {
     width: 100% !important;
+    max-width: 100% !important;
     min-width: 0 !important;
     box-sizing: border-box !important;
-  }
-
-  .kanban-board .hover-lift>div:last-child>div:last-child>* {
-    max-width: 100% !important;
-    box-sizing: border-box !important;
-  }
-
-  /* TimeTracker específico */
-  .kanban-board .hover-lift .time-tracker {
-    width: 100% !important;
     overflow: hidden !important;
-    box-sizing: border-box !important;
-    max-width: 100% !important;
+    height: auto !important;
+    padding: 12px !important;
   }
 
-  .kanban-board .hover-lift .time-tracker * {
-    max-width: 100% !important;
-    box-sizing: border-box !important;
-  }
-
-  /* Sección de meta información (asignación + tiempo) */
-  .kanban-board .hover-lift [style*="borderTop"] {
-    min-width: 0 !important;
+  .kanban-board .task-card-header,
+  .kanban-board .task-card-badges,
+  .kanban-board .task-card-meta,
+  .kanban-board .task-card-meta-row,
+  .kanban-board .task-card-actions,
+  .kanban-board .task-card-tracker,
+  .kanban-board .time-tracker {
     width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    box-sizing: border-box !important;
   }
 
-  /* Contenedor de asignación y tiempo */
-  .kanban-board .hover-lift [style*="borderTop"]>div:first-child {
+  .kanban-board .task-card-badges {
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+    flex-wrap: wrap !important;
+  }
+
+  .kanban-board .task-card-meta-row {
+    display: flex !important;
     flex-direction: column !important;
+    align-items: stretch !important;
     gap: 10px !important;
+  }
+
+  .kanban-board .task-card-actions {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 8px !important;
     width: 100% !important;
-    min-width: 0 !important;
+  }
+
+  .kanban-board .task-card-actions button {
+    width: 100% !important;
+    min-height: 32px !important;
+    padding: 6px 12px !important;
+    font-size: 12px !important;
+    box-sizing: border-box !important;
+  }
+
+  .kanban-board .task-card-tracker {
+    margin-top: 6px !important;
+    overflow: hidden !important;
+  }
+
+  .kanban-board .time-tracker,
+  .kanban-board .time-tracker * {
+    max-width: 100% !important;
+    box-sizing: border-box !important;
   }
 
   /* Select de asignación */
-  .kanban-board .hover-lift select {
+  .kanban-board .task-card select {
     width: 100% !important;
     min-width: 100% !important;
     box-sizing: border-box !important;
   }
 
   /* Div de asignación clickeable */
-  .kanban-board .hover-lift [style*="cursor: pointer"][style*="display: flex"] {
-    width: 100% !important;
-    box-sizing: border-box !important;
-    min-width: 0 !important;
-  }
-
-  /* Texto del nombre asignado */
-  .kanban-board .hover-lift span[style*="fontWeight: 600"] {
-    word-break: break-word !important;
-    overflow-wrap: break-word !important;
-    min-width: 0 !important;
-  }
+  /* REMOVIDO: Selectores demasiado genéricos - ahora usamos clases específicas */
 
   /* Prevenir overflow en todos los contenedores */
   body,
@@ -1521,10 +1534,7 @@ select {
   }
 
   /* Filtros y búsquedas */
-  [style*="display: flex"][style*="gap"] {
-    flex-wrap: wrap !important;
-    gap: clamp(0.5rem, 1.5vw, 0.75rem) !important;
-  }
+  /* REMOVIDO: Regla demasiado genérica que rompía layouts internos */
 
   /* Selectores de fecha */
   input[type="date"],
@@ -1573,9 +1583,7 @@ select {
   }
 
   /* Botones en grupos */
-  [style*="display: flex"][style*="gap"] {
-    flex-wrap: wrap !important;
-  }
+  /* REMOVIDO: Regla demasiado genérica que rompía layouts internos */
 
   /* Asegurar que los textos largos se ajusten */
   * {
@@ -1709,8 +1717,7 @@ select {
   }
 
   /* Search bar en móvil */
-  .search-bar,
-  [style*="display: flex"][style*="gap"][style*="marginBottom"] {
+  .search-bar {
     flex-wrap: wrap !important;
   }
 
@@ -1797,10 +1804,7 @@ select {
   }
 
   /* Settings - Tabs y formularios */
-  [style*="display: flex"][style*="gap"][style*="marginBottom"] {
-    flex-direction: column !important;
-    gap: 12px !important;
-  }
+  /* REMOVIDO: Regla demasiado genérica que rompía layouts internos */
 
   /* Dashboard - Grid de proyectos */
   [style*="display: grid"][style*="grid-template-columns: repeat(auto-fill"] {
@@ -1828,10 +1832,7 @@ select {
   }
 
   /* Botones en grupos */
-  [style*="display: flex"][style*="gap"] button {
-    flex: 1 1 auto !important;
-    min-width: 0 !important;
-  }
+  /* REMOVIDO: Regla demasiado genérica que rompía layouts internos */
 
   /* Modales y diálogos */
   [style*="position: fixed"][style*="z-index: 1000"] {

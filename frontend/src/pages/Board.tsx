@@ -647,7 +647,7 @@ export default function Board() {
                           onTouchStart={(e) => handleTouchStart(e, task)}
                           onTouchMove={handleTouchMove}
                           onTouchEnd={handleTouchEnd}
-                          className="hover-lift fade-in"
+                          className="task-card hover-lift fade-in"
                           style={{
                             padding: isMobile ? "12px" : "14px",
                             borderLeft: `4px solid ${STATUS_COLORS[task.status] || "#6c757d"}`,
@@ -664,7 +664,7 @@ export default function Board() {
                             minWidth: 0,
                             maxWidth: "100%",
                             boxSizing: "border-box",
-                            overflow: "visible",
+                            overflow: "hidden",
                             height: "auto",
                           }}
                           onMouseEnter={!isMobile ? (e) => {
@@ -681,8 +681,8 @@ export default function Board() {
                           onClick={() => setSelectedTask(task)}
                         >
                           {/* Header: Type, Priority, Title, Description */}
-                          <div style={{ marginBottom: "12px", minWidth: 0, width: "100%" }}>
-                            <div style={{
+                          <div className="task-card-header" style={{ marginBottom: "12px", minWidth: 0, width: "100%" }}>
+                            <div className="task-card-badges" style={{
                               display: "flex",
                               alignItems: "center",
                               gap: "8px",
@@ -759,6 +759,7 @@ export default function Board() {
 
                           {/* Meta Info Section: Assignment & Time */}
                           <div
+                            className="task-card-meta"
                             style={{
                               marginTop: isMobile ? "10px" : "12px",
                               paddingTop: isMobile ? "10px" : "12px",
@@ -768,6 +769,7 @@ export default function Board() {
                             }}
                           >
                             <div
+                              className="task-card-meta-row"
                               style={{
                                 display: "flex",
                                 flexDirection: isMobile ? "column" : "row",
@@ -897,6 +899,7 @@ export default function Board() {
 
                             {/* Quick Actions - Botones para cambiar estado */}
                             <div
+                              className="task-card-actions"
                               style={{
                                 display: "flex",
                                 flexDirection: isMobile ? "column" : "row",
@@ -989,7 +992,7 @@ export default function Board() {
 
                             {/* Time Tracker */}
                             {projectId && (
-                              <div style={{
+                              <div className="task-card-tracker" style={{
                                 marginTop: isMobile ? "6px" : "8px",
                                 width: "100%",
                                 minWidth: 0,
