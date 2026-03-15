@@ -600,8 +600,14 @@ public class TasksController : ControllerBase
         if (!validStatuses.Contains(status))
             return BadRequest(new { message = "Invalid status" });
 
-        // Regla: no cerrar sin responsable
-        if (status == "Done" && !task.AssignedToId.HasValue)
+        // Verificar si es un proyecto personal (OrganizationId es null)
+        var project = await _db.Projects
+            .FirstOrDefaultAsync(p => p.Id == projectId);
+        
+        var isPersonalProject = project != null && project.OrganizationId == null;
+
+        // Regla: no cerrar sin responsable (solo para proyectos de organización/equipo)
+        if (status == "Done" && !task.AssignedToId.HasValue && !isPersonalProject)
             return BadRequest(new { message = "Cannot close task without assignee" });
 
         var oldStatus = task.Status;

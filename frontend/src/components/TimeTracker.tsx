@@ -114,24 +114,40 @@ export default function TimeTracker({
     return mins > 0 ? `${hours}h ${mins}m` : `${hours}h`;
   };
 
+  const [isMobile, setIsMobile] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return window.innerWidth <= 768;
+    }
+    return false;
+  });
+
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
   return (
     <div
       style={{
         display: "flex",
         flexDirection: "column",
-        gap: "8px",
-        padding: "8px",
+        gap: isMobile ? "10px" : "8px",
+        padding: isMobile ? "12px" : "8px",
         backgroundColor: isRunning ? "rgba(0, 123, 255, 0.1)" : "var(--bg-secondary)",
-        borderRadius: "6px",
+        borderRadius: "8px",
         border: isRunning ? "1px solid #007bff" : "1px solid #dee2e6",
       }}
     >
       {error && (
         <div
           style={{
-            fontSize: "11px",
+            fontSize: isMobile ? "12px" : "11px",
             color: "#dc3545",
-            padding: "4px",
+            padding: isMobile ? "8px" : "4px",
             backgroundColor: "#fee",
             borderRadius: "4px",
           }}
@@ -140,24 +156,31 @@ export default function TimeTracker({
         </div>
       )}
 
-      <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+      <div style={{ 
+        display: "flex", 
+        alignItems: "center", 
+        gap: isMobile ? "12px" : "8px",
+        flexWrap: isMobile ? "wrap" : "nowrap",
+      }}>
         {isRunning ? (
           <>
             <div
               style={{
-                width: "8px",
-                height: "8px",
+                width: isMobile ? "10px" : "8px",
+                height: isMobile ? "10px" : "8px",
                 borderRadius: "50%",
                 backgroundColor: "#dc3545",
                 animation: "pulse 2s infinite",
+                flexShrink: 0,
               }}
             />
             <span
               style={{
-                fontSize: "12px",
+                fontSize: isMobile ? "14px" : "12px",
                 fontWeight: 600,
                 color: "#007bff",
                 fontFamily: "monospace",
+                flex: isMobile ? "1 1 auto" : "0 0 auto",
               }}
             >
               {formatTime(elapsedSeconds)}
@@ -166,15 +189,19 @@ export default function TimeTracker({
               onClick={stopTimer}
               disabled={loading}
               style={{
-                marginLeft: "auto",
-                padding: "4px 8px",
-                fontSize: "11px",
+                marginLeft: isMobile ? "0" : "auto",
+                padding: isMobile ? "10px 16px" : "4px 8px",
+                fontSize: isMobile ? "13px" : "11px",
                 backgroundColor: "#dc3545",
                 color: "white",
                 border: "none",
-                borderRadius: "4px",
+                borderRadius: "6px",
                 cursor: loading ? "not-allowed" : "pointer",
                 fontWeight: 600,
+                minHeight: isMobile ? "44px" : "auto",
+                minWidth: isMobile ? "100px" : "auto",
+                width: isMobile ? "100%" : "auto",
+                flex: isMobile ? "1 1 100%" : "0 0 auto",
               }}
             >
               {loading ? "..." : "⏹ Detener"}
@@ -182,22 +209,30 @@ export default function TimeTracker({
           </>
         ) : (
           <>
-            <span style={{ fontSize: "11px", color: "var(--text-secondary)" }}>
+            <span style={{ 
+              fontSize: isMobile ? "13px" : "11px", 
+              color: "var(--text-secondary)",
+              flex: isMobile ? "1 1 auto" : "0 0 auto",
+            }}>
               ⏱️ {formatTotalTime(totalMinutes)}
             </span>
             <button
               onClick={startTimer}
               disabled={loading}
               style={{
-                marginLeft: "auto",
-                padding: "4px 8px",
-                fontSize: "11px",
+                marginLeft: isMobile ? "0" : "auto",
+                padding: isMobile ? "10px 16px" : "4px 8px",
+                fontSize: isMobile ? "13px" : "11px",
                 backgroundColor: "#28a745",
                 color: "white",
                 border: "none",
-                borderRadius: "4px",
+                borderRadius: "6px",
                 cursor: loading ? "not-allowed" : "pointer",
                 fontWeight: 600,
+                minHeight: isMobile ? "44px" : "auto",
+                minWidth: isMobile ? "100px" : "auto",
+                width: isMobile ? "100%" : "auto",
+                flex: isMobile ? "1 1 100%" : "0 0 auto",
               }}
             >
               {loading ? "..." : "▶ Iniciar"}

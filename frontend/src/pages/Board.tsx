@@ -359,25 +359,45 @@ export default function Board() {
           actions={
             <div style={{ 
               display: "flex", 
-              gap: isMobile ? "6px" : "8px", 
-              flexWrap: "wrap", 
+              gap: isMobile ? "10px" : "8px", 
+              flexWrap: isMobile ? "wrap" : "nowrap", 
               width: "100%",
-              justifyContent: isMobile ? "center" : "flex-start",
+              justifyContent: isMobile ? "flex-start" : "flex-start",
             }}>
               <Button 
                 variant="secondary" 
                 onClick={() => setShowCommentsPanel(true)}
-                style={isMobile ? { fontSize: "12px", padding: "8px 12px" } : {}}
+                style={isMobile ? { 
+                  fontSize: "14px", 
+                  padding: "12px 16px",
+                  minHeight: "44px",
+                  minWidth: "44px",
+                  flex: isMobile ? "1 1 calc(50% - 5px)" : "0 0 auto",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  gap: "6px",
+                } : {}}
               >
-                {isMobile ? "💬" : "💬 Comentarios"}
+                {isMobile ? "💬 Comentarios" : "💬 Comentarios"}
               </Button>
               {!isPersonalMode && !isPersonalRoute && organizationId && (
                 <Button 
                   variant="secondary" 
                   onClick={() => setShowMemberModal(true)}
-                  style={isMobile ? { fontSize: "12px", padding: "8px 12px" } : {}}
+                  style={isMobile ? { 
+                    fontSize: "14px", 
+                    padding: "12px 16px",
+                    minHeight: "44px",
+                    minWidth: "44px",
+                    flex: isMobile ? "1 1 calc(50% - 5px)" : "0 0 auto",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    gap: "6px",
+                  } : {}}
                 >
-                  {isMobile ? "👥" : "👥 Miembros"}
+                  {isMobile ? "👥 Miembros" : "👥 Miembros"}
                 </Button>
               )}
               <Button
@@ -389,9 +409,19 @@ export default function Board() {
                     navigate(`/org/${organizationId}/project/${projectId}/notes`);
                   }
                 }}
-                style={isMobile ? { fontSize: "12px", padding: "8px 12px" } : {}}
+                style={isMobile ? { 
+                  fontSize: "14px", 
+                  padding: "12px 16px",
+                  minHeight: "44px",
+                  minWidth: "44px",
+                  flex: isMobile ? "1 1 calc(50% - 5px)" : "0 0 auto",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  gap: "6px",
+                } : {}}
               >
-                {isMobile ? "📝" : "📝 Notas"}
+                {isMobile ? "📝 Notas" : "📝 Notas"}
               </Button>
               <Button
                 variant="secondary"
@@ -402,9 +432,19 @@ export default function Board() {
                     navigate(`/org/${organizationId}/project/${projectId}/timeline`);
                   }
                 }}
-                style={isMobile ? { fontSize: "12px", padding: "8px 12px" } : {}}
+                style={isMobile ? { 
+                  fontSize: "14px", 
+                  padding: "12px 16px",
+                  minHeight: "44px",
+                  minWidth: "44px",
+                  flex: isMobile ? "1 1 calc(50% - 5px)" : "0 0 auto",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  gap: "6px",
+                } : {}}
               >
-                {isMobile ? "📅" : "📅 Cronograma"}
+                {isMobile ? "📅 Cronograma" : "📅 Cronograma"}
               </Button>
               <Button 
                 variant="primary" 
@@ -421,13 +461,23 @@ export default function Board() {
                     setShowCreateModal(true);
                   }
                 }}
-                style={{
-                  minWidth: isMobile ? "120px" : "auto",
-                  fontSize: isMobile ? "14px" : "15px",
-                  padding: isMobile ? "10px 16px" : "12px 20px",
+                style={isMobile ? {
+                  fontSize: "15px",
+                  fontWeight: 600,
+                  padding: "14px 20px",
+                  minHeight: "48px",
+                  flex: isMobile ? "1 1 100%" : "0 0 auto",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  gap: "8px",
+                } : {
+                  minWidth: "auto",
+                  fontSize: "15px",
+                  padding: "12px 20px",
                 }}
               >
-                {isMobile ? "+ Tarea" : "+ Nueva Tarea"}
+                {isMobile ? "+ Nueva Tarea" : "+ Nueva Tarea"}
               </Button>
             </div>
           }
@@ -488,11 +538,15 @@ export default function Board() {
             <div
               className="kanban-board"
               style={{
-                display: "grid",
-                gridTemplateColumns: `repeat(${STATUSES.length}, 1fr)`,
-                gap: "16px",
-                overflowX: "auto",
+                display: isMobile ? "flex" : "grid",
+                gridTemplateColumns: isMobile ? "none" : `repeat(${STATUSES.length}, 1fr)`,
+                flexDirection: isMobile ? "row" : "row",
+                gap: isMobile ? "12px" : "16px",
+                overflowX: isMobile ? "auto" : "auto",
+                overflowY: "hidden",
                 minWidth: 0,
+                paddingBottom: isMobile ? "8px" : "0",
+                WebkitOverflowScrolling: "touch",
               }}
             >
               {STATUSES.map((status) => {
@@ -509,7 +563,9 @@ export default function Board() {
                       borderRadius: "12px",
                       padding: isMobile ? "12px" : "16px",
                       minHeight: isMobile ? "400px" : "600px",
-                      minWidth: isMobile ? "280px" : "auto",
+                      minWidth: isMobile ? "300px" : "auto",
+                      maxWidth: isMobile ? "300px" : "none",
+                      width: isMobile ? "300px" : "auto",
                       boxShadow: "0 2px 8px 0 rgba(0, 0, 0, 0.08)",
                       border: touchTarget === status ? `2px solid ${statusColor}` : "1px solid var(--border-color)",
                       transition: "all 0.2s ease",
@@ -787,9 +843,11 @@ export default function Board() {
                             <div
                               style={{
                                 display: "flex",
-                                gap: "6px",
+                                flexDirection: isMobile ? "column" : "row",
+                                gap: isMobile ? "8px" : "6px",
                                 marginBottom: "8px",
-                                flexWrap: "wrap",
+                                flexWrap: isMobile ? "nowrap" : "wrap",
+                                width: "100%",
                               }}
                             >
                               {getPreviousStatus(task.status) && (
@@ -799,24 +857,26 @@ export default function Board() {
                                     changeTaskStatus(task.id, getPreviousStatus(task.status)!);
                                   }}
                                   style={{
-                                    padding: isMobile ? "8px 12px" : "6px 10px",
-                                    fontSize: isMobile ? "12px" : "11px",
+                                    padding: isMobile ? "12px 16px" : "6px 10px",
+                                    fontSize: isMobile ? "14px" : "11px",
                                     fontWeight: 600,
                                     border: "none",
-                                    borderRadius: "6px",
+                                    borderRadius: "8px",
                                     backgroundColor: "var(--bg-tertiary)",
                                     color: "var(--text-primary)",
                                     cursor: "pointer",
                                     transition: "all 0.2s",
                                     display: "flex",
                                     alignItems: "center",
-                                    gap: "4px",
+                                    justifyContent: "center",
+                                    gap: "6px",
                                     minHeight: isMobile ? "44px" : "auto",
-                                    minWidth: isMobile ? "44px" : "auto",
+                                    width: isMobile ? "100%" : "auto",
+                                    flex: isMobile ? "1 1 100%" : "0 0 auto",
                                   }}
                                   onMouseEnter={(e) => {
                                     e.currentTarget.style.backgroundColor = "var(--border-color)";
-                                    e.currentTarget.style.transform = "scale(1.05)";
+                                    e.currentTarget.style.transform = "scale(1.02)";
                                   }}
                                   onMouseLeave={(e) => {
                                     e.currentTarget.style.backgroundColor = "var(--bg-tertiary)";
@@ -835,26 +895,26 @@ export default function Board() {
                                     changeTaskStatus(task.id, getNextStatus(task.status)!);
                                   }}
                                   style={{
-                                    padding: isMobile ? "8px 12px" : "6px 10px",
-                                    fontSize: isMobile ? "12px" : "11px",
+                                    padding: isMobile ? "12px 16px" : "6px 10px",
+                                    fontSize: isMobile ? "14px" : "11px",
                                     fontWeight: 600,
                                     border: "none",
-                                    borderRadius: "6px",
+                                    borderRadius: "8px",
                                     backgroundColor: STATUS_COLORS[getNextStatus(task.status)!] || "#007bff",
                                     color: "var(--white)",
                                     cursor: "pointer",
                                     transition: "all 0.2s",
                                     display: "flex",
                                     alignItems: "center",
-                                    gap: "4px",
-                                    flex: 1,
-                                    minWidth: isMobile ? "100px" : "90px",
-                                    minHeight: isMobile ? "44px" : "auto",
                                     justifyContent: "center",
+                                    gap: "6px",
+                                    flex: isMobile ? "1 1 100%" : 1,
+                                    minWidth: isMobile ? "100%" : "90px",
+                                    minHeight: isMobile ? "44px" : "auto",
                                   }}
                                   onMouseEnter={(e) => {
                                     e.currentTarget.style.opacity = "0.9";
-                                    e.currentTarget.style.transform = "scale(1.05)";
+                                    e.currentTarget.style.transform = "scale(1.02)";
                                   }}
                                   onMouseLeave={(e) => {
                                     e.currentTarget.style.opacity = "1";
@@ -873,24 +933,26 @@ export default function Board() {
                                     changeTaskStatus(task.id, "Done");
                                   }}
                                   style={{
-                                    padding: isMobile ? "8px 12px" : "6px 10px",
-                                    fontSize: isMobile ? "12px" : "11px",
+                                    padding: isMobile ? "12px 16px" : "6px 10px",
+                                    fontSize: isMobile ? "14px" : "11px",
                                     fontWeight: 600,
                                     border: "none",
-                                    borderRadius: "6px",
+                                    borderRadius: "8px",
                                     backgroundColor: "#28a745",
                                     color: "var(--white)",
                                     cursor: "pointer",
                                     transition: "all 0.2s",
                                     display: "flex",
                                     alignItems: "center",
-                                    gap: "4px",
+                                    justifyContent: "center",
+                                    gap: "6px",
                                     minHeight: isMobile ? "44px" : "auto",
-                                    minWidth: isMobile ? "44px" : "auto",
+                                    width: isMobile ? "100%" : "auto",
+                                    flex: isMobile ? "1 1 100%" : "0 0 auto",
                                   }}
                                   onMouseEnter={(e) => {
                                     e.currentTarget.style.backgroundColor = "#218838";
-                                    e.currentTarget.style.transform = "scale(1.05)";
+                                    e.currentTarget.style.transform = "scale(1.02)";
                                   }}
                                   onMouseLeave={(e) => {
                                     e.currentTarget.style.backgroundColor = "#28a745";

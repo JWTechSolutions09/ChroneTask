@@ -86,14 +86,13 @@ export default function PageHeader({ title, subtitle, breadcrumbs, actions }: Pa
           <div 
             style={{ 
               display: "flex", 
-              gap: isMobile ? "6px" : "8px", 
-              alignItems: "center", 
-              flexWrap: "nowrap",
+              gap: isMobile ? "10px" : "8px", 
+              alignItems: "stretch", 
+              flexWrap: isMobile ? "wrap" : "nowrap",
               width: isMobile ? "100%" : "auto",
               maxWidth: "100%",
-              justifyContent: "flex-start",
-              overflowX: "auto",
-              WebkitOverflowScrolling: "touch",
+              justifyContent: isMobile ? "flex-start" : "flex-start",
+              marginTop: isMobile ? "12px" : "0",
             }}
             className="page-header-actions"
           >
