@@ -628,7 +628,13 @@ export default function Board() {
                     </div>
 
                     {/* Tasks */}
-                    <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+                    <div style={{ 
+                      display: "flex", 
+                      flexDirection: "column", 
+                      gap: isMobile ? "14px" : "12px",
+                      minWidth: 0,
+                      width: "100%",
+                    }}>
                       {statusTasks.map((task) => (
                         <div
                           key={task.id}
@@ -642,7 +648,7 @@ export default function Board() {
                           onTouchEnd={handleTouchEnd}
                           className="hover-lift fade-in"
                           style={{
-                            padding: isMobile ? "12px" : "14px",
+                            padding: isMobile ? "14px" : "14px",
                             borderLeft: `4px solid ${STATUS_COLORS[task.status] || "#6c757d"}`,
                             cursor: isMobile ? "pointer" : "grab",
                             backgroundColor: "var(--bg-primary)",
@@ -653,6 +659,9 @@ export default function Board() {
                             border: "1px solid var(--border-color)",
                             touchAction: isMobile ? "pan-y" : "none",
                             userSelect: "none",
+                            width: "100%",
+                            minWidth: 0,
+                            boxSizing: "border-box",
                           }}
                           onMouseEnter={!isMobile ? (e) => {
                             e.currentTarget.style.borderColor = STATUS_COLORS[task.status] || "#6c757d";
@@ -667,18 +676,27 @@ export default function Board() {
                           } : undefined}
                           onClick={() => setSelectedTask(task)}
                         >
-                          <div style={{ marginBottom: "12px" }}>
-                            <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "8px" }}>
+                          {/* Header: Type, Priority, Title, Description */}
+                          <div style={{ marginBottom: "12px", minWidth: 0, width: "100%" }}>
+                            <div style={{ 
+                              display: "flex", 
+                              alignItems: "center", 
+                              gap: "8px", 
+                              marginBottom: "8px",
+                              flexWrap: "wrap",
+                            }}>
                               <span
                                 style={{
-                                  fontSize: "10px",
+                                  fontSize: isMobile ? "11px" : "10px",
                                   fontWeight: 700,
                                   backgroundColor: "var(--bg-tertiary)",
                                   color: "var(--text-primary)",
-                                  padding: "4px 8px",
+                                  padding: isMobile ? "5px 10px" : "4px 8px",
                                   borderRadius: "6px",
                                   textTransform: "uppercase",
                                   letterSpacing: "0.5px",
+                                  whiteSpace: "nowrap",
+                                  flexShrink: 0,
                                 }}
                               >
                                 {task.type}
@@ -686,7 +704,8 @@ export default function Board() {
                               {task.priority && (
                                 <span
                                   style={{
-                                    fontSize: "12px",
+                                    fontSize: isMobile ? "14px" : "12px",
+                                    flexShrink: 0,
                                   }}
                                 >
                                   {task.priority === "Critical" && "🔴"}
@@ -698,13 +717,15 @@ export default function Board() {
                             </div>
                             <h4
                               style={{
-                                margin: "0 0 6px 0",
-                                fontSize: isMobile ? "14px" : "15px",
+                                margin: "0 0 8px 0",
+                                fontSize: isMobile ? "15px" : "15px",
                                 fontWeight: 700,
                                 color: "var(--text-primary)",
                                 lineHeight: 1.4,
                                 wordBreak: "break-word",
                                 overflowWrap: "break-word",
+                                minWidth: 0,
+                                width: "100%",
                               }}
                             >
                               {task.title}
@@ -713,7 +734,7 @@ export default function Board() {
                               <p
                                 style={{
                                   margin: "0",
-                                  fontSize: "12px",
+                                  fontSize: isMobile ? "13px" : "12px",
                                   color: "var(--text-secondary)",
                                   overflow: "hidden",
                                   textOverflow: "ellipsis",
@@ -721,6 +742,10 @@ export default function Board() {
                                   WebkitLineClamp: 2,
                                   WebkitBoxOrient: "vertical",
                                   lineHeight: 1.5,
+                                  wordBreak: "break-word",
+                                  overflowWrap: "break-word",
+                                  minWidth: 0,
+                                  width: "100%",
                                 }}
                               >
                                 {task.description}
@@ -728,25 +753,38 @@ export default function Board() {
                             )}
                           </div>
 
+                          {/* Meta Info Section: Assignment & Time */}
                           <div
                             style={{
-                              fontSize: "11px",
-                              color: "#6c757d",
                               marginTop: "12px",
                               paddingTop: "12px",
-                              borderTop: "2px solid var(--border-color)",
+                              borderTop: "1px solid var(--border-color)",
+                              minWidth: 0,
+                              width: "100%",
                             }}
                           >
                             <div
                               style={{
                                 display: "flex",
-                                justifyContent: "space-between",
-                                alignItems: "center",
-                                marginBottom: "10px",
+                                flexDirection: isMobile ? "column" : "row",
+                                justifyContent: isMobile ? "flex-start" : "space-between",
+                                alignItems: isMobile ? "stretch" : "center",
+                                gap: isMobile ? "10px" : "8px",
+                                marginBottom: "12px",
+                                minWidth: 0,
+                                width: "100%",
                               }}
                             >
                               {!isPersonalMode && !isPersonalRoute && (
-                                <div style={{ display: "flex", alignItems: "center", gap: "6px", position: "relative" }}>
+                                <div style={{ 
+                                  display: "flex", 
+                                  alignItems: "center", 
+                                  gap: "6px", 
+                                  position: "relative",
+                                  minWidth: 0,
+                                  flex: isMobile ? "1 1 100%" : "0 0 auto",
+                                  width: isMobile ? "100%" : "auto",
+                                }}>
                                   {assigningTaskId === task.id ? (
                                     <select
                                       value={task.assignedToId || ""}
@@ -757,15 +795,17 @@ export default function Board() {
                                       onBlur={() => setAssigningTaskId(null)}
                                       autoFocus
                                       style={{
-                                        padding: isMobile ? "8px 12px" : "4px 8px",
+                                        padding: isMobile ? "10px 14px" : "4px 8px",
                                         fontSize: isMobile ? "14px" : "11px",
                                         border: "1px solid #007bff",
                                         borderRadius: "6px",
                                         backgroundColor: "var(--bg-primary)",
                                         color: "var(--text-primary)",
                                         cursor: "pointer",
-                                        minWidth: isMobile ? "140px" : "120px",
+                                        width: isMobile ? "100%" : "auto",
+                                        minWidth: isMobile ? "100%" : "120px",
                                         minHeight: isMobile ? "44px" : "auto",
+                                        boxSizing: "border-box",
                                       }}
                                       onClick={(e) => e.stopPropagation()}
                                     >
@@ -786,12 +826,15 @@ export default function Board() {
                                         cursor: "pointer",
                                         display: "flex",
                                         alignItems: "center",
-                                        gap: "6px",
-                                        padding: isMobile ? "8px 12px" : "4px 8px",
+                                        gap: "8px",
+                                        padding: isMobile ? "10px 14px" : "4px 8px",
                                         borderRadius: "6px",
                                         transition: "background-color 0.2s",
                                         minHeight: isMobile ? "44px" : "auto",
-                                        minWidth: isMobile ? "44px" : "auto",
+                                        width: isMobile ? "100%" : "auto",
+                                        minWidth: 0,
+                                        flex: isMobile ? "1 1 100%" : "0 0 auto",
+                                        boxSizing: "border-box",
                                       }}
                                       onMouseEnter={(e) => {
                                         e.currentTarget.style.backgroundColor = "var(--hover-bg)";
@@ -801,18 +844,25 @@ export default function Board() {
                                       }}
                                       title="Click para asignar usuario"
                                     >
+                                      <span style={{ fontSize: isMobile ? "16px" : "14px", flexShrink: 0 }}>👤</span>
                                       {task.assignedToName ? (
-                                        <>
-                                          <span style={{ fontSize: "14px" }}>👤</span>
-                                          <span style={{ fontWeight: 600, color: "var(--text-primary)" }}>
-                                            {task.assignedToName}
-                                          </span>
-                                        </>
+                                        <span style={{ 
+                                          fontWeight: 600, 
+                                          color: "var(--text-primary)",
+                                          fontSize: isMobile ? "14px" : "12px",
+                                          wordBreak: "break-word",
+                                          overflowWrap: "break-word",
+                                          minWidth: 0,
+                                        }}>
+                                          {task.assignedToName}
+                                        </span>
                                       ) : (
-                                        <>
-                                          <span style={{ fontSize: "12px" }}>➕</span>
-                                          <span style={{ opacity: 0.6, fontSize: "11px" }}>Asignar</span>
-                                        </>
+                                        <span style={{ 
+                                          opacity: 0.6, 
+                                          fontSize: isMobile ? "13px" : "11px",
+                                        }}>
+                                          Asignar
+                                        </span>
                                       )}
                                     </div>
                                   )}
@@ -821,15 +871,17 @@ export default function Board() {
                               {task.estimatedMinutes && (
                                 <div
                                   style={{
-                                    fontSize: "11px",
+                                    fontSize: isMobile ? "13px" : "11px",
                                     fontWeight: 600,
                                     color: "var(--text-secondary)",
                                     display: "flex",
                                     alignItems: "center",
-                                    gap: "4px",
+                                    gap: "6px",
+                                    flexShrink: 0,
+                                    padding: isMobile ? "8px 0" : "0",
                                   }}
                                 >
-                                  <span>⏱️</span>
+                                  <span style={{ fontSize: isMobile ? "16px" : "14px" }}>⏱️</span>
                                   <span>
                                     {task.estimatedMinutes < 60
                                       ? `${task.estimatedMinutes}m`
@@ -844,10 +896,12 @@ export default function Board() {
                               style={{
                                 display: "flex",
                                 flexDirection: isMobile ? "column" : "row",
-                                gap: isMobile ? "8px" : "6px",
-                                marginBottom: "8px",
+                                gap: isMobile ? "10px" : "6px",
+                                marginBottom: isMobile ? "12px" : "8px",
                                 flexWrap: isMobile ? "nowrap" : "wrap",
                                 width: "100%",
+                                minWidth: 0,
+                                boxSizing: "border-box",
                               }}
                             >
                               {getPreviousStatus(task.status) && (
@@ -968,7 +1022,11 @@ export default function Board() {
 
                             {/* Time Tracker */}
                             {projectId && (
-                              <div style={{ marginTop: "8px" }}>
+                              <div style={{ 
+                                marginTop: isMobile ? "12px" : "8px",
+                                width: "100%",
+                                minWidth: 0,
+                              }}>
                                 <TimeTracker
                                   taskId={task.id}
                                   projectId={projectId}
