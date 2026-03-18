@@ -5,7 +5,7 @@ import { setToken, isAuthed } from "../auth/token";
 import { useToast } from "../contexts/ToastContext";
 import { useTheme } from "../contexts/ThemeContext";
 import { useUserUsageType } from "../hooks/useUserUsageType";
-import { supabase } from "../api/supabase";
+import { getSupabase, isSupabaseConfigured } from "../api/supabase";
 import "../styles/auth.css";
 
 export default function Auth() {
@@ -209,6 +209,24 @@ export default function Auth() {
     try {
       setLoading(true);
       setErr(null);
+
+      if (!isSupabaseConfigured()) {
+        const msg =
+          "Google (Supabase) no está configurado. Configura VITE_SUPABASE_URL y VITE_SUPABASE_ANON_KEY y vuelve a desplegar.";
+        setErr(msg);
+        showToast(msg, "error");
+        setLoading(false);
+        return;
+      }
+
+      const supabase = getSupabase();
+      if (!supabase) {
+        const msg = "Supabase no está disponible. Revisa la configuración.";
+        setErr(msg);
+        showToast(msg, "error");
+        setLoading(false);
+        return;
+      }
 
       const { error } = await supabase.auth.signInWithOAuth({
         provider: "google",

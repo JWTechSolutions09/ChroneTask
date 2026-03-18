@@ -1,6 +1,6 @@
 import React from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { supabase } from "../api/supabase";
+import { getSupabase, isSupabaseConfigured } from "../api/supabase";
 import { http } from "../api/http";
 import { setToken } from "../auth/token";
 import { useToast } from "../contexts/ToastContext";
@@ -13,6 +13,19 @@ export default function AuthCallback() {
   React.useEffect(() => {
     const run = async () => {
       try {
+        if (!isSupabaseConfigured()) {
+          showToast("Supabase no está configurado en este deploy. Revisa variables de entorno.", "error");
+          navigate("/login", { replace: true });
+          return;
+        }
+
+        const supabase = getSupabase();
+        if (!supabase) {
+          showToast("Supabase no está disponible. Revisa la configuración.", "error");
+          navigate("/login", { replace: true });
+          return;
+        }
+
         // If Supabase sent an error, surface it.
         const errorDesc = params.get("error_description") || params.get("error");
         if (errorDesc) {
