@@ -145,21 +145,48 @@ export default function Board() {
   // Manejo de touch para móvil
   const [touchStart, setTouchStart] = useState<{ task: Task; startX: number; startY: number } | null>(null);
   const [touchTarget, setTouchTarget] = useState<string | null>(null);
+  const [isTouchDragging, setIsTouchDragging] = useState(false);
 
   const handleTouchStart = useCallback((e: React.TouchEvent, task: Task) => {
     if (!isMobile) return;
-    e.preventDefault();
+    // No interceptar interacción con controles dentro de la tarjeta
+    const target = e.target as HTMLElement;
+    if (target.tagName === "BUTTON") return;
+    if (target.tagName === "SELECT") return;
+    if (target.tagName === "INPUT") return;
+    if (target.tagName === "TEXTAREA") return;
+    if (target.tagName === "A") return;
+    if (target.closest(".task-card-actions")) return;
+    if (target.closest(".task-card-meta")) return;
+    if (target.closest(".time-tracker")) return;
+
     setTouchStart({
       task,
       startX: e.touches[0].clientX,
       startY: e.touches[0].clientY,
     });
+    setIsTouchDragging(false);
   }, [isMobile]);
 
   const handleTouchMove = useCallback((e: React.TouchEvent) => {
     if (!isMobile || !touchStart) return;
-    e.preventDefault();
     const touch = e.touches[0];
+
+    // Detectar intención: si el usuario está haciendo swipe horizontal, activamos "drag"
+    const dx = touch.clientX - touchStart.startX;
+    const dy = touch.clientY - touchStart.startY;
+    const shouldStartDrag = Math.abs(dx) > 10 && Math.abs(dx) > Math.abs(dy);
+
+    if (shouldStartDrag) {
+      // A partir de aquí sí evitamos el scroll para permitir "drag"
+      e.preventDefault();
+      if (!isTouchDragging) setIsTouchDragging(true);
+    } else {
+      // Permitir scroll vertical natural
+      if (touchTarget) setTouchTarget(null);
+      return;
+    }
+
     const elementBelow = document.elementFromPoint(touch.clientX, touch.clientY);
     if (elementBelow) {
       const statusColumn = elementBelow.closest('[data-status]');
@@ -168,7 +195,7 @@ export default function Board() {
         if (status) setTouchTarget(status);
       }
     }
-  }, [isMobile, touchStart]);
+  }, [isMobile, touchStart, isTouchDragging, touchTarget]);
 
   const handleStatusChange = useCallback(async (taskId: string, newStatus: string) => {
     try {
@@ -182,6 +209,13 @@ export default function Board() {
 
   const handleTouchEnd = useCallback(async (e: React.TouchEvent) => {
     if (!isMobile || !touchStart) return;
+    // Si no hubo "drag" real, no hacemos nada (onClick abre el detalle)
+    if (!isTouchDragging) {
+      setTouchStart(null);
+      setTouchTarget(null);
+      return;
+    }
+
     e.preventDefault();
     const touch = e.changedTouches[0];
     const elementBelow = document.elementFromPoint(touch.clientX, touch.clientY);
@@ -198,7 +232,8 @@ export default function Board() {
 
     setTouchStart(null);
     setTouchTarget(null);
-  }, [isMobile, touchStart, handleStatusChange]);
+    setIsTouchDragging(false);
+  }, [isMobile, touchStart, handleStatusChange, isTouchDragging]);
 
   const handleDragOver = useCallback((e: React.DragEvent) => {
     e.preventDefault();
@@ -287,6 +322,22 @@ export default function Board() {
     const hours = Math.floor(minutes / 60);
     const mins = minutes % 60;
     return mins > 0 ? `${hours}h ${mins}m` : `${hours}h`;
+  }, []);
+
+  const formatShortDate = useCallback((dateString?: string) => {
+    if (!dateString) return null;
+    const d = new Date(dateString);
+    if (isNaN(d.getTime())) return null;
+    return d.toLocaleDateString("es-ES", { day: "2-digit", month: "short" });
+  }, []);
+
+  const parseTags = useCallback((tags?: string) => {
+    if (!tags) return [];
+    return tags
+      .split(",")
+      .map((t) => t.trim())
+      .filter(Boolean)
+      .slice(0, 3);
   }, []);
 
   const getTasksByStatus = useCallback((status: string) => {
@@ -555,8 +606,15 @@ export default function Board() {
                 overflowX: isMobile ? "auto" : "auto",
                 overflowY: "hidden",
                 minWidth: 0,
-                paddingBottom: isMobile ? "8px" : "0",
+                // En móvil: dar padding simétrico para que no se vea "pegado" a la izquierda
+                padding: isMobile ? "0 12px 10px 12px" : "0",
                 WebkitOverflowScrolling: "touch",
+                scrollSnapType: isMobile ? "x mandatory" : undefined,
+                scrollPaddingLeft: isMobile ? "12px" : undefined,
+                scrollPaddingRight: isMobile ? "12px" : undefined,
+                // Centrar visualmente cuando el contenido es menor al viewport
+                justifyContent: isMobile ? "flex-start" : undefined,
+                alignItems: isMobile ? "stretch" : undefined,
               }}
             >
               {STATUSES.map((status) => {
@@ -571,16 +629,20 @@ export default function Board() {
                     style={{
                       backgroundColor: "var(--bg-primary)",
                       borderRadius: "12px",
-                      padding: isMobile ? "8px" : "16px",
-                      minHeight: isMobile ? "400px" : "600px",
-                      minWidth: isMobile ? "360px" : "auto",
-                      maxWidth: isMobile ? "360px" : "none",
-                      width: isMobile ? "360px" : "auto",
+                      padding: isMobile ? "10px" : "16px",
+                      minHeight: isMobile ? "420px" : "600px",
+                      // En móvil: usar ancho relativo para que no se corte en pantallas pequeñas
+                      // y que se vea más "desktop-like": una columna ocupa casi todo el viewport
+                      width: isMobile ? "92vw" : "auto",
+                      maxWidth: isMobile ? "520px" : "none",
+                      minWidth: isMobile ? "300px" : "auto",
                       boxShadow: "0 2px 8px 0 rgba(0, 0, 0, 0.08)",
                       border: touchTarget === status ? `2px solid ${statusColor}` : "1px solid var(--border-color)",
                       transition: "all 0.2s ease",
                       flexShrink: 0,
                       boxSizing: "border-box",
+                      // Snap al centro para que no se vea apilado a la izquierda
+                      scrollSnapAlign: isMobile ? "center" : undefined,
                     }}
                     onDragOver={!isMobile ? handleDragOver : undefined}
                     onDrop={!isMobile ? (e) => handleDrop(e, status) : undefined}
@@ -599,25 +661,25 @@ export default function Board() {
                         display: "flex",
                         justifyContent: "space-between",
                         alignItems: "center",
-                        marginBottom: "16px",
-                        paddingBottom: "12px",
+                        marginBottom: isMobile ? "12px" : "16px",
+                        paddingBottom: isMobile ? "10px" : "12px",
                         borderBottom: `3px solid ${statusColor}40`,
                         backgroundColor: `${statusColor}08`,
-                        padding: "12px",
+                        padding: isMobile ? "10px 12px" : "12px",
                         borderRadius: "8px",
                       }}
                     >
                       <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
                         <div
                           style={{
-                            width: "14px",
-                            height: "14px",
+                            width: isMobile ? "12px" : "14px",
+                            height: isMobile ? "12px" : "14px",
                             borderRadius: "50%",
                             backgroundColor: statusColor,
                             boxShadow: `0 0 0 3px ${statusColor}30`,
                           }}
                         />
-                        <h3 style={{ margin: 0, fontSize: "16px", fontWeight: 700, color: "var(--text-primary)" }}>
+                        <h3 style={{ margin: 0, fontSize: isMobile ? "15px" : "16px", fontWeight: 800, color: "var(--text-primary)" }}>
                           {status}
                         </h3>
                       </div>
@@ -625,9 +687,9 @@ export default function Board() {
                         style={{
                           backgroundColor: statusColor,
                           color: "var(--white)",
-                          padding: "6px 12px",
+                          padding: isMobile ? "6px 10px" : "6px 12px",
                           borderRadius: "16px",
-                          fontSize: "13px",
+                          fontSize: isMobile ? "12px" : "13px",
                           fontWeight: 700,
                           minWidth: "32px",
                           textAlign: "center",
@@ -667,7 +729,7 @@ export default function Board() {
                             borderRadius: "10px",
                             boxShadow: "0 2px 4px 0 rgba(0, 0, 0, 0.08)",
                             transition: "all 0.2s ease",
-                            marginBottom: isMobile ? "12px" : "10px",
+                            marginBottom: isMobile ? "10px" : "10px",
                             border: "1px solid var(--border-color)",
                             touchAction: isMobile ? "pan-y" : "none",
                             userSelect: "none",
@@ -733,7 +795,7 @@ export default function Board() {
                             <h4
                               style={{
                                 margin: "0 0 8px 0",
-                                fontSize: isMobile ? "15px" : "15px",
+                                fontSize: isMobile ? "16px" : "15px",
                                 fontWeight: 700,
                                 color: "var(--text-primary)",
                                 lineHeight: 1.4,
@@ -745,6 +807,106 @@ export default function Board() {
                             >
                               {task.title}
                             </h4>
+
+                            {/* Context chips (móvil: dar más contexto tipo desktop sin saturar) */}
+                            {isMobile && (
+                              <div
+                                style={{
+                                  display: "flex",
+                                  flexWrap: "wrap",
+                                  gap: "6px",
+                                  marginBottom: task.description ? "10px" : "8px",
+                                  alignItems: "center",
+                                }}
+                              >
+                                {task.assignedToName && (
+                                  <span
+                                    style={{
+                                      fontSize: "12px",
+                                      fontWeight: 600,
+                                      padding: "4px 8px",
+                                      borderRadius: "999px",
+                                      backgroundColor: "var(--bg-tertiary)",
+                                      color: "var(--text-primary)",
+                                      maxWidth: "100%",
+                                      overflow: "hidden",
+                                      textOverflow: "ellipsis",
+                                      whiteSpace: "nowrap",
+                                    }}
+                                    title={task.assignedToName}
+                                  >
+                                    👤 {task.assignedToName}
+                                  </span>
+                                )}
+                                {formatShortDate(task.dueDate) && (
+                                  <span
+                                    style={{
+                                      fontSize: "12px",
+                                      fontWeight: 700,
+                                      padding: "4px 8px",
+                                      borderRadius: "999px",
+                                      backgroundColor: "rgba(255, 193, 7, 0.16)",
+                                      color: "var(--text-primary)",
+                                    }}
+                                    title="Fecha límite"
+                                  >
+                                    ⏳ {formatShortDate(task.dueDate)}
+                                  </span>
+                                )}
+                                {typeof task.estimatedMinutes === "number" && task.estimatedMinutes > 0 && (
+                                  <span
+                                    style={{
+                                      fontSize: "12px",
+                                      fontWeight: 700,
+                                      padding: "4px 8px",
+                                      borderRadius: "999px",
+                                      backgroundColor: "rgba(0, 123, 255, 0.12)",
+                                      color: "var(--text-primary)",
+                                    }}
+                                    title="Estimado"
+                                  >
+                                    ⏱️ {formatTime(task.estimatedMinutes)}
+                                  </span>
+                                )}
+                                {task.totalMinutes > 0 && (
+                                  <span
+                                    style={{
+                                      fontSize: "12px",
+                                      fontWeight: 700,
+                                      padding: "4px 8px",
+                                      borderRadius: "999px",
+                                      backgroundColor: "rgba(40, 167, 69, 0.12)",
+                                      color: "var(--text-primary)",
+                                    }}
+                                    title="Tiempo registrado"
+                                  >
+                                    ✅ {formatTime(task.totalMinutes)}
+                                  </span>
+                                )}
+                                {parseTags(task.tags).map((tag) => (
+                                  <span
+                                    key={tag}
+                                    style={{
+                                      fontSize: "12px",
+                                      fontWeight: 600,
+                                      padding: "4px 8px",
+                                      borderRadius: "999px",
+                                      border: "1px solid var(--border-color)",
+                                      backgroundColor: "var(--bg-primary)",
+                                      color: "var(--text-secondary)",
+                                      maxWidth: "100%",
+                                      overflow: "hidden",
+                                      textOverflow: "ellipsis",
+                                      whiteSpace: "nowrap",
+                                    }}
+                                    title={tag}
+                                  >
+                                    #{tag}
+                                  </span>
+                                ))}
+                              </div>
+                            )}
+
                             {task.description && (
                               <p
                                 style={{
@@ -754,13 +916,17 @@ export default function Board() {
                                   overflow: "hidden",
                                   textOverflow: "ellipsis",
                                   display: "-webkit-box",
-                                  WebkitLineClamp: 2,
+                                  WebkitLineClamp: isMobile ? 3 : 2,
                                   WebkitBoxOrient: "vertical",
                                   lineHeight: 1.5,
                                   wordBreak: "break-word",
                                   overflowWrap: "break-word",
                                   minWidth: 0,
                                   width: "100%",
+                                  backgroundColor: isMobile ? "var(--bg-secondary)" : "transparent",
+                                  border: isMobile ? "1px solid var(--border-color)" : "none",
+                                  borderRadius: isMobile ? "10px" : "0",
+                                  padding: isMobile ? "10px 10px" : "0",
                                 }}
                               >
                                 {task.description}
@@ -913,10 +1079,10 @@ export default function Board() {
                               className="task-card-actions"
                               style={{
                                 display: "flex",
-                                flexDirection: isMobile ? "column" : "row",
+                                flexDirection: isMobile ? "row" : "row",
                                 gap: isMobile ? "8px" : "6px",
                                 marginBottom: isMobile ? "10px" : "8px",
-                                flexWrap: isMobile ? "nowrap" : "wrap",
+                                flexWrap: isMobile ? "wrap" : "wrap",
                                 width: "100%",
                                 minWidth: 0,
                                 boxSizing: "border-box",
@@ -929,7 +1095,7 @@ export default function Board() {
                                     changeTaskStatus(task.id, getNextStatus(task.status)!);
                                   }}
                                   style={{
-                                    padding: isMobile ? "6px 12px" : "6px 10px",
+                                    padding: isMobile ? "10px 12px" : "6px 10px",
                                     fontSize: isMobile ? "12px" : "11px",
                                     fontWeight: 600,
                                     border: "none",
@@ -942,10 +1108,10 @@ export default function Board() {
                                     alignItems: "center",
                                     justifyContent: "center",
                                     gap: "6px",
-                                    flex: isMobile ? "1 1 100%" : 1,
-                                    minWidth: isMobile ? "100%" : "90px",
-                                    minHeight: isMobile ? "32px" : undefined,
-                                    width: isMobile ? "100%" : "auto",
+                                    flex: isMobile ? "1 1 calc(50% - 4px)" : 1,
+                                    minWidth: isMobile ? "calc(50% - 4px)" : "90px",
+                                    minHeight: isMobile ? "40px" : undefined,
+                                    width: isMobile ? "auto" : "auto",
                                   }}
                                   onMouseEnter={(e) => {
                                     e.currentTarget.style.opacity = "0.9";
@@ -968,7 +1134,7 @@ export default function Board() {
                                     changeTaskStatus(task.id, "Done");
                                   }}
                                   style={{
-                                    padding: isMobile ? "6px 12px" : "6px 10px",
+                                    padding: isMobile ? "10px 12px" : "6px 10px",
                                     fontSize: isMobile ? "12px" : "11px",
                                     fontWeight: 600,
                                     border: "none",
@@ -981,9 +1147,9 @@ export default function Board() {
                                     alignItems: "center",
                                     justifyContent: "center",
                                     gap: "6px",
-                                    minHeight: isMobile ? "32px" : undefined,
-                                    width: isMobile ? "100%" : "auto",
-                                    flex: isMobile ? "1 1 100%" : "0 0 auto",
+                                    minHeight: isMobile ? "40px" : undefined,
+                                    width: isMobile ? "auto" : "auto",
+                                    flex: isMobile ? "1 1 calc(50% - 4px)" : "0 0 auto",
                                   }}
                                   onMouseEnter={(e) => {
                                     e.currentTarget.style.backgroundColor = "#218838";
