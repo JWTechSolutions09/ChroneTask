@@ -708,6 +708,7 @@ export default function Board() {
                       minWidth: 0,
                       width: "100%",
                       boxSizing: "border-box",
+                      alignItems: "stretch",
                     }}>
                       {statusTasks.map((task) => (
                         <div
@@ -739,6 +740,7 @@ export default function Board() {
                             boxSizing: "border-box",
                             overflow: "visible",
                             height: "auto",
+                            alignSelf: "stretch",
                           }}
                           onMouseEnter={!isMobile ? (e) => {
                             e.currentTarget.style.borderColor = STATUS_COLORS[task.status] || "#6c757d";
@@ -799,8 +801,11 @@ export default function Board() {
                                 fontWeight: 700,
                                 color: "var(--text-primary)",
                                 lineHeight: 1.4,
-                                wordBreak: "break-word",
+                                // En iOS móvil evita cortar letra por letra con guiones
+                                hyphens: "none",
+                                wordBreak: "normal",
                                 overflowWrap: "break-word",
+                                whiteSpace: "normal",
                                 minWidth: 0,
                                 width: "100%",
                               }}
@@ -820,8 +825,10 @@ export default function Board() {
                                   WebkitLineClamp: isMobile ? 3 : 2,
                                   WebkitBoxOrient: "vertical",
                                   lineHeight: 1.5,
-                                  wordBreak: "break-word",
+                                  hyphens: "none",
+                                  wordBreak: "normal",
                                   overflowWrap: "break-word",
+                                  whiteSpace: "normal",
                                   minWidth: 0,
                                   width: "100%",
                                   // En móvil, estilo más limpio como la referencia (sin caja)
