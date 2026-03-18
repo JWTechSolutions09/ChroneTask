@@ -384,6 +384,52 @@ export default function Projects() {
                         flexWrap: "wrap",
                       }}
                     >
+                    {!isPersonalMode && !isPersonalRoute && organizationId && (
+                      <button
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          setShowMemberModal({ projectId: project.id, projectName: project.name });
+                        }}
+                        style={{
+                          position: isMobile ? "absolute" : "relative",
+                          top: isMobile ? "16px" : undefined,
+                          right: isMobile ? "16px" : undefined,
+                          alignSelf: "flex-start",
+                          padding: isMobile ? "10px 12px" : "10px 14px",
+                          borderRadius: "8px",
+                          border: "1px solid rgba(0, 123, 255, 0.3)",
+                          backgroundColor: "rgba(255, 255, 255, 0.95)",
+                          color: "#007bff",
+                          cursor: "pointer",
+                          fontSize: isMobile ? "13px" : "13px",
+                          display: "flex",
+                          alignItems: "center",
+                          gap: "6px",
+                          fontWeight: 600,
+                          transition: "all 0.2s",
+                          zIndex: 10,
+                          boxShadow: "0 2px 8px rgba(0, 0, 0, 0.15)",
+                          backdropFilter: "blur(10px)",
+                          justifyContent: "center",
+                          minHeight: isMobile ? "40px" : undefined,
+                          flex: isMobile ? undefined : "0 0 auto",
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.backgroundColor = "#e7f3ff";
+                          e.currentTarget.style.transform = "scale(1.05)";
+                          e.currentTarget.style.boxShadow = "0 4px 12px rgba(0, 123, 255, 0.25)";
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.backgroundColor = "rgba(255, 255, 255, 0.95)";
+                          e.currentTarget.style.transform = "scale(1)";
+                          e.currentTarget.style.boxShadow = "0 2px 8px rgba(0, 0, 0, 0.15)";
+                        }}
+                        title="Gestionar miembros del proyecto"
+                      >
+                        👥 Miembros
+                      </button>
+                    )}
                       <Link
                         to={
                           isPersonalMode || isPersonalRoute
@@ -393,8 +439,14 @@ export default function Projects() {
                         style={{
                           textDecoration: "none",
                           color: "inherit",
-                          flex: "1 1 260px",
+                          display: "block",
+                          width: "100%",
+                          flex: "1 1 100%",
                           minWidth: 0,
+                          paddingTop: isMobile && !project.imageUrl ? "8px" : undefined,
+                          paddingRight: !isPersonalMode && !isPersonalRoute && organizationId
+                            ? (isMobile ? "120px" : undefined)
+                            : undefined,
                         }}
                         className="fade-in"
                       >
@@ -518,50 +570,6 @@ export default function Projects() {
                         </span>
                       </div>
                     </Link>
-                    {!isPersonalMode && !isPersonalRoute && organizationId && (
-                      <button
-                        onClick={(e) => {
-                          e.preventDefault();
-                          e.stopPropagation();
-                          setShowMemberModal({ projectId: project.id, projectName: project.name });
-                        }}
-                        style={{
-                          position: "relative",
-                          alignSelf: "flex-start",
-                          padding: isMobile ? "12px 14px" : "10px 14px",
-                          borderRadius: "8px",
-                          border: "1px solid rgba(0, 123, 255, 0.3)",
-                          backgroundColor: "rgba(255, 255, 255, 0.95)",
-                          color: "#007bff",
-                          cursor: "pointer",
-                          fontSize: isMobile ? "14px" : "13px",
-                          display: "flex",
-                          alignItems: "center",
-                          gap: "6px",
-                          fontWeight: 600,
-                          transition: "all 0.2s",
-                          zIndex: 10,
-                          boxShadow: "0 2px 8px rgba(0, 0, 0, 0.15)",
-                          backdropFilter: "blur(10px)",
-                          justifyContent: "center",
-                          minHeight: isMobile ? "44px" : undefined,
-                          flex: isMobile ? "1 1 100%" : "0 0 auto",
-                        }}
-                        onMouseEnter={(e) => {
-                          e.currentTarget.style.backgroundColor = "#e7f3ff";
-                          e.currentTarget.style.transform = "scale(1.05)";
-                          e.currentTarget.style.boxShadow = "0 4px 12px rgba(0, 123, 255, 0.25)";
-                        }}
-                        onMouseLeave={(e) => {
-                          e.currentTarget.style.backgroundColor = "rgba(255, 255, 255, 0.95)";
-                          e.currentTarget.style.transform = "scale(1)";
-                          e.currentTarget.style.boxShadow = "0 2px 8px rgba(0, 0, 0, 0.15)";
-                        }}
-                        title="Gestionar miembros del proyecto"
-                      >
-                        👥 Miembros
-                      </button>
-                    )}
                     </div>
                   </Card>
                 );
