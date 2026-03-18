@@ -241,50 +241,106 @@ export default function ProjectCommentsBody({
           backgroundColor: "var(--bg-secondary)",
         }}
       >
-        <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
-          <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
-            <input
-              type="checkbox"
-              id="pin-comment"
-              checked={isPinned}
-              onChange={(e) => setIsPinned(e.target.checked)}
-              style={{ cursor: "pointer" }}
-            />
-            <label htmlFor="pin-comment" style={{ fontSize: "14px", cursor: "pointer" }}>
-              Fijar comentario
-            </label>
-          </div>
-          <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
-            {colors.map((color) => (
-              <button
-                key={color}
-                type="button"
-                onClick={() => setSelectedColor(selectedColor === color ? "" : color)}
-                style={{
-                  width: "32px",
-                  height: "32px",
-                  borderRadius: "6px",
-                  backgroundColor: color,
-                  border: selectedColor === color ? "3px solid var(--text-primary)" : "2px solid transparent",
-                  cursor: "pointer",
-                }}
+        <form
+          onSubmit={handleSubmit}
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            gap: "12px",
+            width: "100%",
+            maxWidth: "100%",
+            boxSizing: "border-box",
+          }}
+        >
+          {/* Pin + color (móvil-friendly) */}
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "flex-start",
+              gap: "12px",
+              width: "100%",
+              maxWidth: "100%",
+              padding: "10px 12px",
+              borderRadius: "10px",
+              border: "1px solid var(--border-color)",
+              backgroundColor: "var(--bg-primary)",
+              boxSizing: "border-box",
+              overflow: "hidden",
+            }}
+          >
+            <label
+              htmlFor="pin-comment"
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "8px",
+                margin: 0,
+                padding: 0,
+                cursor: "pointer",
+                fontSize: "13px",
+                fontWeight: 600,
+                color: "var(--text-primary)",
+                whiteSpace: "nowrap",
+                flexShrink: 0,
+              }}
+            >
+              <input
+                type="checkbox"
+                id="pin-comment"
+                checked={isPinned}
+                onChange={(e) => setIsPinned(e.target.checked)}
+                style={{ cursor: "pointer", margin: 0 }}
               />
-            ))}
+              📌 Fijar
+            </label>
+
+            <div
+              style={{
+                display: "flex",
+                gap: "8px",
+                alignItems: "center",
+                overflowX: "auto",
+                paddingBottom: "2px",
+                flex: "1 1 auto",
+                minWidth: 0,
+              }}
+            >
+              {colors.map((color) => (
+                <button
+                  key={color}
+                  type="button"
+                  onClick={() => setSelectedColor(selectedColor === color ? "" : color)}
+                  style={{
+                    width: "28px",
+                    height: "28px",
+                    borderRadius: "8px",
+                    backgroundColor: color,
+                    border: selectedColor === color ? "3px solid var(--text-primary)" : "2px solid transparent",
+                    cursor: "pointer",
+                    flexShrink: 0,
+                  }}
+                  aria-label={`Color ${color}`}
+                  title="Color"
+                />
+              ))}
+            </div>
           </div>
           <textarea
             value={newComment}
             onChange={(e) => setNewComment(e.target.value)}
             placeholder="Escribe un comentario..."
             style={{
-              minHeight: "100px",
-              padding: "12px",
-              borderRadius: "8px",
+              minHeight: "110px",
+              padding: "12px 12px",
+              borderRadius: "10px",
               border: "1px solid var(--border-color)",
               backgroundColor: "var(--bg-primary)",
               color: "var(--text-primary)",
               fontFamily: "inherit",
               fontSize: "14px",
               resize: "vertical",
+              outline: "none",
             }}
           />
           {attachments.length > 0 && (
@@ -325,17 +381,17 @@ export default function ProjectCommentsBody({
               ))}
             </div>
           )}
-          <div style={{ display: "flex", gap: "8px" }}>
+          <div style={{ display: "flex", gap: "8px", width: "100%" }}>
             <input ref={fileInputRef} type="file" multiple onChange={handleFileSelect} style={{ display: "none" }} />
             <Button
               type="button"
               variant="secondary"
               onClick={() => fileInputRef.current?.click()}
-              style={{ flex: 1 }}
+              style={{ flex: 1, minHeight: "44px" }}
             >
               📎 Adjuntar
             </Button>
-            <Button type="submit" variant="primary" disabled={uploading} style={{ flex: 1 }}>
+            <Button type="submit" variant="primary" disabled={uploading} style={{ flex: 1, minHeight: "44px" }}>
               {uploading ? "Enviando..." : "Comentar"}
             </Button>
           </div>
