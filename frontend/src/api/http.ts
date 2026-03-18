@@ -23,13 +23,17 @@ const getApiUrl = () => {
   const apiUrl = import.meta.env.VITE_API_URL;
   
   if (apiUrl) {
-    console.log('🌐 API URL desde VITE_API_URL:', apiUrl);
+    if (import.meta.env.DEV) {
+      console.log('🌐 API URL desde VITE_API_URL:', apiUrl);
+    }
     return apiUrl;
   }
   
   // URL por defecto para producción (Render)
   const prodUrl = 'https://chronetask-1.onrender.com';
-  console.log('🌐 API URL (producción):', prodUrl);
+  if (import.meta.env.DEV) {
+    console.log('🌐 API URL (producción):', prodUrl);
+  }
   return prodUrl;
 };
 
@@ -43,7 +47,9 @@ export const http = axios.create({
 });
 
 // Log para verificar la configuración
-console.log('✅ Axios configurado con baseURL:', apiBaseURL);
+if (import.meta.env.DEV) {
+  console.log('✅ Axios configurado con baseURL:', apiBaseURL);
+}
 
 // Interceptor de request: agrega el token a todas las peticiones y valida expiración
 http.interceptors.request.use(

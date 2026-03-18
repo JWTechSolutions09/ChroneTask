@@ -24,10 +24,19 @@ export const useToast = () => {
 export const ToastProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [toasts, setToasts] = useState<ToastItem[]>([]);
 
+  const sanitizeMessage = useCallback((message: string, type: ToastType) => {
+    // In production, avoid exposing technical details to end users.
+    if (!import.meta.env.DEV && type === "error") {
+      return "Ocurrió un error. Intenta nuevamente.";
+    }
+    return message;
+  }, []);
+
   const showToast = useCallback((message: string, type: ToastType = "info") => {
     const id = Math.random().toString(36).substring(7);
-    setToasts((prev) => [...prev, { id, message, type }]);
-  }, []);
+    const safeMessage = sanitizeMessage(message, type);
+    setToasts((prev) => [...prev, { id, message: safeMessage, type }]);
+  }, [sanitizeMessage]);
 
   const removeToast = useCallback((id: string) => {
     setToasts((prev) => prev.filter((toast) => toast.id !== id));
