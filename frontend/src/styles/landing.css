@@ -60,10 +60,17 @@ body {
 
 @media (max-width: 767.98px) {
   .landing-nav {
-    position: relative !important;
-    top: auto !important;
-    left: auto !important;
-    right: auto !important;
+    /* En móvil: mantener navbar siempre accesible al hacer scroll */
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    z-index: 1200 !important;
+  }
+
+  /* Compensar navbar fixed para que el contenido no quede oculto */
+  .landing-page {
+    padding-top: clamp(60px, 10vw, 70px);
   }
 }
 
@@ -1339,8 +1346,12 @@ body {
 
 @media (max-width: 767.98px) {
   .landing-nav {
-    position: relative !important;
-    top: auto !important;
+    /* En móvil: mantener navbar siempre accesible al hacer scroll */
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    z-index: 1200 !important;
   }
 
   .landing-mobile-overlay {
