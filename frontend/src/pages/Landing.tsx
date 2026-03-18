@@ -559,6 +559,36 @@ export default function Landing() {
             <a href="#features" onClick={(e) => { e.preventDefault(); scrollToSection(featuresRef); }}>Características</a>
             <a href="#benefits" onClick={(e) => { e.preventDefault(); scrollToSection(benefitsRef); }}>Beneficios</a>
             <a href="#how-it-works" onClick={(e) => { e.preventDefault(); scrollToSection(howItWorksRef); }}>Cómo Funciona</a>
+            <button
+              type="button"
+              onClick={() => navigate("/privacy")}
+              style={{
+                background: "transparent",
+                border: "none",
+                padding: 0,
+                color: "inherit",
+                cursor: "pointer",
+                font: "inherit",
+                textDecoration: "none",
+              }}
+            >
+              Política de Privacidad
+            </button>
+            <button
+              type="button"
+              onClick={() => navigate("/terms")}
+              style={{
+                background: "transparent",
+                border: "none",
+                padding: 0,
+                color: "inherit",
+                cursor: "pointer",
+                font: "inherit",
+                textDecoration: "none",
+              }}
+            >
+              Términos de Servicio
+            </button>
           </div>
           <div className="footer-copyright">
             <p>© 2024 JW TECH SOLUTIONS. Todos los derechos reservados.</p>
