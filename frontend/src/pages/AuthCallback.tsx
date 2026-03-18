@@ -34,6 +34,24 @@ export default function AuthCallback() {
           return;
         }
 
+        // Supabase OAuth (PKCE) returns ?code=... and requires exchanging it for a session.
+        const code = params.get("code");
+        if (code) {
+          const { error: exchangeError } = await supabase.auth.exchangeCodeForSession(code);
+          if (exchangeError) {
+            showToast("Error procesando callback de Google (exchange).", "error");
+            navigate("/login", { replace: true });
+            return;
+          }
+
+          // Clean URL (remove code) to avoid re-exchange on refresh.
+          try {
+            window.history.replaceState({}, document.title, "/auth/callback");
+          } catch {
+            // ignore
+          }
+        }
+
         const { data, error } = await supabase.auth.getSession();
         if (error) {
           showToast("Error obteniendo sesión de Google", "error");
