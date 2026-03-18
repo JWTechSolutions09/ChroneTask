@@ -808,105 +808,6 @@ export default function Board() {
                               {task.title}
                             </h4>
 
-                            {/* Context chips (móvil: dar más contexto tipo desktop sin saturar) */}
-                            {isMobile && (
-                              <div
-                                style={{
-                                  display: "flex",
-                                  flexWrap: "wrap",
-                                  gap: "6px",
-                                  marginBottom: task.description ? "10px" : "8px",
-                                  alignItems: "center",
-                                }}
-                              >
-                                {task.assignedToName && (
-                                  <span
-                                    style={{
-                                      fontSize: "12px",
-                                      fontWeight: 600,
-                                      padding: "4px 8px",
-                                      borderRadius: "999px",
-                                      backgroundColor: "var(--bg-tertiary)",
-                                      color: "var(--text-primary)",
-                                      maxWidth: "100%",
-                                      overflow: "hidden",
-                                      textOverflow: "ellipsis",
-                                      whiteSpace: "nowrap",
-                                    }}
-                                    title={task.assignedToName}
-                                  >
-                                    👤 {task.assignedToName}
-                                  </span>
-                                )}
-                                {formatShortDate(task.dueDate) && (
-                                  <span
-                                    style={{
-                                      fontSize: "12px",
-                                      fontWeight: 700,
-                                      padding: "4px 8px",
-                                      borderRadius: "999px",
-                                      backgroundColor: "rgba(255, 193, 7, 0.16)",
-                                      color: "var(--text-primary)",
-                                    }}
-                                    title="Fecha límite"
-                                  >
-                                    ⏳ {formatShortDate(task.dueDate)}
-                                  </span>
-                                )}
-                                {typeof task.estimatedMinutes === "number" && task.estimatedMinutes > 0 && (
-                                  <span
-                                    style={{
-                                      fontSize: "12px",
-                                      fontWeight: 700,
-                                      padding: "4px 8px",
-                                      borderRadius: "999px",
-                                      backgroundColor: "rgba(0, 123, 255, 0.12)",
-                                      color: "var(--text-primary)",
-                                    }}
-                                    title="Estimado"
-                                  >
-                                    ⏱️ {formatTime(task.estimatedMinutes)}
-                                  </span>
-                                )}
-                                {task.totalMinutes > 0 && (
-                                  <span
-                                    style={{
-                                      fontSize: "12px",
-                                      fontWeight: 700,
-                                      padding: "4px 8px",
-                                      borderRadius: "999px",
-                                      backgroundColor: "rgba(40, 167, 69, 0.12)",
-                                      color: "var(--text-primary)",
-                                    }}
-                                    title="Tiempo registrado"
-                                  >
-                                    ✅ {formatTime(task.totalMinutes)}
-                                  </span>
-                                )}
-                                {parseTags(task.tags).map((tag) => (
-                                  <span
-                                    key={tag}
-                                    style={{
-                                      fontSize: "12px",
-                                      fontWeight: 600,
-                                      padding: "4px 8px",
-                                      borderRadius: "999px",
-                                      border: "1px solid var(--border-color)",
-                                      backgroundColor: "var(--bg-primary)",
-                                      color: "var(--text-secondary)",
-                                      maxWidth: "100%",
-                                      overflow: "hidden",
-                                      textOverflow: "ellipsis",
-                                      whiteSpace: "nowrap",
-                                    }}
-                                    title={tag}
-                                  >
-                                    #{tag}
-                                  </span>
-                                ))}
-                              </div>
-                            )}
-
                             {task.description && (
                               <p
                                 style={{
@@ -923,16 +824,30 @@ export default function Board() {
                                   overflowWrap: "break-word",
                                   minWidth: 0,
                                   width: "100%",
-                                  backgroundColor: isMobile ? "var(--bg-secondary)" : "transparent",
-                                  border: isMobile ? "1px solid var(--border-color)" : "none",
-                                  borderRadius: isMobile ? "10px" : "0",
-                                  padding: isMobile ? "10px 10px" : "0",
+                                  // En móvil, estilo más limpio como la referencia (sin caja)
+                                  backgroundColor: "transparent",
+                                  border: "none",
+                                  borderRadius: 0,
+                                  padding: 0,
                                 }}
                               >
                                 {task.description}
                               </p>
                             )}
                           </div>
+
+                          {/* Divider (móvil: separar contexto de acciones como en la referencia) */}
+                          {isMobile && (
+                            <div
+                              style={{
+                                height: "1px",
+                                width: "100%",
+                                backgroundColor: "var(--border-color)",
+                                opacity: 0.7,
+                                margin: "10px 0 12px",
+                              }}
+                            />
+                          )}
 
                           {/* Meta Info Section: Assignment & Time */}
                           <div
@@ -1079,10 +994,10 @@ export default function Board() {
                               className="task-card-actions"
                               style={{
                                 display: "flex",
-                                flexDirection: isMobile ? "row" : "row",
-                                gap: isMobile ? "8px" : "6px",
+                                flexDirection: isMobile ? "column" : "row",
+                                gap: isMobile ? "10px" : "6px",
                                 marginBottom: isMobile ? "10px" : "8px",
-                                flexWrap: isMobile ? "wrap" : "wrap",
+                                flexWrap: isMobile ? "nowrap" : "wrap",
                                 width: "100%",
                                 minWidth: 0,
                                 boxSizing: "border-box",
@@ -1095,11 +1010,11 @@ export default function Board() {
                                     changeTaskStatus(task.id, getNextStatus(task.status)!);
                                   }}
                                   style={{
-                                    padding: isMobile ? "10px 12px" : "6px 10px",
-                                    fontSize: isMobile ? "12px" : "11px",
-                                    fontWeight: 600,
+                                    padding: isMobile ? "12px 14px" : "6px 10px",
+                                    fontSize: isMobile ? "14px" : "11px",
+                                    fontWeight: 700,
                                     border: "none",
-                                    borderRadius: "8px",
+                                    borderRadius: "12px",
                                     backgroundColor: STATUS_COLORS[getNextStatus(task.status)!] || "#007bff",
                                     color: "var(--white)",
                                     cursor: "pointer",
@@ -1108,10 +1023,8 @@ export default function Board() {
                                     alignItems: "center",
                                     justifyContent: "center",
                                     gap: "6px",
-                                    flex: isMobile ? "1 1 calc(50% - 4px)" : 1,
-                                    minWidth: isMobile ? "calc(50% - 4px)" : "90px",
-                                    minHeight: isMobile ? "40px" : undefined,
-                                    width: isMobile ? "auto" : "auto",
+                                    width: isMobile ? "100%" : "auto",
+                                    minHeight: isMobile ? "46px" : undefined,
                                   }}
                                   onMouseEnter={(e) => {
                                     e.currentTarget.style.opacity = "0.9";
@@ -1134,11 +1047,11 @@ export default function Board() {
                                     changeTaskStatus(task.id, "Done");
                                   }}
                                   style={{
-                                    padding: isMobile ? "10px 12px" : "6px 10px",
-                                    fontSize: isMobile ? "12px" : "11px",
-                                    fontWeight: 600,
+                                    padding: isMobile ? "12px 14px" : "6px 10px",
+                                    fontSize: isMobile ? "14px" : "11px",
+                                    fontWeight: 800,
                                     border: "none",
-                                    borderRadius: "8px",
+                                    borderRadius: "12px",
                                     backgroundColor: "#28a745",
                                     color: "var(--white)",
                                     cursor: "pointer",
@@ -1147,9 +1060,8 @@ export default function Board() {
                                     alignItems: "center",
                                     justifyContent: "center",
                                     gap: "6px",
-                                    minHeight: isMobile ? "40px" : undefined,
-                                    width: isMobile ? "auto" : "auto",
-                                    flex: isMobile ? "1 1 calc(50% - 4px)" : "0 0 auto",
+                                    minHeight: isMobile ? "46px" : undefined,
+                                    width: isMobile ? "100%" : "auto",
                                   }}
                                   onMouseEnter={(e) => {
                                     e.currentTarget.style.backgroundColor = "#218838";
@@ -1170,18 +1082,27 @@ export default function Board() {
                             {/* Time Tracker */}
                             {projectId && (
                               <div className="task-card-tracker" style={{
-                                marginTop: isMobile ? "6px" : "8px",
+                                marginTop: isMobile ? "8px" : "8px",
                                 width: "100%",
                                 minWidth: 0,
                                 marginBottom: 0,
                                 boxSizing: "border-box",
                               }}>
-                                <TimeTracker
-                                  taskId={task.id}
-                                  projectId={projectId}
-                                  totalMinutes={task.totalMinutes}
-                                  onTimeUpdate={loadTasks}
-                                />
+                                <div
+                                  style={{
+                                    border: "1px solid var(--border-color)",
+                                    borderRadius: "12px",
+                                    backgroundColor: "var(--bg-secondary)",
+                                    padding: isMobile ? "8px" : "0",
+                                  }}
+                                >
+                                  <TimeTracker
+                                    taskId={task.id}
+                                    projectId={projectId}
+                                    totalMinutes={task.totalMinutes}
+                                    onTimeUpdate={loadTasks}
+                                  />
+                                </div>
                               </div>
                             )}
                           </div>
