@@ -135,8 +135,8 @@ export default function PrivacyPolicy() {
               <h2 style={{ margin: "0 0 8px 0", fontSize: "18px", fontWeight: 800 }}>7. Contacto</h2>
               <p style={{ margin: 0, color: "var(--text-secondary)", lineHeight: 1.7 }}>
                 Responsable: <strong>JW TECH SOLUTIONS</strong>. Para asuntos de privacidad, escribe a:{" "}
-                <span style={{ color: "var(--text-primary)", fontWeight: 700 }}>support@jwtechsolutions.com</span>
-                <span style={{ color: "var(--text-tertiary)" }}> (puedes cambiar este email por el oficial)</span>.
+                <span style={{ color: "var(--text-primary)", fontWeight: 700 }}>jwtechdr@gmail.com</span>
+                <span style={{ color: "var(--text-tertiary)" }}> (Estamos para servirte)</span>.
               </p>
             </section>
 
