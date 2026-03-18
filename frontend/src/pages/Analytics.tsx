@@ -325,12 +325,21 @@ export default function Analytics() {
           ) : (
             <>
               {/* Summary Cards - Mejoradas */}
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: "20px", marginBottom: "32px" }}>
+              <div
+                style={{
+                  display: "grid",
+                  gridTemplateColumns: isMobile ? "1fr" : "repeat(auto-fit, minmax(200px, 1fr))",
+                  gap: isMobile ? "14px" : "20px",
+                  marginBottom: isMobile ? "20px" : "32px",
+                }}
+              >
                 <Card
                   style={{
-                    padding: "24px",
+                    padding: isMobile ? "18px" : "24px",
                     background: "linear-gradient(135deg, #007bff15 0%, #007bff05 100%)",
                     border: "1px solid #007bff30",
+                    borderRadius: "16px",
+                    boxShadow: "0 6px 18px rgba(0, 0, 0, 0.08)",
                   }}
                 >
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "12px" }}>
@@ -338,7 +347,7 @@ export default function Analytics() {
                       <div style={{ fontSize: "12px", color: "var(--text-secondary)", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.5px", marginBottom: "8px" }}>
                         Total Tareas
                       </div>
-                      <div style={{ fontSize: "36px", fontWeight: 700, color: "#007bff", lineHeight: 1.2 }}>
+                      <div style={{ fontSize: isMobile ? "34px" : "36px", fontWeight: 800, color: "#007bff", lineHeight: 1.15 }}>
                         {analytics.totalTasks}
                       </div>
                     </div>
@@ -347,9 +356,11 @@ export default function Analytics() {
                 </Card>
                 <Card
                   style={{
-                    padding: "24px",
+                    padding: isMobile ? "18px" : "24px",
                     background: "linear-gradient(135deg, #28a74515 0%, #28a74505 100%)",
                     border: "1px solid #28a74530",
+                    borderRadius: "16px",
+                    boxShadow: "0 6px 18px rgba(0, 0, 0, 0.08)",
                   }}
                 >
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "12px" }}>
@@ -357,7 +368,7 @@ export default function Analytics() {
                       <div style={{ fontSize: "12px", color: "var(--text-secondary)", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.5px", marginBottom: "8px" }}>
                         Completadas
                       </div>
-                      <div style={{ fontSize: "36px", fontWeight: 700, color: "#28a745", lineHeight: 1.2 }}>
+                      <div style={{ fontSize: isMobile ? "34px" : "36px", fontWeight: 800, color: "#28a745", lineHeight: 1.15 }}>
                         {analytics.completedTasks}
                       </div>
                       <div style={{ fontSize: "13px", color: "var(--text-secondary)", marginTop: "4px" }}>
@@ -369,9 +380,11 @@ export default function Analytics() {
                 </Card>
                 <Card
                   style={{
-                    padding: "24px",
+                    padding: isMobile ? "18px" : "24px",
                     background: "linear-gradient(135deg, #ffc10715 0%, #ffc10705 100%)",
                     border: "1px solid #ffc10730",
+                    borderRadius: "16px",
+                    boxShadow: "0 6px 18px rgba(0, 0, 0, 0.08)",
                   }}
                 >
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "12px" }}>
@@ -379,7 +392,7 @@ export default function Analytics() {
                       <div style={{ fontSize: "12px", color: "var(--text-secondary)", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.5px", marginBottom: "8px" }}>
                         Pendientes
                       </div>
-                      <div style={{ fontSize: "36px", fontWeight: 700, color: "#ffc107", lineHeight: 1.2 }}>
+                      <div style={{ fontSize: isMobile ? "34px" : "36px", fontWeight: 800, color: "#ffc107", lineHeight: 1.15 }}>
                         {analytics.pendingTasks}
                       </div>
                     </div>
@@ -388,9 +401,11 @@ export default function Analytics() {
                 </Card>
                 <Card
                   style={{
-                    padding: "24px",
+                    padding: isMobile ? "18px" : "24px",
                     background: "linear-gradient(135deg, #dc354515 0%, #dc354505 100%)",
                     border: "1px solid #dc354530",
+                    borderRadius: "16px",
+                    boxShadow: "0 6px 18px rgba(0, 0, 0, 0.08)",
                   }}
                 >
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "12px" }}>
@@ -398,7 +413,7 @@ export default function Analytics() {
                       <div style={{ fontSize: "12px", color: "var(--text-secondary)", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.5px", marginBottom: "8px" }}>
                         Vencidas
                       </div>
-                      <div style={{ fontSize: "36px", fontWeight: 700, color: "#dc3545", lineHeight: 1.2 }}>
+                      <div style={{ fontSize: isMobile ? "34px" : "36px", fontWeight: 800, color: "#dc3545", lineHeight: 1.15 }}>
                         {analytics.overdueTasks}
                       </div>
                     </div>
@@ -407,9 +422,11 @@ export default function Analytics() {
                 </Card>
                 <Card
                   style={{
-                    padding: "24px",
+                    padding: isMobile ? "18px" : "24px",
                     background: "linear-gradient(135deg, #28a74515 0%, #28a74505 100%)",
                     border: "1px solid #28a74530",
+                    borderRadius: "16px",
+                    boxShadow: "0 6px 18px rgba(0, 0, 0, 0.08)",
                   }}
                 >
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "12px" }}>
@@ -417,7 +434,7 @@ export default function Analytics() {
                       <div style={{ fontSize: "12px", color: "var(--text-secondary)", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.5px", marginBottom: "8px" }}>
                         SLA Cumplidos
                       </div>
-                      <div style={{ fontSize: "36px", fontWeight: 700, color: "#28a745", lineHeight: 1.2 }}>
+                      <div style={{ fontSize: isMobile ? "34px" : "36px", fontWeight: 800, color: "#28a745", lineHeight: 1.15 }}>
                         {analytics.slaMet}
                       </div>
                     </div>
@@ -426,9 +443,11 @@ export default function Analytics() {
                 </Card>
                 <Card
                   style={{
-                    padding: "24px",
+                    padding: isMobile ? "18px" : "24px",
                     background: "linear-gradient(135deg, #dc354515 0%, #dc354505 100%)",
                     border: "1px solid #dc354530",
+                    borderRadius: "16px",
+                    boxShadow: "0 6px 18px rgba(0, 0, 0, 0.08)",
                   }}
                 >
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "12px" }}>
@@ -436,7 +455,7 @@ export default function Analytics() {
                       <div style={{ fontSize: "12px", color: "var(--text-secondary)", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.5px", marginBottom: "8px" }}>
                         SLA Incumplidos
                       </div>
-                      <div style={{ fontSize: "36px", fontWeight: 700, color: "#dc3545", lineHeight: 1.2 }}>
+                      <div style={{ fontSize: isMobile ? "34px" : "36px", fontWeight: 800, color: "#dc3545", lineHeight: 1.15 }}>
                         {analytics.slaMissed}
                       </div>
                     </div>

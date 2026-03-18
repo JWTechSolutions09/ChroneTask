@@ -29,6 +29,17 @@ export default function Orgs() {
   const [invitationsModalOrg, setInvitationsModalOrg] = useState<{ id: string; name: string } | null>(null);
   const { showToast } = useToast();
   const t = useTerminology();
+  const [isMobile, setIsMobile] = useState(() => {
+    if (typeof window !== "undefined") return window.innerWidth <= 768;
+    return false;
+  });
+
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth <= 768);
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
+  }, []);
 
   const load = useCallback(async () => {
     setErr(null);
@@ -156,7 +167,7 @@ export default function Orgs() {
                       marginBottom: "6px",
                       fontSize: "14px",
                       fontWeight: 500,
-                      color: "#495057",
+                      color: "var(--text-secondary)",
                     }}
                   >
                     Nombre *
@@ -177,7 +188,7 @@ export default function Orgs() {
                       marginBottom: "6px",
                       fontSize: "14px",
                       fontWeight: 500,
-                      color: "#495057",
+                      color: "var(--text-secondary)",
                     }}
                   >
                     Slug (opcional)
@@ -237,7 +248,7 @@ export default function Orgs() {
                             fontSize: "18px",
                             fontWeight: 700,
                             margin: 0,
-                            color: "#212529",
+                            color: "var(--text-primary)",
                             marginBottom: "6px",
                             lineHeight: 1.3,
                           }}
@@ -248,7 +259,7 @@ export default function Orgs() {
                           <div
                             style={{
                               fontSize: "13px",
-                              color: "#6c757d",
+                              color: "var(--text-secondary)",
                               display: "flex",
                               alignItems: "center",
                               gap: "4px",
@@ -263,7 +274,7 @@ export default function Orgs() {
                         <div
                           style={{
                             fontSize: "12px",
-                            color: "#adb5bd",
+                            color: "var(--text-tertiary)",
                             marginTop: "8px",
                             display: "flex",
                             alignItems: "center",
@@ -279,6 +290,43 @@ export default function Orgs() {
                         </div>
                       )}
                     </Link>
+                    <button
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        if (isMobile) {
+                          nav(`/org/${o.id}/invitations`);
+                        } else {
+                          setInvitationsModalOrg({ id: o.id, name: o.name });
+                        }
+                      }}
+                      style={{
+                        background: "none",
+                        border: "1px solid var(--primary)",
+                        cursor: "pointer",
+                        padding: "8px 10px",
+                        borderRadius: "8px",
+                        color: "var(--primary)",
+                        fontSize: "14px",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        transition: "all 0.2s",
+                        flexShrink: 0,
+                        minWidth: "40px",
+                        minHeight: "40px",
+                      }}
+                      title="Invitar miembros"
+                      aria-label="Invitar miembros"
+                      onMouseEnter={(e) => {
+                        if (!isMobile) e.currentTarget.style.backgroundColor = "var(--hover-bg)";
+                      }}
+                      onMouseLeave={(e) => {
+                        if (!isMobile) e.currentTarget.style.backgroundColor = "transparent";
+                      }}
+                    >
+                      ✉️
+                    </button>
                     <button
                       onClick={(e) => {
                         e.preventDefault();
@@ -345,13 +393,13 @@ export default function Orgs() {
                           style={{
                             fontSize: "18px",
                             fontWeight: 700,
-                            color: "#212529",
+                            color: "var(--text-primary)",
                             marginBottom: "8px",
                           }}
                         >
                           {t.deleteOrganizationConfirm}
                         </h4>
-                        <p style={{ fontSize: "14px", color: "#6c757d", margin: 0 }}>
+                        <p style={{ fontSize: "14px", color: "var(--text-secondary)", margin: 0 }}>
                           Esta acción no se puede deshacer. Se eliminarán todos los proyectos y tareas asociados.
                         </p>
                         <p

@@ -13,6 +13,7 @@ import CreateTaskPage from "./pages/CreateTaskPage";
 import CreateNotePage from "./pages/CreateNotePage";
 import CreateEventPage from "./pages/CreateEventPage";
 import ProjectCommentsPage from "./pages/ProjectCommentsPage";
+import InvitationsPage from "./pages/InvitationsPage";
 import Settings from "./pages/Settings";
 import Notifications from "./pages/Notifications";
 import Analytics from "./pages/Analytics";
@@ -381,6 +382,14 @@ function AppContent() {
                 element={
                     <PrivateRoute>
                         <ProjectCommentsPage />
+                    </PrivateRoute>
+                }
+            />
+            <Route
+                path="/org/:organizationId/invitations"
+                element={
+                    <PrivateRoute>
+                        <InvitationsPage />
                     </PrivateRoute>
                 }
             />

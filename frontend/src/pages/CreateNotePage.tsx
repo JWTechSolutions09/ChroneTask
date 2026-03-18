@@ -18,6 +18,7 @@ export default function CreateNotePage() {
   const { usageType } = useUserUsageType();
   const isPersonalMode = usageType === "personal";
   const isPersonalRoute = location?.pathname?.startsWith("/personal") ?? false;
+  // En cualquier modo: si NO hay projectId, es nota personal
   const isPersonalNotes = !projectId;
   const { showToast } = useToast();
 

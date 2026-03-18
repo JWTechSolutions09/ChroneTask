@@ -79,6 +79,7 @@ export default function Notes() {
   const isPersonalRoute = location?.pathname?.startsWith("/personal") ?? false;
 
   // Determinar si son notas personales (sin projectId) o de proyecto (con projectId)
+  // En cualquier modo: si NO hay projectId, son personales.
   const isPersonalNotes = !projectId;
 
   const [notes, setNotes] = useState<Note[]>([]);

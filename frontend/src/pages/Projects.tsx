@@ -375,71 +375,87 @@ export default function Projects() {
                         />
                       </div>
                     )}
-                    <Link
-                      to={
-                        isPersonalMode || isPersonalRoute
-                          ? `/personal/project/${project.id}/board`
-                          : `/org/${organizationId}/project/${project.id}/board`
-                      }
-                      style={{ textDecoration: "none", color: "inherit" }}
-                      className="fade-in"
+                    <div
+                      style={{
+                        display: "flex",
+                        alignItems: "flex-start",
+                        justifyContent: "space-between",
+                        gap: "12px",
+                        flexWrap: "wrap",
+                      }}
                     >
-                      <div style={{ marginBottom: "16px" }}>
-                        <div
-                          style={{
-                            display: "flex",
-                            justifyContent: "space-between",
-                            alignItems: "flex-start",
-                            marginBottom: "10px",
-                            gap: "8px",
-                          }}
-                        >
-                          <h3
+                      <Link
+                        to={
+                          isPersonalMode || isPersonalRoute
+                            ? `/personal/project/${project.id}/board`
+                            : `/org/${organizationId}/project/${project.id}/board`
+                        }
+                        style={{
+                          textDecoration: "none",
+                          color: "inherit",
+                          flex: "1 1 260px",
+                          minWidth: 0,
+                        }}
+                        className="fade-in"
+                      >
+                        <div style={{ marginBottom: "16px" }}>
+                          <div
                             style={{
-                              fontSize: "20px",
-                              fontWeight: 700,
-                              margin: 0,
-                              color: "var(--text-primary)",
-                              flex: 1,
-                              lineHeight: "1.3",
+                              display: "flex",
+                              justifyContent: "space-between",
+                              alignItems: "flex-start",
+                              marginBottom: "10px",
+                              gap: "8px",
+                              flexWrap: "wrap",
                             }}
                           >
-                            {project.name}
-                          </h3>
-                          {project.template && (
-                            <span
+                            <h3
                               style={{
-                                padding: "6px 12px",
-                                borderRadius: "8px",
-                                backgroundColor: "#e7f3ff",
-                                color: "#007bff",
-                                fontSize: "12px",
-                                fontWeight: 600,
-                                whiteSpace: "nowrap",
-                                boxShadow: "0 2px 4px rgba(0, 123, 255, 0.1)",
+                                fontSize: "20px",
+                                fontWeight: 700,
+                                margin: 0,
+                                color: "var(--text-primary)",
+                                flex: "1 1 180px",
+                                minWidth: 0,
+                                lineHeight: "1.3",
                               }}
                             >
-                              {project.template}
-                            </span>
+                              {project.name}
+                            </h3>
+                            {project.template && (
+                              <span
+                                style={{
+                                  padding: "6px 12px",
+                                  borderRadius: "8px",
+                                  backgroundColor: "#e7f3ff",
+                                  color: "#007bff",
+                                  fontSize: "12px",
+                                  fontWeight: 600,
+                                  whiteSpace: "nowrap",
+                                  boxShadow: "0 2px 4px rgba(0, 123, 255, 0.1)",
+                                }}
+                              >
+                                {project.template}
+                              </span>
+                            )}
+                          </div>
+                          {project.description && (
+                            <p
+                              style={{
+                                fontSize: "14px",
+                                color: "var(--text-secondary)",
+                                margin: 0,
+                                lineHeight: "1.5",
+                                display: "-webkit-box",
+                                WebkitLineClamp: 2,
+                                WebkitBoxOrient: "vertical",
+                                overflow: "hidden",
+                              }}
+                            >
+                              {project.description}
+                            </p>
                           )}
                         </div>
-                        {project.description && (
-                          <p
-                            style={{
-                              fontSize: "14px",
-                              color: "var(--text-secondary)",
-                              margin: 0,
-                              lineHeight: "1.5",
-                              display: "-webkit-box",
-                              WebkitLineClamp: 2,
-                              WebkitBoxOrient: "vertical",
-                              overflow: "hidden",
-                            }}
-                          >
-                            {project.description}
-                          </p>
-                        )}
-                      </div>
 
                       <div style={{ marginBottom: "16px" }}>
                         <div
@@ -510,16 +526,15 @@ export default function Projects() {
                           setShowMemberModal({ projectId: project.id, projectName: project.name });
                         }}
                         style={{
-                          position: "absolute",
-                          top: "16px",
-                          right: "16px",
-                          padding: "8px 12px",
+                          position: "relative",
+                          alignSelf: "flex-start",
+                          padding: isMobile ? "12px 14px" : "10px 14px",
                           borderRadius: "8px",
                           border: "1px solid rgba(0, 123, 255, 0.3)",
                           backgroundColor: "rgba(255, 255, 255, 0.95)",
                           color: "#007bff",
                           cursor: "pointer",
-                          fontSize: "13px",
+                          fontSize: isMobile ? "14px" : "13px",
                           display: "flex",
                           alignItems: "center",
                           gap: "6px",
@@ -528,6 +543,9 @@ export default function Projects() {
                           zIndex: 10,
                           boxShadow: "0 2px 8px rgba(0, 0, 0, 0.15)",
                           backdropFilter: "blur(10px)",
+                          justifyContent: "center",
+                          minHeight: isMobile ? "44px" : undefined,
+                          flex: isMobile ? "1 1 100%" : "0 0 auto",
                         }}
                         onMouseEnter={(e) => {
                           e.currentTarget.style.backgroundColor = "#e7f3ff";
@@ -544,6 +562,7 @@ export default function Projects() {
                         👥 Miembros
                       </button>
                     )}
+                    </div>
                   </Card>
                 );
               })}

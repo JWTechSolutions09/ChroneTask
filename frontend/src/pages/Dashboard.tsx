@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback, useMemo } from "react";
-import { useParams, Link, useLocation } from "react-router-dom";
+import { useParams, Link, useLocation, useNavigate } from "react-router-dom";
 import { http } from "../api/http";
 import Layout from "../components/Layout";
 import PageHeader from "../components/PageHeader";
@@ -27,6 +27,7 @@ type Project = {
 
 export default function Dashboard() {
   const { organizationId } = useParams<{ organizationId?: string }>();
+  const navigate = useNavigate();
   const location = useLocation();
   const { usageType } = useUserUsageType();
   const isPersonalMode = usageType === "personal";
@@ -213,7 +214,13 @@ export default function Dashboard() {
                     👥 Miembros
                   </button>
                   <button
-                    onClick={() => setShowInvitationsModal(true)}
+                    onClick={() => {
+                      if (isMobile) {
+                        navigate(`/org/${organizationId}/invitations`);
+                      } else {
+                        setShowInvitationsModal(true);
+                      }
+                    }}
                     style={{
                       padding: "8px 12px",
                       borderRadius: "6px",

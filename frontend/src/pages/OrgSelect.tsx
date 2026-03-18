@@ -175,7 +175,7 @@ export default function OrgSelect() {
                           fontSize: "20px",
                           fontWeight: 700,
                           margin: 0,
-                          color: "#212529",
+                          color: "var(--text-primary)",
                           marginBottom: "6px",
                           lineHeight: 1.3,
                         }}
@@ -186,7 +186,7 @@ export default function OrgSelect() {
                         <div
                           style={{
                             fontSize: "13px",
-                            color: "#6c757d",
+                            color: "var(--text-secondary)",
                             marginBottom: "8px",
                             display: "flex",
                             alignItems: "center",
@@ -201,7 +201,7 @@ export default function OrgSelect() {
                         <div
                           style={{
                             fontSize: "12px",
-                            color: "#adb5bd",
+                            color: "var(--text-tertiary)",
                             display: "flex",
                             alignItems: "center",
                             gap: "4px",

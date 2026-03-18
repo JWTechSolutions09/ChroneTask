@@ -509,6 +509,13 @@ a:hover {
   opacity: 1;
 }
 
+/* Mejorar visibilidad de placeholders en modo claro (especialmente en modo equipos) */
+[data-theme="light"] .input::placeholder,
+[data-theme="light"] .textarea::placeholder {
+  color: #6c757d;
+  opacity: 1;
+}
+
 /* Mejorar contraste de links en modo oscuro */
 [data-theme="dark"] a {
   color: #4da6ff;
