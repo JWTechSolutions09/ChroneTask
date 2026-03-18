@@ -398,26 +398,26 @@ export default function Projects() {
                         }}
                         className="fade-in"
                       >
-                        <div style={{ marginBottom: "16px" }}>
+                        <div style={{ marginBottom: isMobile ? "12px" : "16px" }}>
                           <div
                             style={{
                               display: "flex",
                               justifyContent: "space-between",
                               alignItems: "flex-start",
-                              marginBottom: "10px",
-                              gap: "8px",
+                              marginBottom: isMobile ? "8px" : "10px",
+                              gap: "10px",
                               flexWrap: "wrap",
                             }}
                           >
                             <h3
                               style={{
-                                fontSize: "20px",
-                                fontWeight: 700,
+                                fontSize: isMobile ? "18px" : "20px",
+                                fontWeight: 800,
                                 margin: 0,
                                 color: "var(--text-primary)",
-                                flex: "1 1 180px",
+                                flex: "1 1 220px",
                                 minWidth: 0,
-                                lineHeight: "1.3",
+                                lineHeight: 1.25,
                               }}
                             >
                               {project.name}
@@ -425,14 +425,14 @@ export default function Projects() {
                             {project.template && (
                               <span
                                 style={{
-                                  padding: "6px 12px",
-                                  borderRadius: "8px",
-                                  backgroundColor: "#e7f3ff",
-                                  color: "#007bff",
+                                  padding: isMobile ? "6px 12px" : "6px 12px",
+                                  borderRadius: "999px",
+                                  backgroundColor: "rgba(0, 123, 255, 0.12)",
+                                  color: "var(--primary)",
                                   fontSize: "12px",
-                                  fontWeight: 600,
+                                  fontWeight: 700,
                                   whiteSpace: "nowrap",
-                                  boxShadow: "0 2px 4px rgba(0, 123, 255, 0.1)",
+                                  border: "1px solid rgba(0, 123, 255, 0.22)",
                                 }}
                               >
                                 {project.template}
@@ -445,9 +445,9 @@ export default function Projects() {
                                 fontSize: "14px",
                                 color: "var(--text-secondary)",
                                 margin: 0,
-                                lineHeight: "1.5",
+                                lineHeight: 1.5,
                                 display: "-webkit-box",
-                                WebkitLineClamp: 2,
+                                WebkitLineClamp: isMobile ? 3 : 2,
                                 WebkitBoxOrient: "vertical",
                                 overflow: "hidden",
                               }}
@@ -457,7 +457,7 @@ export default function Projects() {
                           )}
                         </div>
 
-                      <div style={{ marginBottom: "16px" }}>
+                      <div style={{ marginBottom: isMobile ? "12px" : "16px" }}>
                         <div
                           style={{
                             display: "flex",
@@ -498,7 +498,7 @@ export default function Projects() {
                           justifyContent: "space-between",
                           fontSize: "14px",
                           color: "var(--text-secondary)",
-                          paddingTop: "16px",
+                          paddingTop: isMobile ? "12px" : "16px",
                           borderTop: "1px solid var(--border-color)",
                         }}
                       >
@@ -527,7 +527,8 @@ export default function Projects() {
                         }}
                         style={{
                           position: "relative",
-                          alignSelf: "flex-start",
+                          alignSelf: isMobile ? "stretch" : "flex-start",
+                          width: isMobile ? "100%" : undefined,
                           padding: isMobile ? "12px 14px" : "10px 14px",
                           borderRadius: "8px",
                           border: "1px solid rgba(0, 123, 255, 0.3)",
@@ -546,6 +547,7 @@ export default function Projects() {
                           justifyContent: "center",
                           minHeight: isMobile ? "44px" : undefined,
                           flex: isMobile ? "1 1 100%" : "0 0 auto",
+                          marginTop: isMobile ? "4px" : undefined,
                         }}
                         onMouseEnter={(e) => {
                           e.currentTarget.style.backgroundColor = "#e7f3ff";
