@@ -169,6 +169,9 @@ public class PersonalCalendarEventsController : ControllerBase
         // Notificar al usuario sobre el nuevo evento del calendario
         await NotificationHelper.NotifyNewCalendarEventAsync(_db, calendarEvent, userId);
 
+        // Si el evento está ligado a un proyecto (org/equipo), notificar a los miembros del proyecto
+        await NotificationHelper.NotifyNewCalendarEventForProjectMembersAsync(_db, calendarEvent, userId);
+
         // Crear notificación de recordatorio si está configurado
         if (calendarEvent.HasReminder && calendarEvent.ReminderMinutesBefore.HasValue)
         {

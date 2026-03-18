@@ -123,6 +123,9 @@ public class OrganizationsController : ControllerBase
 
                 await _db.SaveChangesAsync();
 
+            // Notificar al creador (para que aparezca en el panel de notificaciones)
+            await NotificationHelper.NotifyOrganizationCreatedAsync(_db, org, userId);
+
             return CreatedAtAction(nameof(GetById), new { id = org.Id }, new OrganizationResponse
             {
                 Id = org.Id,

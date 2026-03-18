@@ -32,6 +32,39 @@ export default function InvitationsBody({ organizationId, organizationName, enab
   const [copiedLink, setCopiedLink] = useState<string | null>(null);
   const { showToast } = useToast();
 
+  const copyToClipboard = useCallback(async (text: string) => {
+    // 1) Prefer modern clipboard API when available (requires secure context + permissions in some browsers)
+    try {
+      if (navigator?.clipboard?.writeText) {
+        await navigator.clipboard.writeText(text);
+        return true;
+      }
+    } catch {
+      // fallback below
+    }
+
+    // 2) Fallback for iOS/Safari or non-secure contexts
+    try {
+      const ta = document.createElement("textarea");
+      ta.value = text;
+      ta.setAttribute("readonly", "true");
+      ta.style.position = "fixed";
+      ta.style.left = "-9999px";
+      ta.style.top = "0";
+      ta.style.opacity = "0";
+      document.body.appendChild(ta);
+
+      ta.focus();
+      ta.select();
+
+      const ok = document.execCommand("copy");
+      document.body.removeChild(ta);
+      return ok;
+    } catch {
+      return false;
+    }
+  }, []);
+
   const loadInvitations = useCallback(async () => {
     if (!enabled) return;
 
@@ -67,10 +100,14 @@ export default function InvitationsBody({ organizationId, organizationName, enab
 
       // Copiar link automáticamente
       if (res.data?.invitationLink) {
-        navigator.clipboard.writeText(res.data.invitationLink);
-        setCopiedLink(res.data.token);
-        showToast("Link copiado al portapapeles", "success");
-        setTimeout(() => setCopiedLink(null), 3000);
+        const ok = await copyToClipboard(res.data.invitationLink);
+        if (ok) {
+          setCopiedLink(res.data.token);
+          showToast("Link copiado al portapapeles", "success");
+          setTimeout(() => setCopiedLink(null), 3000);
+        } else {
+          showToast("No se pudo copiar el link. Mantén presionado para copiar.", "warning");
+        }
       }
     } catch (ex: any) {
       const errorMsg = ex?.response?.data?.message ?? ex.message ?? "Error creando invitación";
@@ -94,12 +131,19 @@ export default function InvitationsBody({ organizationId, organizationName, enab
     }
   };
 
-  const copyLink = (link: string, token: string) => {
-    navigator.clipboard.writeText(link);
-    setCopiedLink(token);
-    showToast("Link copiado al portapapeles", "success");
-    setTimeout(() => setCopiedLink(null), 3000);
-  };
+  const copyLink = useCallback(
+    async (link: string, token: string) => {
+      const ok = await copyToClipboard(link);
+      if (!ok) {
+        showToast("No se pudo copiar el link. Mantén presionado para copiar.", "warning");
+        return;
+      }
+      setCopiedLink(token);
+      showToast("Link copiado al portapapeles", "success");
+      setTimeout(() => setCopiedLink(null), 3000);
+    },
+    [copyToClipboard, showToast]
+  );
 
   const isExpired = (expiresAt: string) => new Date(expiresAt) < new Date();
 
@@ -218,7 +262,11 @@ export default function InvitationsBody({ organizationId, organizationName, enab
                           type="button"
                           variant="secondary"
                           onClick={() => copyLink(inv.invitationLink!, inv.token)}
-                          style={{ flex: "1 1 180px" }}
+                          style={{
+                            flex: "1 1 180px",
+                            padding: "8px 12px",
+                            minHeight: "36px",
+                          }}
                         >
                           {copiedLink === inv.token ? "✅ Copiado" : "📋 Copiar link"}
                         </Button>

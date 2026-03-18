@@ -41,6 +41,7 @@ const NOTIFICATION_ICONS: Record<string, string> = {
   task_unassigned: "👤",
   calendar_reminder: "⏰",
   new_project_note: "📝",
+  organization_created: "🏢",
 };
 
 const NOTIFICATION_COLORS: Record<string, string> = {
@@ -59,6 +60,7 @@ const NOTIFICATION_COLORS: Record<string, string> = {
   task_unassigned: "#6c757d",
   calendar_reminder: "#ffc107",
   new_project_note: "#6f42c1",
+  organization_created: "#0d6efd",
 };
 
 export default function Notifications() {
@@ -67,6 +69,8 @@ export default function Notifications() {
   const { usageType } = useUserUsageType();
   const isPersonalMode = usageType === "personal";
   const isPersonalRoute = location?.pathname?.startsWith("/personal") ?? false;
+  const isTeamRoute = location?.pathname?.startsWith("/teams") ?? false;
+  const isOrgRoute = location?.pathname?.startsWith("/org/") ?? false;
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const [loading, setLoading] = useState(false);
@@ -181,17 +185,23 @@ export default function Notifications() {
       }
       return `/personal/dashboard`;
     }
+    if (isTeamRoute) {
+      return "/teams";
+    }
     if (notification.taskId && notification.projectId) {
-      return `/org/${organizationId}/project/${notification.projectId}/board`;
+      return organizationId
+        ? `/org/${organizationId}/project/${notification.projectId}/board`
+        : "/org-select";
     }
     if (notification.projectId) {
-      return `/org/${organizationId}/projects`;
+      return organizationId ? `/org/${organizationId}/projects` : "/org-select";
     }
-    return `/org/${organizationId}/dashboard`;
+    return organizationId ? `/org/${organizationId}/dashboard` : "/org-select";
   };
 
-  // En modo personal, no requerimos organizationId
-  if (!isPersonalMode && !isPersonalRoute && !organizationId) {
+  // Solo exigir organizationId cuando estás navegando dentro de una organización
+  // (en /teams/notifications no existe orgId)
+  if (!isPersonalMode && !isPersonalRoute && isOrgRoute && !organizationId) {
     return (
       <Layout>
         <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center" }}>

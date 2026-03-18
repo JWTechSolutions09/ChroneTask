@@ -311,6 +311,58 @@ public static class NotificationHelper
         }
     }
 
+    public static async SystemTask NotifyNewCalendarEventForProjectMembersAsync(
+        ChroneTaskDbContext db,
+        PersonalCalendarEvent calendarEvent,
+        Guid triggeredByUserId)
+    {
+        // Solo aplica si el evento está relacionado a un proyecto
+        if (!calendarEvent.RelatedProjectId.HasValue)
+            return;
+
+        var projectId = calendarEvent.RelatedProjectId.Value;
+
+        // Obtener el nombre del usuario que creó el evento
+        var creator = await db.Users.FirstOrDefaultAsync(u => u.Id == triggeredByUserId);
+        var creatorName = creator?.FullName ?? "Un usuario";
+
+        // Notificar a miembros del proyecto (excepto al creador)
+        var projectMembers = await db.ProjectMembers
+            .Where(pm => pm.ProjectId == projectId && pm.UserId != triggeredByUserId)
+            .Select(pm => pm.UserId)
+            .ToListAsync();
+
+        foreach (var memberId in projectMembers)
+        {
+            await CreateNotificationAsync(
+                db,
+                memberId,
+                "calendar_event_created",
+                "Nuevo evento del calendario",
+                $"{creatorName} creó el evento '{calendarEvent.Title}'",
+                projectId,
+                calendarEvent.RelatedTaskId,
+                triggeredByUserId);
+        }
+    }
+
+    public static async SystemTask NotifyOrganizationCreatedAsync(
+        ChroneTaskDbContext db,
+        Organization org,
+        Guid triggeredByUserId)
+    {
+        // Notificar al creador (en el momento de creación normalmente no hay más miembros)
+        await CreateNotificationAsync(
+            db,
+            triggeredByUserId,
+            "organization_created",
+            "Equipo/Organización creada",
+            $"Creaste '{org.Name}'",
+            null,
+            null,
+            triggeredByUserId);
+    }
+
     public static async SystemTask NotifyNewCommentAsync(
         ChroneTaskDbContext db,
         TaskComment comment,

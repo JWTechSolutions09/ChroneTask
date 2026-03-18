@@ -738,6 +738,15 @@ export default function Layout({ children, organizationId, usageType: propUsageT
                 forceShowLabel={isMobile && sidebarOpen}
                 onNavigate={closeMobileMenu}
               />
+              <NavItem
+                icon="🔔"
+                label="Notificaciones"
+                to="/teams/notifications"
+                active={isActive("/teams/notifications")}
+                collapsed={effectiveCollapsed}
+                forceShowLabel={isMobile && sidebarOpen}
+                onNavigate={closeMobileMenu}
+              />
             </>
           ) : !loadingUsageType && !isPersonalMode ? (
             <>

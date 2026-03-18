@@ -194,6 +194,14 @@ function AppContent() {
                 }
             />
             <Route
+                path="/teams/notifications"
+                element={
+                    <PrivateRoute>
+                        <Notifications />
+                    </PrivateRoute>
+                }
+            />
+            <Route
                 path="/personal/dashboard"
                 element={
                     <PrivateRoute>
