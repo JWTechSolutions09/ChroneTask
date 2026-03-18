@@ -581,6 +581,12 @@ public class TasksController : ControllerBase
     {
         var userId = UserContext.GetUserId(User);
 
+        // Detectar si el usuario está en modo de uso personal
+        // (en ese modo no se debe exigir responsable para cerrar tareas)
+        var user = await _db.Users.FirstOrDefaultAsync(u => u.Id == userId);
+        var isPersonalUsage = user != null &&
+                              string.Equals(user.UsageType, "personal", StringComparison.OrdinalIgnoreCase);
+
         var task = await _db.Tasks
             .Include(t => t.AssignedTo)
             .FirstOrDefaultAsync(t => t.Id == id && t.ProjectId == projectId);
@@ -606,8 +612,8 @@ public class TasksController : ControllerBase
         
         var isPersonalProject = project != null && project.OrganizationId == null;
 
-        // Regla: no cerrar sin responsable (solo para proyectos de organización/equipo)
-        if (status == "Done" && !task.AssignedToId.HasValue && !isPersonalProject)
+        // Regla: no cerrar sin responsable (solo para proyectos de organización/equipo y usuarios NO personales)
+        if (status == "Done" && !task.AssignedToId.HasValue && !isPersonalProject && !isPersonalUsage)
             return BadRequest(new { message = "Cannot close task without assignee" });
 
         var oldStatus = task.Status;
