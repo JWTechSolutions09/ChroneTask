@@ -267,15 +267,73 @@ public class AuthController : ControllerBase
                           Environment.GetEnvironmentVariable("SUPABASE_JWKS_URL") ??
                           $"{supabaseUrl}/auth/v1/.well-known/jwks.json";
 
-            var principal = await ValidateSupabaseJwtAsync(request.AccessToken, supabaseUrl, jwksUrl);
-            if (principal == null)
-                return Unauthorized(new { message = "Invalid Supabase token" });
+            // 1) Try local JWT validation first (fast path)
+            ClaimsPrincipal? principal = null;
+            try
+            {
+                principal = await ValidateSupabaseJwtAsync(request.AccessToken, supabaseUrl, jwksUrl);
+            }
+            catch
+            {
+                principal = null;
+            }
 
-            var email = principal.Claims.FirstOrDefault(c => c.Type == "email")?.Value
-                        ?? principal.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
+            string? email = principal?.Claims.FirstOrDefault(c => c.Type == "email")?.Value
+                            ?? principal?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
+
+            string? name = principal?.Claims.FirstOrDefault(c => c.Type == "name")?.Value
+                           ?? principal?.Claims.FirstOrDefault(c => c.Type == "full_name")?.Value;
+
+            string? avatar = principal?.Claims.FirstOrDefault(c => c.Type == "avatar_url")?.Value;
+
+            // 2) Fallback: introspect against Supabase Auth API (most reliable in prod)
+            if (string.IsNullOrWhiteSpace(email))
+            {
+                var anonKey = _config["Supabase:AnonKey"] ?? Environment.GetEnvironmentVariable("SUPABASE_ANON_KEY");
+                if (string.IsNullOrWhiteSpace(anonKey))
+                {
+                    return Unauthorized(new
+                    {
+                        message = "Invalid Supabase token (and SUPABASE_ANON_KEY not configured for introspection)"
+                    });
+                }
+
+                using var client = new HttpClient();
+                var req = new HttpRequestMessage(HttpMethod.Get, $"{supabaseUrl}/auth/v1/user");
+                req.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", request.AccessToken);
+                req.Headers.Add("apikey", anonKey);
+
+                var resp = await client.SendAsync(req);
+                if (!resp.IsSuccessStatusCode)
+                {
+                    return Unauthorized(new { message = "Invalid Supabase token" });
+                }
+
+                var json = await resp.Content.ReadAsStringAsync();
+                using var doc = JsonDocument.Parse(json);
+                var root = doc.RootElement;
+
+                if (root.TryGetProperty("email", out var emailEl))
+                    email = emailEl.GetString();
+
+                // Try to pull name/avatar from user_metadata if present
+                if (root.TryGetProperty("user_metadata", out var meta))
+                {
+                    if (string.IsNullOrWhiteSpace(name))
+                    {
+                        if (meta.TryGetProperty("full_name", out var fn)) name = fn.GetString();
+                        else if (meta.TryGetProperty("name", out var n)) name = n.GetString();
+                    }
+                    if (string.IsNullOrWhiteSpace(avatar))
+                    {
+                        if (meta.TryGetProperty("avatar_url", out var av)) avatar = av.GetString();
+                        else if (meta.TryGetProperty("picture", out var pic)) avatar = pic.GetString();
+                    }
+                }
+            }
 
             if (string.IsNullOrWhiteSpace(email))
-                return Unauthorized(new { message = "Supabase token missing email claim" });
+                return Unauthorized(new { message = "Supabase token missing email" });
 
             var normalizedEmail = email.Trim().ToLowerInvariant();
 
@@ -283,17 +341,13 @@ public class AuthController : ControllerBase
             if (user == null)
             {
                 // Optional: try to get a display name
-                var name = principal.Claims.FirstOrDefault(c => c.Type == "name")?.Value
-                           ?? principal.Claims.FirstOrDefault(c => c.Type == "full_name")?.Value
-                           ?? normalizedEmail.Split('@').FirstOrDefault()
-                           ?? "Usuario";
-
-                // Optional: avatar url (Supabase often stores it under user_metadata, not always in JWT)
-                var avatar = principal.Claims.FirstOrDefault(c => c.Type == "avatar_url")?.Value;
+                var safeName = (name ?? "").Trim();
+                if (string.IsNullOrWhiteSpace(safeName))
+                    safeName = normalizedEmail.Split('@').FirstOrDefault() ?? "Usuario";
 
                 user = new User
                 {
-                    FullName = name,
+                    FullName = safeName,
                     Email = normalizedEmail,
                     PasswordHash = BCrypt.Net.BCrypt.HashPassword(Guid.NewGuid().ToString()),
                     ProfilePictureUrl = string.IsNullOrWhiteSpace(avatar) ? null : avatar
@@ -301,6 +355,15 @@ public class AuthController : ControllerBase
 
                 _db.Users.Add(user);
                 await _db.SaveChangesAsync();
+            }
+            else
+            {
+                // Best-effort update avatar if present
+                if (!string.IsNullOrWhiteSpace(avatar) && user.ProfilePictureUrl != avatar)
+                {
+                    user.ProfilePictureUrl = avatar;
+                    await _db.SaveChangesAsync();
+                }
             }
 
             var token = GenerateToken(user);

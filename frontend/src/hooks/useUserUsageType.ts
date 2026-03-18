@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { http } from "../api/http";
+import { isAuthed } from "../auth/token";
 
 export type UsageType = "personal" | "team" | "business" | null;
 
@@ -10,6 +11,11 @@ export function useUserUsageType() {
   useEffect(() => {
     const loadUsageType = async () => {
       try {
+        // Evitar llamadas 401 cuando el usuario no está autenticado
+        if (!isAuthed()) {
+          setUsageType(null);
+          return;
+        }
         const res = await http.get("/api/users/me");
         // El backend devuelve UsageType en el perfil (puede ser camelCase o PascalCase dependiendo de la configuración)
         setUsageType(res.data?.usageType || res.data?.UsageType || null);
