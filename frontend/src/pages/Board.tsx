@@ -366,7 +366,17 @@ export default function Board() {
             }}>
               <Button
                 variant="secondary"
-                onClick={() => setShowCommentsPanel(true)}
+                onClick={() => {
+                  if (isMobile) {
+                    if (isPersonalMode || isPersonalRoute) {
+                      navigate(`/personal/project/${projectId}/comments`);
+                    } else if (organizationId && projectId) {
+                      navigate(`/org/${organizationId}/project/${projectId}/comments`);
+                    }
+                  } else {
+                    setShowCommentsPanel(true);
+                  }
+                }}
                 style={isMobile ? {
                   fontSize: "14px",
                   padding: "12px 16px",

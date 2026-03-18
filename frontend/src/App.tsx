@@ -12,6 +12,7 @@ import Board from "./pages/Board";
 import CreateTaskPage from "./pages/CreateTaskPage";
 import CreateNotePage from "./pages/CreateNotePage";
 import CreateEventPage from "./pages/CreateEventPage";
+import ProjectCommentsPage from "./pages/ProjectCommentsPage";
 import Settings from "./pages/Settings";
 import Notifications from "./pages/Notifications";
 import Analytics from "./pages/Analytics";
@@ -240,6 +241,14 @@ function AppContent() {
                 }
             />
             <Route
+                path="/personal/project/:projectId/comments"
+                element={
+                    <PrivateRoute>
+                        <ProjectCommentsPage />
+                    </PrivateRoute>
+                }
+            />
+            <Route
                 path="/personal/timeline"
                 element={
                     <PrivateRoute>
@@ -364,6 +373,14 @@ function AppContent() {
                 element={
                     <PrivateRoute>
                         <Notes />
+                    </PrivateRoute>
+                }
+            />
+            <Route
+                path="/org/:organizationId/project/:projectId/comments"
+                element={
+                    <PrivateRoute>
+                        <ProjectCommentsPage />
                     </PrivateRoute>
                 }
             />
