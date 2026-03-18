@@ -337,6 +337,7 @@ export default function Projects() {
                   project.taskCount > 0
                     ? Math.round((project.activeTaskCount / project.taskCount) * 100)
                     : 0;
+                const showMembersButton = !isPersonalMode && !isPersonalRoute && !!organizationId;
                 return (
                   <Card 
                     key={project.id} 
@@ -384,7 +385,7 @@ export default function Projects() {
                         flexWrap: "wrap",
                       }}
                     >
-                    {!isPersonalMode && !isPersonalRoute && organizationId && (
+                    {showMembersButton && (
                       <button
                         onClick={(e) => {
                           e.preventDefault();
@@ -392,10 +393,9 @@ export default function Projects() {
                           setShowMemberModal({ projectId: project.id, projectName: project.name });
                         }}
                         style={{
-                          position: isMobile ? "absolute" : "relative",
-                          top: isMobile ? "16px" : undefined,
-                          right: isMobile ? "16px" : undefined,
-                          alignSelf: "flex-start",
+                          position: "absolute",
+                          top: "16px",
+                          right: "16px",
                           padding: isMobile ? "10px 12px" : "10px 14px",
                           borderRadius: "8px",
                           border: "1px solid rgba(0, 123, 255, 0.3)",
@@ -413,7 +413,7 @@ export default function Projects() {
                           backdropFilter: "blur(10px)",
                           justifyContent: "center",
                           minHeight: isMobile ? "40px" : undefined,
-                          flex: isMobile ? undefined : "0 0 auto",
+                          whiteSpace: "nowrap",
                         }}
                         onMouseEnter={(e) => {
                           e.currentTarget.style.backgroundColor = "#e7f3ff";
@@ -443,10 +443,6 @@ export default function Projects() {
                           width: "100%",
                           flex: "1 1 100%",
                           minWidth: 0,
-                          paddingTop: isMobile && !project.imageUrl ? "8px" : undefined,
-                          paddingRight: !isPersonalMode && !isPersonalRoute && organizationId
-                            ? (isMobile ? "120px" : undefined)
-                            : undefined,
                         }}
                         className="fade-in"
                       >
@@ -456,9 +452,10 @@ export default function Projects() {
                               display: "flex",
                               justifyContent: "space-between",
                               alignItems: "flex-start",
-                              marginBottom: "10px",
-                              gap: "8px",
-                              flexWrap: "wrap",
+                              marginBottom: isMobile ? "6px" : "10px",
+                              gap: "12px",
+                              flexWrap: "nowrap",
+                              paddingRight: showMembersButton ? "120px" : undefined,
                             }}
                           >
                             <h3
@@ -467,14 +464,16 @@ export default function Projects() {
                                 fontWeight: 700,
                                 margin: 0,
                                 color: "var(--text-primary)",
-                                flex: "1 1 180px",
+                                flex: "1 1 auto",
                                 minWidth: 0,
                                 lineHeight: "1.3",
                               }}
                             >
                               {project.name}
                             </h3>
-                            {project.template && (
+                          </div>
+                          {project.template && (
+                            <div style={{ marginBottom: project.description ? "8px" : 0 }}>
                               <span
                                 style={{
                                   padding: "6px 12px",
@@ -489,8 +488,8 @@ export default function Projects() {
                               >
                                 {project.template}
                               </span>
-                            )}
-                          </div>
+                            </div>
+                          )}
                           {project.description && (
                             <p
                               style={{
