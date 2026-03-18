@@ -830,11 +830,15 @@ select {
 
   /* Navbar global de la app (similar al landing) */
   .app-nav {
-    position: relative !important;
-    top: auto !important;
+    /* En móvil: mantener el navbar siempre accesible al hacer scroll */
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
     background: rgba(10, 10, 10, 0.96);
     border-bottom: 1px solid var(--border-color);
     box-shadow: 0 2px 12px rgba(0, 0, 0, 0.4);
+    z-index: 1100;
   }
 
   .app-nav-container {
@@ -867,6 +871,12 @@ select {
     font-weight: 700;
     font-size: 18px;
     letter-spacing: -0.4px;
+  }
+
+  /* En modo claro, el navbar sigue siendo oscuro; asegurar contraste del texto de marca */
+  [data-theme="light"] .app-nav-logo span {
+    color: #ffffff;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
   }
 
   .app-nav-toggle {
@@ -995,7 +1005,8 @@ select {
   .main-content {
     margin-left: 0 !important;
     width: 100% !important;
-    padding-top: 0 !important;
+    /* Compensar navbar fixed */
+    padding-top: 64px !important;
     overflow-x: hidden !important;
   }
 
