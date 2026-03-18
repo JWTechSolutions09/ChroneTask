@@ -94,7 +94,40 @@ export default function AuthCallback() {
         if (res.data?.token) {
           setToken(res.data.token);
           showToast("Inicio de sesión exitoso", "success");
-          navigate("/org-select", { replace: true });
+
+          // Decide where to go next:
+          // - If user has no usageType yet => onboarding
+          // - Otherwise => route by usageType
+          try {
+            const meRes = await http.get("/api/users/me");
+            const usageType = (meRes.data?.usageType || meRes.data?.UsageType || null) as
+              | "personal"
+              | "team"
+              | "business"
+              | null;
+
+            if (!usageType) {
+              navigate("/onboarding", { replace: true });
+              return;
+            }
+
+            if (usageType === "personal") {
+              navigate("/personal/projects", { replace: true });
+              return;
+            }
+
+            if (usageType === "team") {
+              navigate("/teams", { replace: true });
+              return;
+            }
+
+            navigate("/org-select", { replace: true });
+            return;
+          } catch {
+            // Fallback: if /me fails, send to onboarding as safest first-time flow
+            navigate("/onboarding", { replace: true });
+            return;
+          }
           return;
         }
 
