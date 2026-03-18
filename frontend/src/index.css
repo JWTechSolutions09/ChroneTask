@@ -1258,20 +1258,26 @@ select {
     overflow-y: hidden !important;
     -webkit-overflow-scrolling: touch !important;
     gap: 12px !important;
-    padding-bottom: 8px !important;
+    /* evitar que se vea pegado a la izquierda y habilitar "snap" */
+    padding: 0 12px 10px 12px !important;
     scrollbar-width: thin !important;
     width: 100% !important;
     min-width: 0 !important;
     box-sizing: border-box !important;
+    scroll-snap-type: x mandatory !important;
+    scroll-padding-left: 12px !important;
+    scroll-padding-right: 12px !important;
   }
 
   .kanban-board>div {
-    min-width: 360px !important;
-    max-width: 360px !important;
-    width: 360px !important;
+    /* columnas: casi full-width en móvil, como carrusel */
+    min-width: 300px !important;
+    width: 92vw !important;
+    max-width: 520px !important;
     flex-shrink: 0 !important;
     padding: 8px !important;
     box-sizing: border-box !important;
+    scroll-snap-align: center !important;
   }
 
   /* Tarjetas de tareas en móvil - Usar clases específicas en lugar de .hover-lift genérico */
@@ -1289,6 +1295,27 @@ select {
     padding: 14px !important;
     display: block !important;
     flex-shrink: 0 !important;
+  }
+
+  /* FIX iOS: evitar que los títulos se partan con guiones/letra por letra dentro del kanban */
+  .kanban-board,
+  .kanban-board * {
+    hyphens: none !important;
+    -webkit-hyphens: none !important;
+  }
+
+  .kanban-board .task-card h1,
+  .kanban-board .task-card h2,
+  .kanban-board .task-card h3,
+  .kanban-board .task-card h4,
+  .kanban-board .task-card h5,
+  .kanban-board .task-card h6,
+  .kanban-board .task-card p,
+  .kanban-board .task-card span,
+  .kanban-board .task-card div {
+    word-break: normal !important;
+    overflow-wrap: break-word !important;
+    white-space: normal !important;
   }
 
   .kanban-board .task-card-header,
@@ -1642,9 +1669,10 @@ select {
   /* Board - Mejorar columnas kanban */
   .kanban-column,
   .kanban-board>div {
+    /* Mantener consistente con el carrusel del board */
     min-width: 300px !important;
-    max-width: 300px !important;
-    width: 300px !important;
+    width: 92vw !important;
+    max-width: 520px !important;
   }
 
   /* Board stats cards */
