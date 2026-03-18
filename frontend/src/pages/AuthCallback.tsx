@@ -52,7 +52,30 @@ export default function AuthCallback() {
           }
         }
 
-        const { data, error } = await supabase.auth.getSession();
+        // Read session (sometimes needs a brief delay after exchange in some browsers)
+        const readSession = async () => {
+          const { data, error } = await supabase.auth.getSession();
+          return { data, error };
+        };
+
+        let { data, error } = await readSession();
+
+        // Retry once if session is not yet available
+        if (!data.session && !error) {
+          await new Promise((r) => setTimeout(r, 250));
+          ({ data, error } = await readSession());
+        }
+
+        // If still missing, attempt refresh (handles some edge cases)
+        if (!data.session && !error) {
+          try {
+            await supabase.auth.refreshSession();
+            ({ data, error } = await readSession());
+          } catch {
+            // ignore
+          }
+        }
+
         if (error) {
           showToast("Error obteniendo sesión de Google", "error");
           navigate("/login", { replace: true });
