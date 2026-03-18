@@ -5,6 +5,7 @@ import { setToken, isAuthed } from "../auth/token";
 import { useToast } from "../contexts/ToastContext";
 import { useTheme } from "../contexts/ThemeContext";
 import { useUserUsageType } from "../hooks/useUserUsageType";
+import { supabase } from "../api/supabase";
 import "../styles/auth.css";
 
 export default function Auth() {
@@ -13,7 +14,7 @@ export default function Auth() {
   const [searchParams] = useSearchParams();
   const { showToast } = useToast();
   const [isRegisterMode, setIsRegisterMode] = useState(location.pathname === "/register");
-  
+
   // Form states
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
@@ -25,7 +26,7 @@ export default function Auth() {
   const { theme } = useTheme();
 
   const { usageType, loading: loadingUsageType } = useUserUsageType();
-  
+
   // Si ya está autenticado, redirigir según el tipo de uso
   useEffect(() => {
     if (isAuthed() && !loadingUsageType) {
@@ -171,7 +172,7 @@ export default function Auth() {
       }
     } catch (ex: any) {
       let errorMsg = "Error al registrarse";
-      
+
       // Manejar error 409 (Conflict) - Email ya registrado
       if (ex?.response?.status === 409) {
         errorMsg = "Este email ya está registrado. Por favor, inicia sesión o usa otro email.";
@@ -208,81 +209,23 @@ export default function Auth() {
     try {
       setLoading(true);
       setErr(null);
-      
-      // Verificar si Google está disponible
-      if (!window.google) {
-        showToast("Google Sign-In no está disponible. Por favor, usa email y contraseña.", "info");
-        setLoading(false);
-        return;
-      }
 
-      // Usar Google Identity Services
-      window.google.accounts.id.initialize({
-        client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID || "",
-        callback: async (response: any) => {
-          try {
-            // Decodificar el token JWT de Google
-            const payload = JSON.parse(atob(response.credential.split('.')[1]));
-            
-            // Enviar el token al backend
-            const res = await http.post("/api/auth/google", {
-              idToken: response.credential,
-              email: payload.email,
-              fullName: payload.name,
-              profilePictureUrl: payload.picture,
-            });
-
-            if (res.data?.token) {
-              setToken(res.data.token);
-              showToast("Inicio de sesión con Google exitoso", "success");
-              navigate("/org-select", { replace: true });
-            }
-          } catch (ex: any) {
-            const errorMsg = ex?.response?.data?.message ?? ex.message ?? "Error al iniciar sesión con Google";
-            setErr(errorMsg);
-            showToast(errorMsg, "error");
-          } finally {
-            setLoading(false);
-          }
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: "google",
+        options: {
+          redirectTo: `${window.location.origin}/auth/callback`,
         },
       });
 
-      window.google.accounts.id.prompt((notification: any) => {
-        if (notification.isNotDisplayed() || notification.isSkippedMoment()) {
-          // Si no se muestra el prompt, usar popup manual
-          window.google?.accounts.oauth2.initTokenClient({
-            client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID || "",
-            scope: "email profile",
-            callback: async (tokenResponse: any) => {
-              try {
-                const userInfo = await fetch(`https://www.googleapis.com/oauth2/v2/userinfo?access_token=${tokenResponse.access_token}`);
-                const userData = await userInfo.json();
-                
-                const res = await http.post("/api/auth/google", {
-                  idToken: tokenResponse.access_token,
-                  email: userData.email,
-                  fullName: userData.name,
-                  profilePictureUrl: userData.picture,
-                });
-
-                if (res.data?.token) {
-                  setToken(res.data.token);
-                  showToast("Inicio de sesión con Google exitoso", "success");
-                  navigate("/org-select", { replace: true });
-                }
-              } catch (ex: any) {
-                const errorMsg = ex?.response?.data?.message ?? ex.message ?? "Error al iniciar sesión con Google";
-                setErr(errorMsg);
-                showToast(errorMsg, "error");
-              } finally {
-                setLoading(false);
-              }
-            },
-          }).requestAccessToken();
-        }
-      });
+      if (error) {
+        const msg = error?.message ?? "No se pudo iniciar sesión con Google";
+        setErr(msg);
+        showToast(msg, "error");
+        setLoading(false);
+      }
     } catch (error: any) {
-      showToast("Error al iniciar sesión con Google. Usa email y contraseña.", "error");
+      const msg = error?.message ?? "Error al iniciar sesión con Google. Usa email y contraseña.";
+      showToast(msg, "error");
       setLoading(false);
     }
   };
@@ -408,9 +351,9 @@ export default function Auth() {
                   margin: "0 auto 24px auto",
                 }}
               >
-                <img 
-                  src="/logolanding.png" 
-                  alt="ChroneTask Logo" 
+                <img
+                  src="/logolanding.png"
+                  alt="ChroneTask Logo"
                   className="auth-logo"
                   style={{
                     width: "100%",
@@ -451,9 +394,9 @@ export default function Auth() {
                   margin: "0 auto 24px auto",
                 }}
               >
-                <img 
-                  src="/logolanding.png" 
-                  alt="ChroneTask Logo" 
+                <img
+                  src="/logolanding.png"
+                  alt="ChroneTask Logo"
                   className="auth-logo"
                   style={{
                     width: "100%",

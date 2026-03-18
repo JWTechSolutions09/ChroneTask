@@ -7,6 +7,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using Microsoft.EntityFrameworkCore;
+using System.Text.Json;
 
 namespace ChroneTask.Api.Controllers;
 
@@ -16,6 +17,9 @@ public class AuthController : ControllerBase
 {
     private readonly ChroneTaskDbContext _db;
     private readonly IConfiguration _config;
+    private static JsonWebKeySet? _supabaseJwksCache;
+    private static DateTime _supabaseJwksFetchedAt = DateTime.MinValue;
+    private static readonly SemaphoreSlim _supabaseJwksLock = new(1, 1);
 
     public AuthController(ChroneTaskDbContext db, IConfiguration config)
     {
@@ -239,6 +243,119 @@ public class AuthController : ControllerBase
                 message = ex.Message
             });
         }
+    }
+
+    public class SupabaseLoginRequest
+    {
+        public string AccessToken { get; set; } = string.Empty; // Supabase JWT access token
+    }
+
+    [HttpPost("supabase")]
+    public async Task<IActionResult> SupabaseLogin([FromBody] SupabaseLoginRequest request)
+    {
+        try
+        {
+            if (string.IsNullOrWhiteSpace(request.AccessToken))
+                return BadRequest(new { message = "Supabase access token is required" });
+
+            var supabaseUrl = _config["Supabase:Url"] ?? Environment.GetEnvironmentVariable("SUPABASE_URL");
+            if (string.IsNullOrWhiteSpace(supabaseUrl))
+                return StatusCode(500, new { message = "Supabase URL not configured (Supabase:Url / SUPABASE_URL)" });
+
+            supabaseUrl = supabaseUrl.Trim().TrimEnd('/');
+            var jwksUrl = _config["Supabase:JwksUrl"] ??
+                          Environment.GetEnvironmentVariable("SUPABASE_JWKS_URL") ??
+                          $"{supabaseUrl}/auth/v1/.well-known/jwks.json";
+
+            var principal = await ValidateSupabaseJwtAsync(request.AccessToken, supabaseUrl, jwksUrl);
+            if (principal == null)
+                return Unauthorized(new { message = "Invalid Supabase token" });
+
+            var email = principal.Claims.FirstOrDefault(c => c.Type == "email")?.Value
+                        ?? principal.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
+
+            if (string.IsNullOrWhiteSpace(email))
+                return Unauthorized(new { message = "Supabase token missing email claim" });
+
+            var normalizedEmail = email.Trim().ToLowerInvariant();
+
+            var user = await _db.Users.FirstOrDefaultAsync(x => x.Email == normalizedEmail);
+            if (user == null)
+            {
+                // Optional: try to get a display name
+                var name = principal.Claims.FirstOrDefault(c => c.Type == "name")?.Value
+                           ?? principal.Claims.FirstOrDefault(c => c.Type == "full_name")?.Value
+                           ?? normalizedEmail.Split('@').FirstOrDefault()
+                           ?? "Usuario";
+
+                // Optional: avatar url (Supabase often stores it under user_metadata, not always in JWT)
+                var avatar = principal.Claims.FirstOrDefault(c => c.Type == "avatar_url")?.Value;
+
+                user = new User
+                {
+                    FullName = name,
+                    Email = normalizedEmail,
+                    PasswordHash = BCrypt.Net.BCrypt.HashPassword(Guid.NewGuid().ToString()),
+                    ProfilePictureUrl = string.IsNullOrWhiteSpace(avatar) ? null : avatar
+                };
+
+                _db.Users.Add(user);
+                await _db.SaveChangesAsync();
+            }
+
+            var token = GenerateToken(user);
+            return Ok(new { token });
+        }
+        catch (SecurityTokenException)
+        {
+            return Unauthorized(new { message = "Invalid Supabase token" });
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"❌ Error en SupabaseLogin: {ex.Message}");
+            return StatusCode(500, new { error = "Internal Server Error", message = ex.Message });
+        }
+    }
+
+    private static async Task<ClaimsPrincipal?> ValidateSupabaseJwtAsync(string jwt, string supabaseUrl, string jwksUrl)
+    {
+        // Cache JWKS for 12 hours
+        if (_supabaseJwksCache == null || (DateTime.UtcNow - _supabaseJwksFetchedAt) > TimeSpan.FromHours(12))
+        {
+            await _supabaseJwksLock.WaitAsync();
+            try
+            {
+                if (_supabaseJwksCache == null || (DateTime.UtcNow - _supabaseJwksFetchedAt) > TimeSpan.FromHours(12))
+                {
+                    using var http = new HttpClient();
+                    var json = await http.GetStringAsync(jwksUrl);
+                    _supabaseJwksCache = new JsonWebKeySet(json);
+                    _supabaseJwksFetchedAt = DateTime.UtcNow;
+                }
+            }
+            finally
+            {
+                _supabaseJwksLock.Release();
+            }
+        }
+
+        var issuer = $"{supabaseUrl}/auth/v1";
+
+        var handler = new JwtSecurityTokenHandler();
+        var tvp = new TokenValidationParameters
+        {
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKeys = _supabaseJwksCache!.Keys,
+            ValidateIssuer = true,
+            ValidIssuer = issuer,
+            ValidateAudience = true,
+            ValidAudience = "authenticated",
+            ValidateLifetime = true,
+            ClockSkew = TimeSpan.FromMinutes(2)
+        };
+
+        var principal = handler.ValidateToken(jwt, tvp, out _);
+        return principal;
     }
 
     private string GenerateToken(User user)

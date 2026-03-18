@@ -3,6 +3,7 @@ import { Routes, Route, Navigate, useNavigate } from "react-router-dom";
 import Landing from "./pages/Landing";
 import Access from "./pages/Access";
 import Auth from "./pages/Auth";
+import AuthCallback from "./pages/AuthCallback";
 import Onboarding from "./pages/Onboarding";
 import Orgs from "./pages/Orgs";
 import OrgSelect from "./pages/OrgSelect";
@@ -166,6 +167,14 @@ function AppContent() {
                 element={
                     <PublicRoute>
                         <Auth />
+                    </PublicRoute>
+                }
+            />
+            <Route
+                path="/auth/callback"
+                element={
+                    <PublicRoute>
+                        <AuthCallback />
                     </PublicRoute>
                 }
             />
