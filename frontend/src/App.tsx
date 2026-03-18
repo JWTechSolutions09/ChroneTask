@@ -4,6 +4,8 @@ import Landing from "./pages/Landing";
 import Access from "./pages/Access";
 import Auth from "./pages/Auth";
 import AuthCallback from "./pages/AuthCallback";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
+import TermsOfService from "./pages/TermsOfService";
 import Onboarding from "./pages/Onboarding";
 import Orgs from "./pages/Orgs";
 import OrgSelect from "./pages/OrgSelect";
@@ -153,6 +155,14 @@ function AppContent() {
             <Route
                 path="/access"
                 element={<Access />}
+            />
+            <Route
+                path="/privacy"
+                element={<PrivacyPolicy />}
+            />
+            <Route
+                path="/terms"
+                element={<TermsOfService />}
             />
             <Route
                 path="/login"

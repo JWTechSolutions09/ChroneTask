@@ -509,7 +509,40 @@ export default function Landing() {
               </div>
             </div>
             <div className="cta-footer">
-              <p>Desarrollado con ❤️ por <strong>JW TECH SOLUTIONS</strong></p>
+              <p>
+                Desarrollado por <strong>JW TECH SOLUTIONS</strong> •{" "}
+                <button
+                  type="button"
+                  onClick={() => navigate("/privacy")}
+                  style={{
+                    background: "transparent",
+                    border: "none",
+                    padding: 0,
+                    color: "var(--landing-text-secondary)",
+                    cursor: "pointer",
+                    textDecoration: "underline",
+                    fontWeight: 600,
+                  }}
+                >
+                  Política de Privacidad
+                </button>
+                {" "}•{" "}
+                <button
+                  type="button"
+                  onClick={() => navigate("/terms")}
+                  style={{
+                    background: "transparent",
+                    border: "none",
+                    padding: 0,
+                    color: "var(--landing-text-secondary)",
+                    cursor: "pointer",
+                    textDecoration: "underline",
+                    fontWeight: 600,
+                  }}
+                >
+                  Términos de Servicio
+                </button>
+              </p>
             </div>
           </div>
         </div>
