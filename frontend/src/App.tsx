@@ -158,6 +158,10 @@ function AppContent() {
             />
             <Route
                 path="/privacy"
+                element={<Navigate to="/PoliticaDePrivacidad" replace />}
+            />
+            <Route
+                path="/PoliticaDePrivacidad"
                 element={<PrivacyPolicy />}
             />
             <Route

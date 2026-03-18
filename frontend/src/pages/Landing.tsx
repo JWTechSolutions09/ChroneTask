@@ -513,7 +513,7 @@ export default function Landing() {
                 Desarrollado por <strong>JW TECH SOLUTIONS</strong> •{" "}
                 <button
                   type="button"
-                  onClick={() => navigate("/privacy")}
+                  onClick={() => navigate("/PoliticaDePrivacidad")}
                   style={{
                     background: "transparent",
                     border: "none",
@@ -561,7 +561,7 @@ export default function Landing() {
             <a href="#how-it-works" onClick={(e) => { e.preventDefault(); scrollToSection(howItWorksRef); }}>Cómo Funciona</a>
             <button
               type="button"
-              onClick={() => navigate("/privacy")}
+              onClick={() => navigate("/PoliticaDePrivacidad")}
               style={{
                 background: "transparent",
                 border: "none",
