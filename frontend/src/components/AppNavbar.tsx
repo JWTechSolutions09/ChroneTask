@@ -1,11 +1,13 @@
 import React, { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { clearToken } from "../auth/token";
+import { useTheme } from "../contexts/ThemeContext";
 
 const AppNavbar: React.FC = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
+  const { theme, toggleTheme } = useTheme();
 
   const navItems: { label: string; path: string; icon: string }[] = [
     { label: "Dashboard", path: "/personal/dashboard", icon: "🏠" },
@@ -13,6 +15,7 @@ const AppNavbar: React.FC = () => {
     { label: "Calendario", path: "/personal/calendar", icon: "📅" },
     { label: "Cronograma", path: "/personal/timeline", icon: "📆" },
     { label: "Notas", path: "/personal/notes", icon: "📝" },
+    { label: "Configuración", path: "/settings", icon: "⚙️" },
   ];
 
   const isActive = (path: string) =>
@@ -77,6 +80,19 @@ const AppNavbar: React.FC = () => {
               <span>{item.label}</span>
             </button>
           ))}
+
+          {/* Toggle tema (solo acción, sin navegación) */}
+          <button
+            className="app-nav-link"
+            onClick={() => {
+              toggleTheme();
+              setMobileOpen(false);
+            }}
+          >
+            <span className="app-nav-link-icon">{theme === "dark" ? "☀️" : "🌙"}</span>
+            <span>{theme === "dark" ? "Modo Claro" : "Modo Oscuro"}</span>
+          </button>
+
           <button className="app-nav-link app-nav-link-primary" onClick={handleLogout}>
             <span className="app-nav-link-icon">🚪</span>
             <span>Salir</span>
